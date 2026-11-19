@@ -38,19 +38,24 @@ Sanctum/
 │   └── systems/
 │       ├── LightingSystem.js   # Merged-wall analytical 2D lighting, 9-band Bayer dither, additive 16-color RGB
 │       ├── SpriteRegistry.js   # Loads /data/sprites.json hex-grids into fast Uint8Array frames
-│       ├── AudioPSG.js         # Lanthorn-PSG core port: dual-oscillator synth, DSP modifiers, 3-layer painter, Web Audio
+│       ├── AudioPSG.js         # Lanthorn-PSG core: dual-oscillator synth, DSP modifiers, Macro FX, spatial audio, HiFi/LoFi
+│       ├── AudioWorker.js      # Background Web Worker for off-thread DSP waveform rendering & pattern synthesis
+│       ├── MusicPlayer.js      # Modular .csv tracker project engine, event-driven sections (explore, combat, descent, boss)
 │       ├── Renderer.js         # Dual-canvas rendering pipeline, camera lock, subpixel sprite/entity stamping, UI overlay
 │       ├── Interpolator.js     # 15 Hz snapshot buffer -> smooth 60+ FPS entity interpolation
-│       ├── HUDController.js    # In-game DOM HUD, Character Sheet (C), Inventory (I), Pause/Invite
+│       ├── HUDController.js    # In-game DOM HUD, Character Sheet (C), Inventory (I), Audio Settings, Pause/Invite
 │       ├── InputController.js  # Mouse world projection, LMB move/attack lock, RMB skill, visibility culling, hotkeys
 │       └── MenuController.js   # Auth flow, Hero Roster, Multiplayer Lobby Browser, Invite links
-└── data/                       # Moddable JSON content tables & SQLite storage
+└── data/                       # Moddable JSON content tables, tracker CSVs & SQLite storage
     ├── classes.json            # Playable archetypes (VANGUARD, ARCANIST, SHADOW)
     ├── monsters.json           # Monster definitions (crawler, brute)
     ├── items.json              # Base equipment definitions across 4 slots (weapon, armor, gloves, ring)
     ├── affixes.json            # Item prefixes and suffixes
     ├── sprites.json            # Palette-indexed 16-color hex-grid micro-sprites (tiles, entities, objects)
     ├── sfx.json                # Lanthorn-PSG compatible SFX patches (hit, crit, spark, potion, level_up, etc.)
+    ├── music/                  # Modular Lanthorn-PSG v1.1 .csv tracker projects
+    │   ├── sanctum_cathedral.csv # 8-channel cathedral/dungeon suite (Mist & Toll, Butcher's Hall, etc.)
+    │   └── sanctum_town.csv    # 8-channel atmospheric town/hearth suite
     └── saves/
         └── sanctum.db          # SQLite database (WAL mode)
 ```
@@ -122,12 +127,47 @@ Sanctum uses a pure real-time 2D line-of-sight lighting engine (no explored/unex
    * Camera locks directly to the local player's interpolated position (`myP.rx`, `myP.ry`).
    * Renders crisp selection rings, monster health bars, player nametags, floating combat text (`DAMAGE`, `CRIT`, `HEAL`, `LEVEL UP!`, `Too Heavy!`), and hovered loot tooltips with 1px offset drop shadows.
 
-### Lanthorn-PSG Audio Engine (`AudioPSG.js` & `data/sfx.json`)
-* Ported directly from `Edwigeon/Lanthorn-PSG` (`Oscillator` + `Modifiers` + preset JSON schema) into pure JS `Float32Array` DSP:
-  * **Dual Oscillator (`Oscillator`)**: Continuous phase integration supporting `sine`, `square` (static or array PWM `duty_cycle`), `sawtooth`, `triangle`, and deterministic LFSR `noise`, with `wave_type_2` + `mix` blending.
-  * **Modifiers (`Modifiers`)**: `applyADSR`, `applyTremolo`, `generateVibratoProfile`, `generateSlideProfile`, `generatePitchSweep`, `generatePWMProfile`, `applySaturation` (`Math.tanh`), `applyBitcrush`, `applyRingMod`, `applyRetrigger`, and multi-tap `applyEcho`.
-  * **Visual SFX Painter (`renderPainterPatch`)**: Supports PICO-8 / Lanthorn-style 3-layer 32-step `patch.painter` definitions (`step_ms`, `slide`, per-layer waveform/duty, 32-step MIDI pitch & `0..7` volume arrays) routed through the same FX chain (`ring_mod`, `saturation`, `bit_depth`, `echo`) and authored visually in `/dev`.
-  * **Cached Web Audio Playback**: Pre-renders each named SFX patch (parametric, multi-note arpeggio via `notes[]`, or 3-layer `painter`) once into an `AudioBuffer` at `22050 Hz` and plays it with slight `pitchJitter`, anti-spam throttling, and spatial `StereoPannerNode` panning based on world X position (`M` toggles mute).
+### Lanthorn-PSG Audio & Interactive Music Engine (`AudioPSG.js`, `AudioWorker.js`, `MusicPlayer.js`)
+Sanctum embeds a sample-accurate, zero-dependency procedural audio engine ported directly from `Edwigeon/Lanthorn-PSG` (`Oscillator` + `Modifiers` + `.sfx.csv` / `.csv` project schema) into pure `Float32Array` DSP:
+
+1. **Dual Oscillator & DSP Modifier Core (`Oscillator`, `Modifiers`)**:
+   * **Oscillator (`Oscillator`)**: Continuous phase integration supporting `sine`, `square` (static or array PWM `duty_cycle`), `sawtooth`, `triangle`, and deterministic LFSR `noise`, with `wave_type_2` + `mix` dual-oscillator blending.
+   * **Modifiers (`Modifiers`)**: `applyADSR`, `applyTremolo`, `generateVibratoProfile`, `generateSlideProfile`, `generatePitchSweep`, `generatePWMProfile`, `applySaturation` (`Math.tanh`), `applyBitcrush`, `applyRingMod`, `applyRetrigger`, and multi-tap `applyEcho`.
+   * **Visual SFX Painter (`renderPainterPatch`)**: Supports PICO-8 / Lanthorn-style 3-layer 32-step `patch.painter` definitions (`step_ms`, `slide`, per-layer waveform/duty, 32-step MIDI pitch & `0..7` volume arrays) routed through the same FX chain and authored visually in `/dev`.
+   * **Sequential `fx_chain` & Macro Overrides (`!CMD XX`)**: Implements sequential modifier chains (`SAT`, `BIT`, `ECH`, `RNG`, `RET`, `TRM`) with event-level `!CMD` overrides that dynamically replace specific effects without duplicating patches.
+
+2. **Hierarchical Web Audio Routing & Game-State Macro FX**:
+   * **Bus Topology**:
+     $$\text{SFX Bus} + \text{Music Bus} \longrightarrow \text{Submix Bus} + \text{Environmental Delay Bus} \longrightarrow \text{Low-Health Filter} \longrightarrow \text{Master Gain} \longrightarrow \text{Destination}$$
+   * **Low-Health Tension Macro**: When local player HP $\le 25\%$, an automated `BiquadFilterNode` (lowpass) sweeps from $22,000\text{ Hz}$ down to $450\text{ Hz}$ with resonance $Q = 2.2$, creating a tense, muffled heartbeat soundscape. Heals smoothly restore full frequency range.
+   * **Environmental Echo / Reverb Macro**: In caverns or deep cathedral halls, a wet delay/reverb feedback send ($220\text{ ms}$ delay, $35\%$ feedback) engages dynamically.
+   * **Dedicated Volume Controls**: Independent Master, SFX, and Music volume sliders with real-time numeric readouts, persistent `localStorage` synchronization (`sanctum_audio_settings`), and quick mute toggles (`🔊 / 🔇`, hotkey `M`).
+
+3. **Player Proximity SFX & 2D Spatialization**:
+   * Local player coordinates $(rx, ry)$ update the audio listener position each frame.
+   * **Distance Attenuation**: World sound events (`hit`, `crit`, `potion`, player deaths) attenuate via non-linear Euclidean distance rolloff:
+     $$\text{norm} = 1.0 - \frac{\text{dist}}{260\text{ px}}, \quad \text{gain} = \text{norm}^{1.4}$$
+   * **Dynamic Stereo Panning**: Off-center sound sources pan naturally left-to-right through a `StereoPannerNode` ($\text{pan} \in [-0.85, 0.85]$).
+   * **Distance Culling**: Sounds beyond hearing radius ($> 260\text{ px}$) cull immediately before node allocation, saving CPU and audio nodes.
+
+4. **Multi-Rate DSP Switching (Hi-Fi vs. Lo-Fi Retro Mode)**:
+   * **Lo-Fi Retro (`11,025 Hz`)**: Authentically recreates early 90s tracker grit while reducing CPU synthesis cycles and RAM usage by ~75%.
+   * **Standard (`22,050 Hz`)**: Default balanced fidelity.
+   * **Hi-Fi Studio (`44,100 Hz`)**: High-resolution studio reproduction.
+   * Switching quality modes in the Pause Menu automatically re-instantiates DSP math, flushes cached buffers, updates the background worker, and persists settings.
+
+5. **Background Thread Synthesis (`AudioWorker.js`)**:
+   * Offloads waveform math, pattern rendering, and DSP modifier chains to a dedicated background Web Worker.
+   * Utilizes zero-copy Transferable `ArrayBuffer` handoffs (`postMessage(..., [samples.buffer])`), keeping the main render loop locked at 60+ FPS without garbage collection pauses.
+
+6. **Interactive Tracker Music Player (`MusicPlayer.js`)**:
+   * Parses native Lanthorn-PSG v1.1 `.csv` tracker project files (`/data/music/sanctum_cathedral.csv`, `sanctum_town.csv`).
+   * **Event-Driven Modular Sections**:
+     * `explore`: Cycles atmospheric exploration patterns (`A`, `B`, `C`, `H` — *"Mist & Toll"*, *"Tristram Dusk"*, *"Cello Lament"*, *"Hollow Silence"*).
+     * `combat`: Engages seamlessly when hostile monsters aggro or enter melee range (`F`, `G` — *"The Butcher's Hall"*, *"Labyrinth Tension"*).
+     * `descent`: Immediate transition cue (`D` — *"Descent into Crypt"*) upon taking stairs down.
+     * `boss`: Climax battle patterns (`E`, `F` — *"Cathedral Arpeggio"*, *"The Butcher's Hall"*).
+   * **Seamless Inter-Pattern Looping**: Disables the per-pattern brickwall limiter to ensure seamless volume continuity across pattern loops and state transitions without ducking.
 
 ### Snapshot Interpolation (`Interpolator.js`)
 * Buffers up to 6 incoming `WORLD_SNAPSHOT` packets (broadcast at 15 Hz).
