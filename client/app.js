@@ -25,7 +25,7 @@ const renderer = new Renderer({ sprites });
 const audio = new AudioPSG();
 audio.loadManifest('/data/sfx.json');
 const music = new MusicPlayer({ audio });
-music.setBiome('town', { immediate: false });
+music.setBiome('cathedral', { immediate: false });
 sprites.load('/data/sprites.json').then((ok) => {
   if (ok && dungeon) renderer.bakeDungeonBuffer(dungeon);
 });
@@ -66,7 +66,7 @@ function exitToMainMenu() {
     ws.close();
     ws = null;
   }
-  music.setBiome('town', { fadeSec: 1.5 });
+  music.setBiome('cathedral', { fadeSec: 1.5 });
   myPlayerId = null;
   dungeon = null;
   latestSnapshot = null;
@@ -133,8 +133,8 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       if (packet.data.floor) {
         hud.setFloorStatus(packet.data.floor);
       }
-      // Enter dungeon audio suite only when transitioning from town/menu or initial start
-      if (music.currentSuiteName === 'town' || !music.isPlaying) {
+      // Keep cathedral theme playing seamlessly from title into dungeon
+      if (!music.isPlaying) {
         music.setBiome('cathedral', { immediate: false, fadeSec: 1.5 });
       }
     } else if (packet.type === PACKET_TYPES.WORLD_SNAPSHOT) {
