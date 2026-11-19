@@ -6,6 +6,7 @@
  */
 
 import { noteToMidi, midiToFreq } from './AudioPSG.js';
+import { MusicDatabase } from './MusicDatabase.js';
 
 export const TRACK_SUITES = {
   town: '/data/music/sanctum_town.csv',
@@ -20,6 +21,8 @@ export class MusicPlayer {
   constructor({ audio }) {
     this.audio = audio;
     this.ctx = null;
+    this.db = new MusicDatabase();
+    this.soundtrackBundlePromise = null;
 
     // Multi-suite cache: suiteName -> { header, patches, orderList, patterns, patternBuffers }
     this.suiteCache = new Map();
@@ -101,6 +104,35 @@ export class MusicPlayer {
     if (this.suiteCache.has(suiteName)) {
       return this.suiteCache.get(suiteName);
     }
+
+    // 1. Fast path: Check IndexedDB database for pre-compiled suite
+    if (this.db) {
+      try {
+        const cached = await this.db.getSuite(suiteName);
+        if (cached && cached.patterns && cached.patches) {
+          if (!cached.patternBuffers) cached.patternBuffers = new Map();
+          this.suiteCache.set(suiteName, cached);
+          return cached;
+        }
+      } catch (_) {}
+    }
+
+    // 2. Pre-packed soundtrack JSON bundle (/data/music/soundtrack.json)
+    if (!this.soundtrackBundlePromise) {
+      this.soundtrackBundlePromise = fetch('/data/music/soundtrack.json')
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null);
+    }
+    const bundle = await this.soundtrackBundlePromise;
+    if (bundle && bundle[suiteName]) {
+      const suiteData = bundle[suiteName];
+      suiteData.patternBuffers = new Map();
+      this.suiteCache.set(suiteName, suiteData);
+      if (this.db) this.db.saveSuite(suiteName, suiteData).catch(() => {});
+      return suiteData;
+    }
+
+    // 3. Fallback: individual CSV fetch & parse
     const url = TRACK_SUITES[suiteName];
     if (!url) return null;
 
@@ -110,6 +142,7 @@ export class MusicPlayer {
       const text = await res.text();
       const suiteData = this.parseCSV(text);
       this.suiteCache.set(suiteName, suiteData);
+      if (this.db) this.db.saveSuite(suiteName, suiteData).catch(() => {});
       return suiteData;
     } catch (err) {
       console.warn(`[MusicPlayer] Failed to load suite '${suiteName}':`, err.message);
@@ -231,6 +264,33 @@ export class MusicPlayer {
     return p.numSteps * stepSec;
   }
 
+  async ensurePatternBuffer(suiteData, patternId) {
+    if (suiteData.patternBuffers.has(patternId)) {
+      return suiteData.patternBuffers.get(patternId);
+    }
+
+    const sampleRate = this.audio.sampleRate;
+    // Fast path: Retrieve pre-rendered binary PCM buffer from IndexedDB database
+    if (this.db) {
+      try {
+        const pcmBuffer = await this.db.getPatternPCM(this.currentSuiteName, patternId, sampleRate);
+        if (pcmBuffer && pcmBuffer.byteLength > 0) {
+          const ctx = this.audio.ensureContext();
+          if (ctx) {
+            const floatArr = new Float32Array(pcmBuffer);
+            const buf = ctx.createBuffer(1, floatArr.length, sampleRate);
+            buf.copyToChannel(floatArr, 0);
+            suiteData.patternBuffers.set(patternId, buf);
+            return buf;
+          }
+        }
+      } catch (_) {}
+    }
+
+    // Fallback: Synthesize via DSP math and persist binary buffer to IndexedDB
+    return this.renderPatternToBuffer(suiteData, patternId);
+  }
+
   renderPatternToBuffer(suiteData, patternId) {
     if (suiteData.patternBuffers.has(patternId)) {
       return suiteData.patternBuffers.get(patternId);
@@ -278,6 +338,15 @@ export class MusicPlayer {
     const buf = ctx.createBuffer(1, totalSamples, sampleRate);
     buf.copyToChannel(mixed, 0);
     suiteData.patternBuffers.set(patternId, buf);
+
+    // Save binary Float32Array ArrayBuffer to IndexedDB database for instant future reads
+    if (this.db) {
+      try {
+        const copyBuffer = mixed.buffer.slice(0);
+        this.db.savePatternPCM(this.currentSuiteName, patternId, sampleRate, copyBuffer).catch(() => {});
+      } catch (_) {}
+    }
+
     return buf;
   }
 
@@ -291,17 +360,20 @@ export class MusicPlayer {
     }
 
     if (immediate || !this.isPlaying) {
+      const isFirstPlay = !this.isPlaying;
       this.currentSection = sectionName;
       this.sectionIndex = 0;
       this.pendingSection = null;
-      this.transitionToActiveSection(fadeSec);
+      // Snappy 50ms de-click attack on initial boot, smooth fadeSec for live crossfades
+      const attackSec = isFirstPlay ? 0.05 : fadeSec;
+      this.transitionToActiveSection(attackSec);
     } else {
       // Beat-quantized transition: queue next section to start on the next pattern boundary
       this.pendingSection = sectionName;
     }
   }
 
-  transitionToActiveSection(fadeSec = 1.0) {
+  async transitionToActiveSection(fadeSec = 1.0) {
     const ctx = this.ensureVoiceGraph();
     if (!ctx) return;
 
@@ -332,7 +404,9 @@ export class MusicPlayer {
     const sections = this.suiteSections[this.currentSuiteName] || this.suiteSections.crypts;
     const patternList = sections[this.currentSection] || sections.explore;
     const patternId = patternList[this.sectionIndex % patternList.length];
-    const buffer = this.renderPatternToBuffer(suiteData, patternId);
+
+    // Fast path: Retrieve from IndexedDB or buffer cache
+    const buffer = await this.ensurePatternBuffer(suiteData, patternId);
     const patternDur = this.getPatternDuration(suiteData, patternId);
 
     if (buffer) {
@@ -341,24 +415,29 @@ export class MusicPlayer {
       src.connect(newGain);
 
       // Ramp in incoming voice smoothly
-      newGain.gain.setValueAtTime(0.0001, now);
-      newGain.gain.linearRampToValueAtTime(1.0, now + fadeSec);
+      const playNow = ctx.currentTime;
+      newGain.gain.setValueAtTime(0.0001, playNow);
+      newGain.gain.linearRampToValueAtTime(1.0, playNow + fadeSec);
 
-      src.start(now);
+      src.start(playNow);
       this.voiceSources[newIdx] = src;
-      this.nextScheduledTime = now + patternDur;
+      this.nextScheduledTime = playNow + patternDur;
     } else {
-      this.nextScheduledTime = now + 4.0;
+      this.nextScheduledTime = ctx.currentTime + 4.0;
     }
 
     this.isPlaying = true;
     this.sectionIndex++;
 
-    const delayMs = Math.max(50, (this.nextScheduledTime - now - 0.3) * 1000);
+    const delayMs = Math.max(50, (this.nextScheduledTime - ctx.currentTime - 0.3) * 1000);
     this.scheduleTimer = setTimeout(() => this.scheduleNext(), delayMs);
+
+    // Eagerly pre-warm upcoming pattern buffer in background
+    const nextPatternId = patternList[this.sectionIndex % patternList.length];
+    this.ensurePatternBuffer(suiteData, nextPatternId).catch(() => {});
   }
 
-  scheduleNext() {
+  async scheduleNext() {
     if (!this.isPlaying) return;
     const ctx = this.ensureVoiceGraph();
     if (!ctx) return;
@@ -375,7 +454,7 @@ export class MusicPlayer {
     const sections = this.suiteSections[this.currentSuiteName] || this.suiteSections.crypts;
     const patternList = sections[this.currentSection] || sections.explore;
     const patternId = patternList[this.sectionIndex % patternList.length];
-    const buffer = this.renderPatternToBuffer(suiteData, patternId);
+    const buffer = await this.ensurePatternBuffer(suiteData, patternId);
     const patternDur = this.getPatternDuration(suiteData, patternId);
 
     if (buffer) {
@@ -397,6 +476,10 @@ export class MusicPlayer {
     const delayMs = Math.max(50, (this.nextScheduledTime - ctx.currentTime - 0.3) * 1000);
     clearTimeout(this.scheduleTimer);
     this.scheduleTimer = setTimeout(() => this.scheduleNext(), delayMs);
+
+    // Eagerly pre-warm upcoming pattern in background
+    const nextPatternId = patternList[this.sectionIndex % patternList.length];
+    this.ensurePatternBuffer(suiteData, nextPatternId).catch(() => {});
   }
 
   stop({ fadeSec = 0.8 } = {}) {
@@ -422,6 +505,9 @@ export class MusicPlayer {
   clearCache() {
     for (const s of this.suiteCache.values()) {
       s.patternBuffers.clear();
+    }
+    if (this.db) {
+      this.db.clearAll().catch(() => {});
     }
   }
 }

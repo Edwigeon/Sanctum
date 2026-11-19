@@ -26,6 +26,18 @@ const audio = new AudioPSG();
 audio.loadManifest('/data/sfx.json');
 const music = new MusicPlayer({ audio });
 music.setBiome('cathedral', { immediate: false });
+
+// Instant AudioContext Unlock on first user gesture (mouse, touch, keypress)
+function unlockAudio() {
+  const ctx = audio.ensureContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+}
+window.addEventListener('pointerdown', unlockAudio, { capture: true, once: true });
+window.addEventListener('keydown', unlockAudio, { capture: true, once: true });
+window.addEventListener('click', unlockAudio, { capture: true, once: true });
+window.addEventListener('touchstart', unlockAudio, { capture: true, once: true });
 sprites.load('/data/sprites.json').then((ok) => {
   if (ok && dungeon) renderer.bakeDungeonBuffer(dungeon);
 });

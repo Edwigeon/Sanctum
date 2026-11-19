@@ -6,7 +6,8 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "cluster": "node server/cluster.js"
+    "cluster": "node server/cluster.js",
+    "pack:music": "node scripts/pack_soundtrack.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",

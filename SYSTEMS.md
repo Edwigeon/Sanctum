@@ -167,7 +167,12 @@ Sanctum embeds a sample-accurate, zero-dependency procedural audio engine ported
      * `tension`: Heightened suspense patterns (`E`, `F`) when hostile mobs are lurking in shadow radius (95–155 px) or local player HP $\le 25\%$.
      * `combat`: Driving combat patterns (`F`, `G`) engaging smoothly during close-quarters combat (< 95 px or locked target) with a 3.5s hysteresis cooldown.
      * **Zero Crossfade Interruption**: Tone shifts are queued on pattern loop boundaries (`pendingSection`), transitioning sample-accurately on measure starts without dipping volume, ducking, or DC pops.
-   * **Unified Root = D Modal Architecture**: All 6 soundtrack projects share **Root = D** as their harmonic tonal center, allowing seamless horizontal transitions with zero dissonance or key clashing:
+   * **Binary Audio Database & Sub-Millisecond Startup (`MusicDatabase.js`)**:
+     * **IndexedDB Binary Storage (`sanctum_audio_db`)**: Persists rendered `Float32Array` PCM buffers directly into client-side IndexedDB binary object stores (`rendered_pcm`). On subsequent sessions or page reloads, pattern buffers are retrieved in $\le 2\text{ ms}$, bypassing runtime waveform synthesis entirely.
+     * **Pre-Compiled Soundtrack Bundle (`/data/music/soundtrack.json`)**: Packed via `npm run pack:music` (`scripts/pack_soundtrack.js`), bundling all 6 project ASTs into a single fast-loading JSON payload and caching parsed suites in IndexedDB to avoid line-by-line CSV parsing on page boot.
+     * **Instant User-Gesture Audio Unlock**: Captures `pointerdown`, `keydown`, `touchstart`, and `click` on the window during the capture phase, instantly resuming the browser's `AudioContext` without waiting for UI event bubbling.
+     * **Immediate Startup Attack (50 ms)**: Initial boot applies a snappy 50 ms de-click attack ramp (`now + 0.05s`) rather than a slow 1.5s volume fade, ensuring the opening bell chime and 12-string guitar chord strike immediately.
+     * **Eager Pattern Pre-Warming**: Background threads automatically pre-render and cache upcoming pattern buffers 12 seconds in advance, ensuring zero dropped samples or render pauses at loop boundaries.
      * `town` (`/data/music/sanctum_town.csv`): **D Dorian / D Minor** (76 BPM) — Warm campfire hearth, gentle lute, cello lament, mellow drone.
      * `wilderness` (`/data/music/sanctum_wilderness.csv`): **D Aeolian** (84 BPM) — Moorland mist, ruins horn calls, driving percussion, wind.
      * `crypts` (`/data/music/sanctum_crypts.csv`): **D Phrygian** (76 BPM) — Torchlit nave, bone ossuary, crypt cello, tension dread.
