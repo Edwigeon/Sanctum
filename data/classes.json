@@ -1,0 +1,38 @@
+{
+  "VANGUARD": {
+    "id": "VANGUARD",
+    "name": "Vanguard",
+    "title": "Ironclad Striker",
+    "desc": "High armor & vitality. Excels at close-quarters melee.",
+    "stats": { "might": 16, "focus": 8, "agility": 10, "vitality": 16 },
+    "baseDmgMin": 8,
+    "baseDmgMax": 14,
+    "baseArmor": 6,
+    "baseSpeed": 1.4,
+    "baseCrit": 0.12
+  },
+  "ARCANIST": {
+    "id": "ARCANIST",
+    "name": "Arcanist",
+    "title": "Void Channeler",
+    "desc": "High mana & spell power. Empowers Spark projectiles.",
+    "stats": { "might": 8, "focus": 18, "agility": 12, "vitality": 12 },
+    "baseDmgMin": 5,
+    "baseDmgMax": 10,
+    "baseArmor": 3,
+    "baseSpeed": 1.4,
+    "baseCrit": 0.15
+  },
+  "SHADOW": {
+    "id": "SHADOW",
+    "name": "Shadow",
+    "title": "Swift Stalker",
+    "desc": "High agility & crit rate. Fast movement and lethal strikes.",
+    "stats": { "might": 12, "focus": 10, "agility": 18, "vitality": 10 },
+    "baseDmgMin": 7,
+    "baseDmgMax": 13,
+    "baseArmor": 4,
+    "baseSpeed": 1.6,
+    "baseCrit": 0.25
+  }
+}

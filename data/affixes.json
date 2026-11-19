@@ -1,0 +1,18 @@
+{
+  "prefixes": [
+    { "name": "Iron", "stat": "armor", "min": 1, "max": 3 },
+    { "name": "Blood", "stat": "dmg", "min": 1, "max": 3 },
+    { "name": "Runed", "stat": "focus", "min": 1, "max": 3 },
+    { "name": "Gilded", "stat": "vitality", "min": 1, "max": 3 },
+    { "name": "Dusk", "stat": "agility", "min": 1, "max": 3 },
+    { "name": "Titan", "stat": "might", "min": 1, "max": 3 }
+  ],
+  "suffixes": [
+    { "name": "of Precision", "stat": "crit", "min": 0.02, "max": 0.05, "isFloat": true },
+    { "name": "of Vitality", "stat": "hp", "min": 8, "max": 20 },
+    { "name": "of Slaying", "stat": "dmg", "min": 2, "max": 4 },
+    { "name": "of the Bastion", "stat": "armor", "min": 2, "max": 4 },
+    { "name": "of Haste", "stat": "agility", "min": 1, "max": 3 },
+    { "name": "of Echoes", "stat": "focus", "min": 1, "max": 3 }
+  ]
+}

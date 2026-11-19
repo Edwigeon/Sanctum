@@ -1,0 +1,20 @@
+{
+  "crawler": {
+    "id": "crawler",
+    "name": "Crypt Crawler",
+    "baseHp": 26,
+    "baseDmg": 7,
+    "speed": 0.72,
+    "aggroRange": 90,
+    "xp": 22
+  },
+  "brute": {
+    "id": "brute",
+    "name": "Bone Brute",
+    "baseHp": 40,
+    "baseDmg": 10,
+    "speed": 0.52,
+    "aggroRange": 85,
+    "xp": 34
+  }
+}

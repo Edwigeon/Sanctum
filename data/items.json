@@ -1,0 +1,28 @@
+{
+  "bases": {
+    "weapon": [
+      { "name": "Cleaver", "weight": 5.5, "baseStats": { "dmg": 3 } },
+      { "name": "Wand", "weight": 2.0, "baseStats": { "dmg": 2, "focus": 1 } },
+      { "name": "Dirk", "weight": 3.0, "baseStats": { "dmg": 2, "agility": 1 } },
+      { "name": "Longsword", "weight": 6.0, "baseStats": { "dmg": 4 } }
+    ],
+    "armor": [
+      { "name": "Brigandine", "weight": 7.5, "baseStats": { "armor": 3 } },
+      { "name": "Shroud", "weight": 4.0, "baseStats": { "armor": 2, "agility": 1 } },
+      { "name": "Cuirass", "weight": 9.0, "baseStats": { "armor": 4 } },
+      { "name": "Vestments", "weight": 3.5, "baseStats": { "armor": 2, "focus": 1 } }
+    ],
+    "gloves": [
+      { "name": "Spikegloves", "weight": 3.0, "baseStats": { "dmg": 1, "armor": 1 } },
+      { "name": "Gauntlets", "weight": 3.5, "baseStats": { "armor": 2, "might": 1 } },
+      { "name": "Bracers", "weight": 2.0, "baseStats": { "armor": 1, "agility": 1 } },
+      { "name": "Grips", "weight": 2.5, "baseStats": { "dmg": 2 } }
+    ],
+    "ring": [
+      { "name": "Signet", "weight": 0.5, "baseStats": { "might": 1 } },
+      { "name": "Band", "weight": 0.5, "baseStats": { "vitality": 1 } },
+      { "name": "Loop", "weight": 0.5, "baseStats": { "focus": 1 } },
+      { "name": "Seal", "weight": 0.5, "baseStats": { "crit": 0.02 } }
+    ]
+  }
+}

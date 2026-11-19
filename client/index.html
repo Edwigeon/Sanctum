@@ -2,102 +2,464 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PROJECT: SANCTUM (WIP Demake Engine)</title>
+  <title>PROJECT: SANCTUM</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { user-select: none; -webkit-user-select: none; }
     canvas.pixelated { image-rendering: pixelated; image-rendering: crisp-edges; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 p-2 font-sans antialiased overflow-hidden flex flex-col items-center">
-  <div id="lobby-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center">
-    <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-        <h1 class="font-bold text-lg text-slate-100 tracking-wider">PROJECT: SANCTUM</h1>
-        <span class="text-[10px] font-mono bg-slate-800 text-indigo-300 px-2 py-0.5 rounded border border-indigo-900">v0.1.0-WIP</span>
+<body class="bg-slate-950 text-slate-100 p-2 font-sans antialiased overflow-hidden flex flex-col items-center h-screen w-screen box-border">
+
+  <!-- PENDING INVITE BANNER -->
+  <div id="invite-banner" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[60] bg-amber-950/95 border border-amber-500/80 text-amber-100 px-4 py-2 rounded-lg shadow-2xl flex items-center gap-3 text-xs font-mono backdrop-blur-md">
+    <span id="invite-banner-text">Invited to realm...</span>
+    <button id="btn-invite-dismiss" type="button" class="text-amber-300 hover:text-white px-1.5 py-0.5 rounded bg-amber-900/60">✕</button>
+  </div>
+
+  <!-- MAIN MENU SCREEN -->
+  <div id="screen-main-menu" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+    <div class="bg-slate-900/95 border border-slate-800 rounded-xl p-8 max-w-md w-full shadow-2xl text-center space-y-6">
+      <div class="space-y-1">
+        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-950/80 border border-indigo-800/60 text-[10px] font-mono text-indigo-300 mb-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          v0.2.0-WIP • 15 Hz Authoritative
+        </div>
+        <h1 class="font-black text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 drop-shadow">
+          SANCTUM
+        </h1>
+        <p class="text-xs text-slate-400 font-mono">Small. Fast. Efficient. Moddable.</p>
       </div>
-      <div class="space-y-4 text-xs">
-        <div>
-          <label class="block text-slate-400 mb-1">Character Name</label>
-          <input id="inp-name" type="text" value="Wanderer" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+
+      <div id="auth-status-bar" class="hidden bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-[11px] font-mono flex items-center justify-between gap-2">
+        <div class="text-left">
+          <div class="text-emerald-300 font-bold" id="auth-user-label">User</div>
+          <div class="text-[10px] text-slate-400" id="auth-ttl-label">Retention: 180d</div>
         </div>
-        <div>
-          <label class="block text-slate-400 mb-1">Game Mode</label>
-          <div class="grid grid-cols-2 gap-2">
-            <button id="btn-mode-classic" type="button" class="border border-indigo-500 bg-indigo-950/40 text-indigo-200 py-2 rounded text-center font-bold">
-              Classic<span class="block text-[10px] font-normal text-slate-400">Normal Respawn</span>
-            </button>
-            <button id="btn-mode-hardcore" type="button" class="border border-slate-800 bg-slate-950/40 text-slate-400 py-2 rounded text-center font-bold hover:border-rose-900 transition">
-              Hardcore<span class="block text-[10px] font-normal text-rose-400">Permadeath</span>
-            </button>
-          </div>
+        <div class="flex items-center gap-2">
+          <a id="btn-open-mod" href="/mod" target="_blank" class="hidden px-2 py-1 rounded bg-amber-950/60 border border-amber-700/60 text-amber-300 hover:bg-amber-900/60 text-[10px]">Mod Portal</a>
+          <button id="btn-logout" class="px-2 py-1 rounded bg-slate-800 hover:bg-rose-950 border border-slate-700 text-slate-300 text-[10px]">Logout</button>
         </div>
-        <div>
-          <label class="block text-slate-400 mb-1">Dungeon Room Code</label>
-          <input id="inp-room" type="text" value="crypt_01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
-        </div>
-        <button id="btn-enter" class="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold py-2.5 rounded shadow-lg transition">
-          Enter Sanctum (Connect)
+      </div>
+
+      <div class="space-y-2.5 text-sm">
+        <button id="btn-menu-play" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-3 rounded-lg shadow-lg transition tracking-wide">
+          PLAY
+        </button>
+        <button id="btn-menu-controls" class="w-full bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold py-2.5 rounded-lg transition text-xs">
+          Controls &amp; Mechanics
         </button>
       </div>
+
+      <div id="main-menu-controls" class="hidden text-left bg-slate-950/90 border border-slate-800 rounded-lg p-3.5 text-[11px] font-mono text-slate-300 space-y-1.5">
+        <div><strong class="text-amber-400">LMB (Click/Hold):</strong> Move, Pursue &amp; Auto-Attack</div>
+        <div><strong class="text-cyan-400">RMB:</strong> Cast Spark Spell</div>
+        <div><strong class="text-rose-400">1:</strong> Drink Health Potion</div>
+        <div><strong class="text-emerald-400">C / I / ESC:</strong> Character Sheet / Inventory / Menu</div>
+      </div>
     </div>
   </div>
 
-  <div class="w-full max-w-4xl flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800 text-xs">
+  <!-- LOGIN / REGISTER SCREEN -->
+  <div id="screen-auth" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div>
+          <h2 class="font-bold text-base tracking-wider text-amber-300">SANCTUM ACCOUNT</h2>
+          <p class="text-[10px] text-slate-400 font-mono">Saves retained 6 months per login</p>
+        </div>
+        <button id="btn-auth-back" class="text-xs font-mono text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-800">← Back</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Username</label>
+          <input id="auth-username" type="text" maxlength="20" placeholder="3-20 chars (letters, numbers, _)" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Password</label>
+          <input id="auth-password" type="password" maxlength="100" placeholder="Min 4 characters" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+        </div>
+        <div id="auth-error" class="hidden text-[11px] font-mono text-rose-400 bg-rose-950/40 border border-rose-900/60 rounded px-2.5 py-1.5"></div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button id="btn-auth-login" type="button" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg transition">Login</button>
+          <button id="btn-auth-register" type="button" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 rounded-lg transition">Register</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARACTER CREATION / SELECT MENU -->
+  <div id="screen-char-menu" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-3xl w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="font-bold text-base tracking-wider text-amber-300">HERO ROSTER</h2>
+          <p class="text-[11px] text-slate-400 font-mono">Select an existing hero or forge a new one</p>
+        </div>
+        <button id="btn-char-back" class="text-xs font-mono text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-800 hover:border-slate-700">
+          ← Main Menu
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- LEFT: SAVED HEROES LIST -->
+        <div class="flex flex-col justify-between space-y-3 bg-slate-950/60 border border-slate-800 rounded-lg p-3.5">
+          <div class="space-y-2">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Your Saved Heroes</div>
+            <div id="char-roster-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1"></div>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-slate-800 text-xs">
+            <button id="btn-accept-invite" disabled class="hidden w-full bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold py-2.5 rounded-lg shadow-lg transition">
+              Accept Invite &amp; Join
+            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-enter-solo" disabled class="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg shadow-lg transition">
+                Quick Play (Private)
+              </button>
+              <button id="btn-open-lobbies" disabled class="bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg shadow-lg transition">
+                Multiplayer Lobbies
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: CREATE NEW HERO -->
+        <div class="space-y-3 bg-slate-950/40 border border-slate-800 rounded-lg p-3.5 text-xs">
+          <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300">Forge New Hero</div>
+          <div>
+            <label class="block text-slate-400 mb-1">Hero Name</label>
+            <input id="inp-name" type="text" value="Wanderer" maxlength="16" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+          </div>
+
+          <div class="grid grid-cols-3 gap-2" id="class-grid">
+            <button type="button" data-class="VANGUARD" class="class-card text-left p-2 rounded-lg border-2 border-amber-500 bg-amber-950/20 transition">
+              <div class="font-bold text-amber-300">Vanguard</div>
+              <div class="text-[9px] text-slate-400">Melee</div>
+              <div class="text-[9px] font-mono text-slate-300 mt-0.5">MGT 16</div>
+            </button>
+            <button type="button" data-class="ARCANIST" class="class-card text-left p-2 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-cyan-700 transition">
+              <div class="font-bold text-cyan-300">Arcanist</div>
+              <div class="text-[9px] text-slate-400">Caster</div>
+              <div class="text-[9px] font-mono text-slate-300 mt-0.5">FOC 18</div>
+            </button>
+            <button type="button" data-class="SHADOW" class="class-card text-left p-2 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-emerald-700 transition">
+              <div class="font-bold text-emerald-300">Shadow</div>
+              <div class="text-[9px] text-slate-400">Crit</div>
+              <div class="text-[9px] font-mono text-slate-300 mt-0.5">AGI 18</div>
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 mb-1">Game Mode</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-mode-classic" type="button" class="border border-indigo-500 bg-indigo-950/40 text-indigo-200 py-1.5 rounded text-center font-bold">
+                Classic<span class="block text-[9px] font-normal text-slate-400">Normal Respawn</span>
+              </button>
+              <button id="btn-mode-hardcore" type="button" class="border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded text-center font-bold hover:border-rose-900 transition">
+                Hardcore<span class="block text-[9px] font-normal text-rose-400">Permadeath</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="btn-create-char" type="button" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 rounded-lg transition">
+            + Create Hero
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTIPLAYER LOBBY BROWSER -->
+  <div id="screen-lobby" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-3xl w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="font-bold text-base tracking-wider text-indigo-300">MULTIPLAYER LOBBIES</h2>
+          <p id="lobby-hero-subtitle" class="text-[11px] text-slate-400 font-mono">Mode-partitioned active games</p>
+        </div>
+        <button id="btn-lobby-back" class="text-xs font-mono text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-800 hover:border-slate-700">
+          ← Hero Roster
+        </button>
+      </div>
+
+      <div id="lobby-error" class="hidden text-xs font-mono text-rose-300 bg-rose-950/50 border border-rose-800 rounded px-3 py-2"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- LEFT: ACTIVE PUBLIC GAMES + INVITE JOIN -->
+        <div class="flex flex-col justify-between space-y-2.5 bg-slate-950/60 border border-slate-800 rounded-lg p-3.5">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Active Public Games</span>
+              <button id="btn-lobby-refresh" type="button" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Refresh</button>
+            </div>
+            <div id="lobby-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-xs font-mono"></div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-800 space-y-1">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300">Join by Invite Code</div>
+            <div class="flex gap-1.5 text-xs font-mono">
+              <input id="inp-invite-code" type="text" maxlength="10" placeholder="e.g. DEMO99" class="flex-1 bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-slate-100 uppercase focus:outline-none focus:border-amber-500">
+              <button id="btn-join-invite" type="button" class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold">Join</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: CREATE / JOIN ROOM -->
+        <div class="space-y-3 bg-slate-950/40 border border-slate-800 rounded-lg p-3.5 text-xs">
+          <div class="text-[10px] font-mono uppercase tracking-wider text-emerald-300">Create or Join by Name</div>
+          <div>
+            <label class="block text-slate-400 mb-1">Room Name</label>
+            <input id="inp-room" type="text" value="crypt_01" maxlength="24" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Visibility</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-vis-public" type="button" class="border border-emerald-500 bg-emerald-950/30 text-emerald-200 py-1.5 rounded font-bold">Public</button>
+              <button id="btn-vis-private" type="button" class="border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded font-bold">Private</button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Password <span class="text-slate-500">(optional)</span></label>
+            <input id="inp-room-pass" type="password" maxlength="24" placeholder="Leave blank for open" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+          </div>
+          <button id="btn-enter-multi" type="button" class="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold py-2.5 rounded-lg shadow-lg transition">
+            Create / Join Game
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP STATUS BAR -->
+  <header class="w-full max-w-6xl flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800 text-xs shrink-0">
     <div class="flex items-center gap-3">
-      <span class="font-bold tracking-wider text-slate-200">PROJECT: SANCTUM</span>
+      <span class="font-bold tracking-wider text-amber-300">SANCTUM</span>
       <span id="badge-mode" class="bg-indigo-900/60 text-indigo-300 px-1.5 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50">Classic Mode</span>
       <span id="badge-net" class="text-slate-400 font-mono text-[10px]">Disconnected</span>
+      <span id="status-line" class="text-emerald-400 font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded border border-slate-700">Floor 1</span>
+      <button id="btn-copy-invite" type="button" class="hidden text-[10px] font-mono bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded border border-amber-700/60 transition" title="Copy Invite Link">Invite: —</button>
     </div>
-    <div class="text-slate-400 font-mono text-[11px] flex gap-3">
+    <div class="text-slate-400 font-mono text-[11px] hidden sm:flex gap-3">
       <span><strong class="text-amber-400">LMB:</strong> Move / Attack / Loot</span>
-      <span><strong class="text-cyan-400">RMB:</strong> Cast Spell</span>
+      <span><strong class="text-cyan-400">RMB:</strong> Spark</span>
       <span><strong class="text-rose-400">1:</strong> Potion</span>
+      <span><strong class="text-emerald-400">C:</strong> Char</span>
+      <span><strong class="text-indigo-400">I:</strong> Inv</span>
     </div>
-  </div>
+  </header>
 
-  <div id="game-stage" class="relative w-[720px] h-[432px] rounded-lg overflow-hidden border-2 border-slate-800 shadow-2xl bg-black cursor-crosshair">
-    <canvas id="pixelCanvas" width="240" height="144" class="pixelated absolute inset-0 w-full h-full z-0"></canvas>
-    <canvas id="highResCanvas" width="720" height="432" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
-    <div class="absolute bottom-2 left-3 right-3 z-20 flex items-end justify-between pointer-events-auto">
-      <div class="flex items-center gap-2 bg-slate-900/90 border border-red-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm">
-        <div class="w-7 h-7 rounded-full bg-gradient-to-t from-red-800 to-rose-500 border border-red-400/50 flex items-center justify-center shadow-inner">
-          <span class="text-[10px] font-bold text-white drop-shadow">HP</span>
+  <!-- GAME VIEWPORT -->
+  <main class="flex-1 w-full flex items-center justify-center min-h-0 overflow-hidden">
+    <div id="game-stage" class="relative rounded-lg overflow-hidden border-2 border-slate-800 shadow-2xl bg-black cursor-crosshair">
+      <canvas id="pixelCanvas" width="242" height="146" class="pixelated absolute top-0 left-0 z-0 origin-top-left"></canvas>
+      <canvas id="highResCanvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+
+      <!-- CHARACTER SHEET PANEL (C) -->
+      <aside id="panel-char" class="hidden absolute top-3 left-3 bottom-20 w-64 z-30 bg-slate-950/92 border border-amber-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-between text-xs cursor-default">
+        <div class="space-y-2.5 overflow-y-auto pr-1">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div>
+              <div id="char-name" class="font-bold text-amber-300 text-sm">Wanderer</div>
+              <div id="char-sub" class="text-[10px] font-mono text-slate-400">Lv 1 Vanguard</div>
+            </div>
+            <button id="btn-close-char" class="text-slate-400 hover:text-white font-mono px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">✕</button>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-[10px] font-mono text-slate-400">
+              <span>Experience</span>
+              <span id="char-xp-text">0 / 100</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="char-xp-bar" class="h-full bg-amber-400 transition-all" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Attributes</span>
+              <span id="char-stat-pts" class="text-[10px] font-mono text-amber-400 font-bold hidden">0 pts</span>
+            </div>
+            <div class="space-y-1 font-mono text-[11px]" id="char-attrs">
+              <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
+                <span class="text-rose-300">Might</span>
+                <div class="flex items-center gap-2"><span id="stat-might">16</span><button data-stat="might" class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button></div>
+              </div>
+              <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
+                <span class="text-cyan-300">Focus</span>
+                <div class="flex items-center gap-2"><span id="stat-focus">8</span><button data-stat="focus" class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button></div>
+              </div>
+              <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
+                <span class="text-emerald-300">Agility</span>
+                <div class="flex items-center gap-2"><span id="stat-agility">10</span><button data-stat="agility" class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button></div>
+              </div>
+              <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
+                <span class="text-amber-300">Vitality</span>
+                <div class="flex items-center gap-2"><span id="stat-vitality">16</span><button data-stat="vitality" class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1 pt-1 border-t border-slate-800 font-mono text-[11px]">
+            <div class="flex justify-between"><span class="text-slate-400">Melee Dmg</span><span id="der-dmg" class="text-slate-100">8–14</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Spell Power</span><span id="der-spell" class="text-cyan-300">20</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Armor</span><span id="der-armor" class="text-slate-100">10</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Crit Chance</span><span id="der-crit" class="text-amber-300">16%</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Move Speed</span><span id="der-speed" class="text-emerald-300">150</span></div>
+          </div>
         </div>
-        <div class="text-left font-mono">
-          <div id="hud-hp" class="text-xs font-bold text-rose-300">100 / 100</div>
-          <div class="text-[9px] text-slate-400 uppercase tracking-wider">Health</div>
+      </aside>
+
+      <!-- INVENTORY & EQUIPMENT PANEL (I) -->
+      <aside id="panel-inv" class="hidden absolute top-3 right-3 bottom-20 w-72 z-30 bg-slate-950/92 border border-indigo-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-between text-xs cursor-default">
+        <div class="space-y-3 overflow-y-auto pr-1">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="font-bold text-indigo-300 text-sm tracking-wide">INVENTORY</span>
+            <button id="btn-close-inv" class="text-slate-400 hover:text-white font-mono px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">✕</button>
+          </div>
+
+          <div>
+            <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Equipped Gear</div>
+            <div class="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
+              <div id="slot-weapon" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
+                <div class="text-[9px] text-slate-500 uppercase">Weapon</div>
+                <div class="slot-name text-slate-400 truncate">—</div>
+              </div>
+              <div id="slot-armor" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
+                <div class="text-[9px] text-slate-500 uppercase">Armor</div>
+                <div class="slot-name text-slate-400 truncate">—</div>
+              </div>
+              <div id="slot-gloves" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
+                <div class="text-[9px] text-slate-500 uppercase">Gloves</div>
+                <div class="slot-name text-slate-400 truncate">—</div>
+              </div>
+              <div id="slot-ring" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
+                <div class="text-[9px] text-slate-500 uppercase">Ring</div>
+                <div class="slot-name text-slate-400 truncate">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
+              <span>Carry Weight</span>
+              <span id="inv-weight-text" class="text-slate-200">0.0 / 60.0 lb</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="inv-weight-bar" class="h-full bg-indigo-400 transition-all" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
+              <span>Pack Items</span>
+              <span class="text-slate-500 normal-case">Click: Equip • RMB: Drop</span>
+            </div>
+            <div id="inv-list" class="space-y-1 max-h-44 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- IN-GAME PAUSE / ESC MENU -->
+      <div id="panel-pause" class="hidden absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center cursor-default">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 w-80 shadow-2xl text-center space-y-3">
+          <h3 class="font-bold text-base tracking-widest text-amber-300">GAME MENU</h3>
+          <button id="btn-pause-resume" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded text-xs transition">Resume</button>
+          <div id="pause-share-box" class="hidden pt-2 border-t border-slate-800 space-y-1.5 text-left">
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase">
+              <span>Invite Friends to This Game</span>
+              <span id="pause-my-code" class="text-amber-300 font-bold">—</span>
+            </div>
+            <button id="btn-pause-copy-invite" type="button" class="w-full bg-amber-950/70 hover:bg-amber-900/70 border border-amber-700/70 text-amber-200 font-mono font-bold py-1.5 rounded text-xs transition">
+              Copy Invite Link
+            </button>
+          </div>
+          <div class="pt-2 border-t border-slate-800 space-y-1.5 text-left">
+            <div class="text-[10px] font-mono text-slate-400 uppercase">Join Friend's Invite</div>
+            <div class="flex gap-1.5 text-xs font-mono">
+              <input id="inp-pause-invite" type="text" placeholder="Code or ?join=... link" class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-100 focus:outline-none focus:border-amber-500">
+              <button id="btn-pause-invite" type="button" class="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold">Go</button>
+            </div>
+            <div id="pause-invite-err" class="hidden text-[10px] font-mono text-rose-400"></div>
+          </div>
+          <button id="btn-pause-quit" class="w-full bg-slate-800 hover:bg-rose-900/70 border border-slate-700 hover:border-rose-700 text-slate-200 font-semibold py-2 rounded text-xs transition">Exit to Main Menu</button>
         </div>
       </div>
-      <div class="flex flex-col items-center gap-1">
-        <div class="flex gap-1.5 bg-slate-900/90 border border-slate-700/60 p-1.5 rounded-lg shadow-lg backdrop-blur-sm">
-          <button id="btn-pot" class="w-8 h-8 rounded bg-slate-800 border border-rose-700/60 flex flex-col items-center justify-center hover:bg-slate-700 transition">
-            <span class="text-[9px] font-mono text-rose-400 font-bold">1</span>
-            <span id="hud-pot" class="text-[10px] font-bold text-slate-200">x3</span>
+
+      <!-- DEATH / RESPAWN OVERLAY -->
+      <div id="panel-death" class="hidden absolute inset-0 z-40 bg-rose-950/75 backdrop-blur-sm flex items-center justify-center cursor-default">
+        <div class="bg-slate-900/95 border border-rose-800 rounded-xl p-6 w-80 shadow-2xl text-center space-y-3">
+          <h3 id="death-title" class="font-black text-lg tracking-widest text-rose-400">YOU WERE SLAIN</h3>
+          <p id="death-subtitle" class="text-[11px] font-mono text-slate-300">10% XP penalty • Respawn at floor entrance</p>
+          <button id="btn-respawn" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-2.5 rounded-lg text-xs shadow-lg transition">
+            Respawn at Entrance
           </button>
-          <div class="w-8 h-8 rounded bg-slate-800 border border-amber-600/60 flex flex-col items-center justify-center">
-            <span class="text-[8px] font-mono text-amber-300">LMB</span>
-            <span class="text-[9px] text-slate-200 font-semibold">Strike</span>
-          </div>
-          <div class="w-8 h-8 rounded bg-slate-800 border border-cyan-600/60 flex flex-col items-center justify-center">
-            <span class="text-[8px] font-mono text-cyan-300">RMB</span>
-            <span class="text-[9px] text-slate-200 font-semibold">Spark</span>
-          </div>
+          <button id="btn-death-quit" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold py-2 rounded-lg text-xs transition">
+            Exit to Main Menu
+          </button>
         </div>
-        <div id="status-line" class="text-[10px] font-mono text-slate-300 bg-black/60 px-2 py-0.5 rounded">Connected to Authoritative 15 Hz Host.</div>
       </div>
-      <div class="flex items-center gap-2 bg-slate-900/90 border border-blue-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm">
-        <div class="text-right font-mono">
-          <div id="hud-mp" class="text-xs font-bold text-cyan-300">50 / 50</div>
-          <div class="text-[9px] text-slate-400 uppercase tracking-wider">Mana</div>
+
+      <!-- BOTTOM ACTION HUD -->
+      <div class="absolute bottom-2 left-3 right-3 z-20 flex items-end justify-between pointer-events-none">
+        <div class="flex items-center gap-2 bg-slate-900/90 border border-red-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm pointer-events-auto">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-t from-red-800 to-rose-500 border border-red-400/50 flex items-center justify-center shadow-inner">
+            <span class="text-[10px] font-bold text-white drop-shadow">HP</span>
+          </div>
+          <div class="text-left font-mono">
+            <div id="hud-hp" class="text-xs font-bold text-rose-300">100 / 100</div>
+            <div class="text-[9px] text-slate-400 uppercase tracking-wider">Health</div>
+          </div>
         </div>
-        <div class="w-7 h-7 rounded-full bg-gradient-to-t from-blue-800 to-cyan-400 border border-cyan-400/50 flex items-center justify-center shadow-inner">
-          <span class="text-[10px] font-bold text-white drop-shadow">MP</span>
+
+        <div class="flex flex-col items-center gap-1 pointer-events-auto">
+          <div class="flex gap-1.5 bg-slate-900/90 border border-slate-700/60 p-1.5 rounded-lg shadow-lg backdrop-blur-sm">
+            <button id="btn-pot" class="w-8 h-8 rounded bg-slate-800 border border-rose-700/60 flex flex-col items-center justify-center hover:bg-slate-700 transition">
+              <span class="text-[9px] font-mono text-rose-400 font-bold">1</span>
+              <span id="hud-pot" class="text-[10px] font-bold text-slate-200">x3</span>
+            </button>
+            <div class="w-8 h-8 rounded bg-slate-800 border border-amber-600/60 flex flex-col items-center justify-center">
+              <span class="text-[8px] font-mono text-amber-300">LMB</span>
+              <span class="text-[9px] text-slate-200 font-semibold">Strike</span>
+            </div>
+            <div class="w-8 h-8 rounded bg-slate-800 border border-cyan-600/60 flex flex-col items-center justify-center">
+              <span class="text-[8px] font-mono text-cyan-300">RMB</span>
+              <span class="text-[9px] text-slate-200 font-semibold">Spark</span>
+            </div>
+            <div class="w-px bg-slate-700 mx-0.5"></div>
+            <button id="btn-toggle-char" class="relative w-8 h-8 rounded bg-slate-800 border border-amber-700/60 flex flex-col items-center justify-center hover:bg-slate-700 transition">
+              <span class="text-[8px] font-mono text-amber-400">C</span>
+              <span class="text-[9px] text-slate-200 font-semibold">Char</span>
+              <span id="badge-stat-pts" class="hidden absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-slate-950 font-bold text-[9px] flex items-center justify-center">+</span>
+            </button>
+            <button id="btn-toggle-inv" class="w-8 h-8 rounded bg-slate-800 border border-indigo-700/60 flex flex-col items-center justify-center hover:bg-slate-700 transition">
+              <span class="text-[8px] font-mono text-indigo-300">I</span>
+              <span class="text-[9px] text-slate-200 font-semibold">Inv</span>
+            </button>
+            <button id="btn-toggle-menu" class="w-8 h-8 rounded bg-slate-800 border border-slate-600 flex flex-col items-center justify-center hover:bg-slate-700 transition">
+              <span class="text-[8px] font-mono text-slate-400">ESC</span>
+              <span class="text-[9px] text-slate-200 font-semibold">Menu</span>
+            </button>
+          </div>
+          <div class="w-full h-1 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div id="hud-xp-bar" class="h-full bg-amber-400 transition-all" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 bg-slate-900/90 border border-blue-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm pointer-events-auto">
+          <div class="text-right font-mono">
+            <div id="hud-mp" class="text-xs font-bold text-cyan-300">50 / 50</div>
+            <div class="text-[9px] text-slate-400 uppercase tracking-wider">Mana</div>
+          </div>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-t from-blue-800 to-cyan-400 border border-cyan-400/50 flex items-center justify-center shadow-inner">
+            <span class="text-[10px] font-bold text-white drop-shadow">MP</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
   <script type="module" src="app.js"></script>
 </body>
 </html>

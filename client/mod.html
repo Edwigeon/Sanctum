@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SANCTUM — Moderator Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased p-4 md:p-6">
+  <div class="max-w-6xl mx-auto space-y-5">
+    <header class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div class="flex items-center gap-3">
+        <span class="font-black text-xl tracking-widest text-amber-400">SANCTUM</span>
+        <span class="text-xs font-mono bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded">MODERATOR PORTAL</span>
+      </div>
+      <div class="flex items-center gap-3 text-xs font-mono">
+        <span id="mod-user-badge" class="text-slate-400">Not Signed In</span>
+        <a href="/" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-200">← Game Client</a>
+      </div>
+    </header>
+
+    <!-- MODERATOR LOGIN GATE -->
+    <section id="mod-login-box" class="hidden max-w-sm mx-auto bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-3 mt-10">
+      <h2 class="font-bold text-sm text-amber-300 tracking-wider">MODERATOR SIGN IN</h2>
+      <p class="text-[11px] font-mono text-slate-400">Requires an account with moderator role.</p>
+      <input id="mod-login-user" type="text" placeholder="Username (default: admin)" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+      <input id="mod-login-pass" type="password" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+      <div id="mod-login-err" class="hidden text-[11px] font-mono text-rose-400"></div>
+      <button id="btn-mod-login" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 rounded text-xs">Sign In</button>
+    </section>
+
+    <!-- DASHBOARD -->
+    <main id="mod-dashboard" class="hidden space-y-5">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-mono">
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div class="text-slate-400 text-[10px]">ACCOUNTS</div>
+          <div id="stat-accounts" class="text-lg font-bold text-slate-100">0</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div class="text-slate-400 text-[10px]">CHARACTERS</div>
+          <div id="stat-chars" class="text-lg font-bold text-indigo-300">0</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div class="text-slate-400 text-[10px]">FALLEN HEROES</div>
+          <div id="stat-fallen" class="text-lg font-bold text-rose-400">0</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+          <div class="text-slate-400 text-[10px]">EXPIRING &lt; 30D</div>
+          <div id="stat-expiring" class="text-lg font-bold text-amber-300">0</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-center justify-center">
+          <button id="btn-prune" class="w-full bg-rose-950/70 hover:bg-rose-900 border border-rose-700 text-rose-200 font-bold py-2 rounded text-[11px] transition">
+            Prune Expired
+          </button>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="flex gap-2 border-b border-slate-800 pb-2 text-xs font-mono">
+        <button id="tab-chars" class="px-3 py-1.5 rounded bg-indigo-600 text-white font-bold">Characters</button>
+        <button id="tab-accounts" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 border border-slate-800">Accounts</button>
+      </div>
+
+      <!-- CHARACTERS VIEW -->
+      <section id="view-chars" class="space-y-3">
+        <div class="flex gap-2 text-xs font-mono">
+          <input id="search-char-q" type="text" placeholder="Search by hero name or owner username..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 focus:outline-none focus:border-indigo-500">
+          <select id="search-char-mode" class="bg-slate-900 border border-slate-700 rounded px-3 py-2">
+            <option value="">All Modes</option>
+            <option value="CLASSIC">CLASSIC</option>
+            <option value="HARDCORE">HARDCORE</option>
+          </select>
+          <button id="btn-search-chars" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded">Search</button>
+        </div>
+        <div class="overflow-x-auto bg-slate-900 border border-slate-800 rounded-lg">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-950/80 text-slate-400 text-[10px] uppercase border-b border-slate-800">
+              <tr>
+                <th class="p-2.5">Hero</th>
+                <th class="p-2.5">Owner</th>
+                <th class="p-2.5">Class / Mode</th>
+                <th class="p-2.5">Lv / Floor</th>
+                <th class="p-2.5">Status</th>
+                <th class="p-2.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-chars" class="divide-y divide-slate-800/70"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ACCOUNTS VIEW -->
+      <section id="view-accounts" class="hidden space-y-3">
+        <div class="flex gap-2 text-xs font-mono">
+          <input id="search-acc-q" type="text" placeholder="Search by username..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 focus:outline-none focus:border-indigo-500">
+          <button id="btn-search-accs" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded">Search</button>
+        </div>
+        <div class="overflow-x-auto bg-slate-900 border border-slate-800 rounded-lg">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-950/80 text-slate-400 text-[10px] uppercase border-b border-slate-800">
+              <tr>
+                <th class="p-2.5">Username</th>
+                <th class="p-2.5">Role</th>
+                <th class="p-2.5">Heroes</th>
+                <th class="p-2.5">Retention Left</th>
+                <th class="p-2.5">Status</th>
+                <th class="p-2.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-accs" class="divide-y divide-slate-800/70"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CHARACTER EDITOR MODAL -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 max-w-lg w-full space-y-3 text-xs font-mono shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h3 class="font-bold text-amber-300 text-sm">EDIT CHARACTER</h3>
+        <button id="btn-edit-close" class="text-slate-400 hover:text-white px-1.5">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div><label class="text-slate-400 text-[10px]">Name</label><input id="ed-name" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Level</label><input id="ed-level" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">XP</label><input id="ed-xp" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Stat Points</label><input id="ed-statpts" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Potions</label><input id="ed-potions" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Highest Floor</label><input id="ed-floor" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+      </div>
+      <div class="grid grid-cols-4 gap-2">
+        <div><label class="text-slate-400 text-[10px]">Might</label><input id="ed-might" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Focus</label><input id="ed-focus" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Agility</label><input id="ed-agility" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+        <div><label class="text-slate-400 text-[10px]">Vitality</label><input id="ed-vitality" type="number" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1"></div>
+      </div>
+      <label class="flex items-center gap-2 pt-1">
+        <input id="ed-dead" type="checkbox" class="rounded">
+        <span class="text-rose-300">Character is Dead (Hardcore Fallen)</span>
+      </label>
+      <div>
+        <label class="text-slate-400 text-[10px]">Inventory JSON</label>
+        <textarea id="ed-inv" rows="4" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-[10px]"></textarea>
+      </div>
+      <div id="ed-err" class="hidden text-rose-400 text-[11px]"></div>
+      <div class="flex justify-end gap-2 pt-1">
+        <button id="btn-edit-save" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-1.5 rounded">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="mod.js"></script>
+</body>
+</html>

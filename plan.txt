@@ -1,0 +1,88 @@
+Project: Sanctum (WIP) — Ethos & Master Plan
+
+Motto: Small. Fast. Efficient. Moddable.
+
+1. Core Ethos & Design Pillars
+Microscopic Footprint, Zero Bloat:
+No multi-megabyte game engines, no heavy client frameworks, no sprawling asset packs.
+The entire web client loads in milliseconds (< 100 KB) and runs smoothly on any browser, low-power laptop, or desktop.
+1984 Spirit, Modern Feel:
+Inspired by the pacing, loot addiction, and dark-fantasy loop of Diablo II, distilled through the blocky, 16-color charm of a PICO-8 / 1984 fantasy console.
+Mouse-First ARPG Controls: Left-click to move, target, and loot; right-click for active skills; 1–4 for belt potions.
+Dual-Resolution Clarity:
+World Tile Layer (Low-Res Pixel Canvas): 240×144 internal viewport (242×146 canvas with a 2px subpixel scroll margin) upscaled with nearest-neighbor (image-rendering: pixelated) for chunky, evocative retro dungeon tiles, combined with integer tile snapping and fractional GPU CSS translation (translate3d) for silky subpixel camera scrolling.
+Entity & UI Overlay Layer (High-DPI Vector Canvas): Native screen resolution (devicePixelRatio-scaled) overlaid cleanly on top for subpixel-interpolated pawn sprites (players, monsters, projectiles, ground loot), health bars, target highlights, razor-sharp floating damage numbers, and legible item tooltips. Crisp HUD orbs, character sheet, and inventory panels are rendered as HTML/CSS overlays.
+Data-Driven & Moddable:
+Engine mechanics (/shared/, /server/, /client/) are strictly decoupled from content (/data/ JSON tables).
+Stories, acts, monster stats, skill curves, and item affixes can be expanded or modded without rewriting core simulation code.
+Deterministic 32-Bit Simulation:
+All procedural dungeon seeds and RNG use 32-bit integer arithmetic (PRNG), ensuring identical map generation across server and clients with minimal network bandwidth (sending a 32-bit seed instead of map data).
+2. Gameplay Loop, Scale & Progression
+Campaign Scale: The ~2-Hour Run
+3 Thematic Acts: Each Act spans 3 compact procedural floors + 1 Boss encounter (~30–40 minutes per Act).
+Compact Floors: 40×30 tile dungeons keep encounter density high and eliminate tedious backtracking.
+Town Hub & Portals: Quick return to camp to stash, sell, identify, and restock between floors.
+Triple-Tier Progression
+Timeline	Mechanics	Player Payoff
+Seconds	Kiting, stutter-stepping, targeting packs, belt potions	Tactile combat, chiptune hit feedback, crisp floating damage
+Minutes	Level-ups, stat allocation, Normal/Magic/Rare/Unique drops	Noticeable power spikes, build synergies, affix hunting
+Runs (NG+)	New Game+ Cycles (Torment tiers)	Exponential monster HP/damage scaling, higher-tier affixes, bigger numbers
+Satisfying Damage Scaling
+
+Combat uses multiplicative scaling so early-game hits (8–15) naturally evolve into end-game and NG+ spikes (2,400! CRIT / 15,000! OVERKILL), highlighted with dynamic typography on the high-DPI overlay.
+
+3. Game Modes & Lobby Architecture
+
+To protect the stakes of Permadeath, matchmaking and progression are strictly partitioned:
+
+Classic Mode:
+Death respawns the player at the floor entrance with a 10% XP penalty (and restores at least 1 potion).
+Shared Classic lobbies (public, private/password, solo, or 6-char invite codes).
+Hardcore (Permadeath) Mode:
+Isolated Hardcore-only lobbies (no mixing with Classic players).
+Server-authoritative death checks prevent client-side disconnect/alt-F4 dodging.
+Slain heroes become permanent Fallen Spirits and are immortalized in the server's Hall of Fallen Heroes (with a Hall of Legends schema ready for permanent inductions).
+Accounts, Retention & Moderation:
+Scrypt-authenticated accounts with a 180-day rolling retention policy (auto-pruning expired accounts and sessions) and a dedicated Moderator Portal (/mod) for account and character administration.
+4. Technical & Infrastructure Plan
+Language & Code Sharing:
+JavaScript (ES Modules) across both Node.js server and browser client.
+Shared /shared/ modules (Constants.js, MathUtils.js, DungeonGen.js, CombatMath.js) guarantee identical physics, RNG, and damage math on both sides.
+Modular Client & Server Systems:
+Server systems (/server/systems/): GameRoom, DataRegistry, LootGenerator, Database, AuthService, SaveManager, ModService, DemoSeeder.
+Client systems (/client/systems/): Renderer (offscreen floor baking + dual-canvas pipeline), Interpolator, HUDController, InputController, MenuController.
+Detailed documentation of implemented systems lives in SYSTEMS.md.
+Server-Authoritative Simulation (15 Hz):
+Clients send lightweight input intents (MOVE, ATTACK, SKILL, POTION, PICKUP).
+Server owns monster AI, hit detection, loot rolls, and death verification, broadcasting compact snapshots at 15 ticks/second.
+Homelab & Scaling Strategy:
+Designed to run as a tiny Dockerized Node.js service alongside existing homelab workloads (e.g., Jellyfin, RomM) using ~30–50 MB RAM.
+Supports Node.js Worker/Cluster multithreading to scale room instances across all 12c/24t Xeon Gold cores if player concurrency grows into the thousands.
+Distribution:
+Web-First + PWA: Instant play from any browser, installable as a standalone desktop window with zero overhead.
+Optional Native Executables: Can be wrapped later with Tauri (< 8 MB binary) for standalone Linux/Windows distribution.
+
+5. Future Roadmap (Remaining Items Only — See SYSTEMS.md for Implemented Systems)
+
+Phase 2B: Visibility, Town Loop & NG+ Transitions
+ [ ] Radial retro torchlight / fog-of-war Bayer dithering on the low-res world canvas + explored tile memory.
+ [ ] Town Hub & Portal loop (TILES.PORTAL_TOWN) to return to camp, identify/sell gear, restock potions, and access mode-partitioned shared stashes.
+ [ ] Act final floor completion & New Game+ (ngCycle) Torment tier transitions.
+
+Phase 3B: Class Skills, Elite Monsters, Bosses & Audio
+ [ ] Class-distinct right-click and hotbar active skills (e.g., Vanguard Cleave/Leap, Arcanist Spark/Nova, Shadow Dash/Fan of Knives) defined in data/classes.json or data/skills.json.
+ [ ] Elite monster affixes ([Vampiric], [Molten], [Fast], [Teleporter]) with distinct color palettes and nametag badges.
+ [ ] 3 Act Boss encounters with multi-phase attack patterns and guaranteed Unique/Rare drops.
+ [ ] Synthesized Web Audio chiptune SFX engine (client/systems/AudioEngine.js) for hits, crits, spell casts, potion chugs, loot drops, and level-ups.
+
+Phase 4B: Hall of Fame UI, Stashes & Production Hosting
+ [ ] Mode-partitioned Shared Stashes (Classic vs. Hardcore) persisted in SQLite.
+ [ ] In-client Hall of Fallen Heroes & Hall of Legends viewer (consuming /api/fallen and /api/legends) + automatic Hall of Legends induction criteria.
+ [ ] Dockerfile & docker-compose.yml for single-command homelab deployment with persistent volume mounts for /data/saves.
+ [ ] Node.js Cluster / Worker mode (server/cluster.js) for multi-core room distribution.
+
+Phase 5: Narrative Pass, Combat Juice & PWA Polish
+ [ ] 3 Thematic Story Acts, NPC camp interactions, and readable lore tablets (/data/acts.json).
+ [ ] Combat feel pass: hit-stop frames, directional screen shake, and enhanced crit/overkill typography on highResCanvas.
+ [ ] Equipment paperdoll unequipping (click equipped slot to unequip to pack) and item comparison tooltips on hover.
+ [ ] PWA manifest.json, service worker caching, and offline solo-play fallback mode.

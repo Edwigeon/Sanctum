@@ -9,6 +9,7 @@
     "cluster": "node server/cluster.js"
   },
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
     "ws": "^8.18.0"
   }
 }
