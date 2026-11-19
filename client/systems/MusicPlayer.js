@@ -63,10 +63,10 @@ export class MusicPlayer {
           numChannels: parseInt(parts[1], 10) || 8,
           numPatterns: parseInt(parts[2], 10) || 7,
           bpm: parseFloat(parts[3]) || 80,
-          beatsPerBar: parseInt(parts[4], 10) || 4,
+          linesPerBeat: parseInt(parts[4], 10) || 4,
           key: parts[5]?.trim() || 'D',
           scale: parts[6]?.trim() || 'Phrygian',
-          stepsPerBeat: parseInt(parts[7], 10) || 16
+          linesPerMeasure: parseInt(parts[7], 10) || 16
         };
       } else if (line.startsWith('PATCH,')) {
         const firstComma = line.indexOf(',');
@@ -89,6 +89,7 @@ export class MusicPlayer {
           id,
           numSteps: parseInt(parts[2], 10) || 64,
           bpm: parseFloat(parts[3]) || this.projectHeader?.bpm || 80,
+          linesPerBeat: parseInt(parts[4], 10) || this.projectHeader?.linesPerBeat || 4,
           name: parts[8]?.trim() || id,
           events: []
         };
@@ -124,10 +125,10 @@ export class MusicPlayer {
 
   getPatternDuration(patternId) {
     const p = this.patterns[patternId];
-    if (!p) return 3.0;
+    if (!p) return 12.0;
     const bpm = p.bpm || this.projectHeader?.bpm || 80;
-    const stepsPerBeat = this.projectHeader?.stepsPerBeat || 16;
-    const stepSec = 60.0 / (bpm * stepsPerBeat);
+    const lpb = p.linesPerBeat || this.projectHeader?.linesPerBeat || 4;
+    const stepSec = (60.0 / bpm) / lpb;
     return p.numSteps * stepSec;
   }
 
@@ -143,8 +144,8 @@ export class MusicPlayer {
 
     const sampleRate = this.audio.sampleRate;
     const bpm = pattern.bpm || this.projectHeader?.bpm || 80;
-    const stepsPerBeat = this.projectHeader?.stepsPerBeat || 16;
-    const stepSec = 60.0 / (bpm * stepsPerBeat);
+    const lpb = pattern.linesPerBeat || this.projectHeader?.linesPerBeat || 4;
+    const stepSec = (60.0 / bpm) / lpb;
     const numSteps = pattern.numSteps || 64;
 
     const baseSamples = Math.floor(numSteps * stepSec * sampleRate);

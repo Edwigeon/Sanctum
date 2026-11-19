@@ -93,8 +93,8 @@ function renderSingleVoice(patch, freqOverride = null, durationOverride = null, 
   return wave;
 }
 
-function renderPattern(pattern, patches, bpm = 80, stepsPerBeat = 16) {
-  const stepSec = 60.0 / (bpm * stepsPerBeat);
+function renderPattern(pattern, patches, bpm = 80, linesPerBeat = 4) {
+  const stepSec = (60.0 / bpm) / linesPerBeat;
   const numSteps = pattern.numSteps || 64;
   const baseSamples = Math.floor(numSteps * stepSec * sampleRate);
   // Add 1.2s tail for ringing echo/reverb
@@ -128,7 +128,7 @@ function renderPattern(pattern, patches, bpm = 80, stepsPerBeat = 16) {
 }
 
 self.onmessage = (e) => {
-  const { id, type, sampleRate: newSR, name, patch, pattern, patches, bpm, stepsPerBeat } = e.data || {};
+  const { id, type, sampleRate: newSR, name, patch, pattern, patches, bpm, linesPerBeat } = e.data || {};
 
   if (type === 'SET_SAMPLE_RATE' && newSR) {
     sampleRate = newSR;
@@ -138,7 +138,7 @@ self.onmessage = (e) => {
     const samples = renderSingleVoice(patch);
     self.postMessage({ id, type: 'SFX_READY', name, samples }, [samples.buffer]);
   } else if (type === 'RENDER_PATTERN' && pattern && patches) {
-    const samples = renderPattern(pattern, patches, bpm, stepsPerBeat);
+    const samples = renderPattern(pattern, patches, bpm, linesPerBeat || 4);
     self.postMessage({ id, type: 'PATTERN_READY', patternId: pattern.id, samples }, [samples.buffer]);
   }
 };

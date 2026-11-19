@@ -11,423 +11,748 @@ PATCH,EdgeHarp,"{""name"": ""EdgeHarp"", ""wave_type"": ""sawtooth"", ""wave_typ
 SEQ,0,A
 SEQ,1,B
 SEQ,2,C
-SEQ,3,D
+SEQ,3,E
+SEQ,4,F
+SEQ,5,G
+SEQ,6,H
+SEQ,7,B
+SEQ,8,C
+SEQ,9,D
 --- PATTERNS ---,Type,ID,Length
 PATTERN,A,64,84,4,16,E,Minor,Moorland Mist
-EVENT,0,0,B-3,HighlandWind,96,32,--,PAN 44
-EVENT,0,1,E-2,EarthDrone,136,16,--,PAN 128
-EVENT,0,2,E-3,WanderPluck,138,6,--,PAN 78
-EVENT,0,3,B-3,RuinsHorn,152,12,VIB 48,PAN 160
-EVENT,0,4,E-2,SkirmishBass,165,3,--,PAN 128
+EVENT,0,0,B-3,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,E-3,WanderPluck,142,6,--,PAN 78
+EVENT,0,3,B-3,RuinsHorn,156,12,VIB 48,PAN 160
+EVENT,0,4,E-2,SkirmishBass,162,3,--,PAN 128
 EVENT,0,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,0,7,E-4,EdgeHarp,132,3,--,PAN 186
 EVENT,2,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,4,2,B-3,WanderPluck,138,6,--,--
-EVENT,4,4,E-2,SkirmishBass,132,3,--,--
+EVENT,4,2,B-3,WanderPluck,142,6,--,--
+EVENT,4,4,E-2,SkirmishBass,130,3,--,--
 EVENT,4,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,4,7,G-4,EdgeHarp,132,3,--,--
-EVENT,6,4,E-2,SkirmishBass,132,3,--,--
-EVENT,6,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,8,2,F#4,WanderPluck,138,6,--,--
-EVENT,8,4,E-2,SkirmishBass,165,3,--,--
-EVENT,8,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,6,4,E-2,SkirmishBass,130,3,--,--
+EVENT,6,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,8,2,F#4,WanderPluck,142,6,--,--
+EVENT,8,4,E-2,SkirmishBass,162,3,--,--
+EVENT,8,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,8,7,B-4,EdgeHarp,132,3,--,--
 EVENT,10,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,12,2,G-4,WanderPluck,138,6,--,--
-EVENT,12,4,E-2,SkirmishBass,132,3,--,--
+EVENT,12,2,G-4,WanderPluck,142,6,--,--
+EVENT,12,4,E-2,SkirmishBass,130,3,--,--
 EVENT,12,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,12,7,G-4,EdgeHarp,132,3,--,--
-EVENT,14,4,E-2,SkirmishBass,132,3,--,--
-EVENT,14,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,14,4,E-2,SkirmishBass,130,3,--,--
+EVENT,14,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,14,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,16,1,D-2,EarthDrone,136,16,--,PAN 128
-EVENT,16,2,D-3,WanderPluck,138,6,--,--
-EVENT,16,3,A-3,RuinsHorn,152,12,VIB 48,--
-EVENT,16,4,D-2,SkirmishBass,165,3,--,--
+EVENT,16,1,D-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,D-3,WanderPluck,142,6,--,--
+EVENT,16,3,A-3,RuinsHorn,156,12,VIB 48,--
+EVENT,16,4,D-2,SkirmishBass,162,3,--,--
 EVENT,16,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,16,7,D-4,EdgeHarp,132,3,--,--
 EVENT,18,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,20,2,A-3,WanderPluck,138,6,--,--
-EVENT,20,4,D-2,SkirmishBass,132,3,--,--
+EVENT,20,2,A-3,WanderPluck,142,6,--,--
+EVENT,20,4,D-2,SkirmishBass,130,3,--,--
 EVENT,20,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,20,7,F#4,EdgeHarp,132,3,--,--
-EVENT,22,4,D-2,SkirmishBass,132,3,--,--
-EVENT,22,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,24,2,E-4,WanderPluck,138,6,--,--
-EVENT,24,4,D-2,SkirmishBass,165,3,--,--
-EVENT,24,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,22,4,D-2,SkirmishBass,130,3,--,--
+EVENT,22,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,24,2,E-4,WanderPluck,142,6,--,--
+EVENT,24,4,D-2,SkirmishBass,162,3,--,--
+EVENT,24,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,24,7,A-4,EdgeHarp,132,3,--,--
 EVENT,26,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,28,2,F#4,WanderPluck,138,6,--,--
-EVENT,28,4,D-2,SkirmishBass,132,3,--,--
+EVENT,28,2,F#4,WanderPluck,142,6,--,--
+EVENT,28,4,D-2,SkirmishBass,130,3,--,--
 EVENT,28,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,28,7,F#4,EdgeHarp,132,3,--,--
-EVENT,30,4,D-2,SkirmishBass,132,3,--,--
-EVENT,30,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,30,4,D-2,SkirmishBass,130,3,--,--
+EVENT,30,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,30,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,32,0,E-4,HighlandWind,98,32,--,PAN 212
-EVENT,32,1,C-2,EarthDrone,136,16,--,PAN 128
-EVENT,32,2,C-3,WanderPluck,138,6,--,--
-EVENT,32,3,G-3,RuinsHorn,152,12,VIB 48,--
-EVENT,32,4,C-2,SkirmishBass,165,3,--,--
+EVENT,32,0,E-4,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,C-2,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,C-3,WanderPluck,142,6,--,--
+EVENT,32,3,G-3,RuinsHorn,156,12,VIB 48,--
+EVENT,32,4,C-2,SkirmishBass,162,3,--,--
 EVENT,32,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,32,7,C-4,EdgeHarp,132,3,--,--
 EVENT,34,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,36,2,G-3,WanderPluck,138,6,--,--
-EVENT,36,4,C-2,SkirmishBass,132,3,--,--
+EVENT,36,2,G-3,WanderPluck,142,6,--,--
+EVENT,36,4,C-2,SkirmishBass,130,3,--,--
 EVENT,36,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,36,7,E-4,EdgeHarp,132,3,--,--
-EVENT,38,4,C-2,SkirmishBass,132,3,--,--
-EVENT,38,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,40,2,D-4,WanderPluck,138,6,--,--
-EVENT,40,4,C-2,SkirmishBass,165,3,--,--
-EVENT,40,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,38,4,C-2,SkirmishBass,130,3,--,--
+EVENT,38,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,40,2,D-4,WanderPluck,142,6,--,--
+EVENT,40,4,C-2,SkirmishBass,162,3,--,--
+EVENT,40,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,40,7,G-4,EdgeHarp,132,3,--,--
 EVENT,42,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,44,2,E-4,WanderPluck,138,6,--,--
-EVENT,44,4,C-2,SkirmishBass,132,3,--,--
+EVENT,44,2,E-4,WanderPluck,142,6,--,--
+EVENT,44,4,C-2,SkirmishBass,130,3,--,--
 EVENT,44,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,44,7,E-4,EdgeHarp,132,3,--,--
-EVENT,46,4,C-2,SkirmishBass,132,3,--,--
-EVENT,46,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,46,4,C-2,SkirmishBass,130,3,--,--
+EVENT,46,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,46,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,48,1,B-1,EarthDrone,136,16,--,PAN 128
-EVENT,48,2,B-2,WanderPluck,138,6,--,--
-EVENT,48,3,F#3,RuinsHorn,152,14,VIB 48,--
-EVENT,48,4,B-1,SkirmishBass,165,3,--,--
+EVENT,48,1,B-1,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,B-2,WanderPluck,142,6,--,--
+EVENT,48,3,F#3,RuinsHorn,156,14,VIB 48,--
+EVENT,48,4,B-1,SkirmishBass,162,3,--,--
 EVENT,48,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,48,7,B-3,EdgeHarp,132,3,--,--
 EVENT,50,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,52,2,F#3,WanderPluck,138,6,--,--
-EVENT,52,4,B-1,SkirmishBass,132,3,--,--
+EVENT,52,2,F#3,WanderPluck,142,6,--,--
+EVENT,52,4,B-1,SkirmishBass,130,3,--,--
 EVENT,52,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,52,7,D#4,EdgeHarp,132,3,--,--
-EVENT,54,4,B-1,SkirmishBass,132,3,--,--
-EVENT,54,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,56,2,D-4,WanderPluck,138,6,--,--
-EVENT,56,4,B-1,SkirmishBass,165,3,--,--
-EVENT,56,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,54,4,B-1,SkirmishBass,130,3,--,--
+EVENT,54,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,56,2,D-4,WanderPluck,142,6,--,--
+EVENT,56,4,B-1,SkirmishBass,162,3,--,--
+EVENT,56,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,56,7,F#4,EdgeHarp,132,3,--,--
 EVENT,58,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,60,2,B-3,WanderPluck,138,6,--,--
-EVENT,60,4,B-1,SkirmishBass,132,3,--,--
+EVENT,60,2,B-3,WanderPluck,142,6,--,--
+EVENT,60,4,B-1,SkirmishBass,130,3,--,--
 EVENT,60,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,60,7,B-4,EdgeHarp,132,3,--,--
-EVENT,62,4,B-1,SkirmishBass,132,3,--,--
-EVENT,62,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,62,4,B-1,SkirmishBass,130,3,--,--
+EVENT,62,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,62,6,E-6,WildShaker,82,2,--,PAN 84
 PATTERN,B,64,84,4,16,E,Minor,Ruined Courtyard
-EVENT,0,0,E-4,HighlandWind,96,32,--,PAN 44
-EVENT,0,1,E-2,EarthDrone,136,16,--,PAN 128
-EVENT,0,2,E-3,WanderPluck,138,6,--,PAN 78
-EVENT,0,3,E-4,RuinsHorn,152,8,VIB 48,PAN 160
-EVENT,0,4,E-2,SkirmishBass,165,3,--,PAN 128
+EVENT,0,0,E-4,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,E-3,WanderPluck,142,6,--,PAN 78
+EVENT,0,3,E-4,RuinsHorn,156,8,VIB 48,PAN 160
+EVENT,0,4,E-2,SkirmishBass,162,3,--,PAN 128
 EVENT,0,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,0,7,B-4,EdgeHarp,132,3,--,PAN 186
 EVENT,2,6,E-6,WildShaker,82,2,--,PAN 84
 EVENT,2,7,G-4,EdgeHarp,132,3,--,--
-EVENT,4,2,B-3,WanderPluck,138,6,--,--
-EVENT,4,4,E-2,SkirmishBass,132,3,--,--
+EVENT,4,2,B-3,WanderPluck,142,6,--,--
+EVENT,4,4,E-2,SkirmishBass,130,3,--,--
 EVENT,4,6,E-6,WildShaker,82,2,--,PAN 172
-EVENT,6,4,E-2,SkirmishBass,132,3,--,--
-EVENT,6,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,8,2,G-4,WanderPluck,138,6,--,--
-EVENT,8,3,F#4,RuinsHorn,152,8,VIB 48,--
-EVENT,8,4,E-2,SkirmishBass,165,3,--,--
-EVENT,8,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,6,4,E-2,SkirmishBass,130,3,--,--
+EVENT,6,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,8,2,G-4,WanderPluck,142,6,--,--
+EVENT,8,3,F#4,RuinsHorn,156,8,VIB 48,--
+EVENT,8,4,E-2,SkirmishBass,162,3,--,--
+EVENT,8,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,8,7,E-4,EdgeHarp,132,3,--,--
 EVENT,10,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,12,2,F#4,WanderPluck,138,6,--,--
-EVENT,12,4,E-2,SkirmishBass,132,3,--,--
+EVENT,12,2,F#4,WanderPluck,142,6,--,--
+EVENT,12,4,E-2,SkirmishBass,130,3,--,--
 EVENT,12,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,12,7,F#4,EdgeHarp,132,3,--,--
-EVENT,14,4,E-2,SkirmishBass,132,3,--,--
-EVENT,14,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,14,4,E-2,SkirmishBass,130,3,--,--
+EVENT,14,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,14,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,16,1,G-2,EarthDrone,136,16,--,PAN 128
-EVENT,16,2,G-3,WanderPluck,138,6,--,--
-EVENT,16,3,G-4,RuinsHorn,152,10,VIB 48,--
-EVENT,16,4,G-2,SkirmishBass,165,3,--,--
+EVENT,16,1,G-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,G-3,WanderPluck,142,6,--,--
+EVENT,16,3,G-4,RuinsHorn,156,10,VIB 48,--
+EVENT,16,4,G-2,SkirmishBass,162,3,--,--
 EVENT,16,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,16,7,D-5,EdgeHarp,132,3,--,--
 EVENT,18,6,E-6,WildShaker,82,2,--,PAN 84
 EVENT,18,7,B-4,EdgeHarp,132,3,--,--
-EVENT,20,2,D-4,WanderPluck,138,6,--,--
-EVENT,20,4,G-2,SkirmishBass,132,3,--,--
+EVENT,20,2,D-4,WanderPluck,142,6,--,--
+EVENT,20,4,G-2,SkirmishBass,130,3,--,--
 EVENT,20,6,E-6,WildShaker,82,2,--,PAN 172
-EVENT,22,4,G-2,SkirmishBass,132,3,--,--
-EVENT,22,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,24,2,B-4,WanderPluck,138,6,--,--
-EVENT,24,4,G-2,SkirmishBass,165,3,--,--
-EVENT,24,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,22,4,G-2,SkirmishBass,130,3,--,--
+EVENT,22,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,24,2,B-4,WanderPluck,142,6,--,--
+EVENT,24,4,G-2,SkirmishBass,162,3,--,--
+EVENT,24,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,24,7,G-4,EdgeHarp,132,3,--,--
-EVENT,26,3,B-4,RuinsHorn,152,6,VIB 48,--
+EVENT,26,3,B-4,RuinsHorn,156,6,VIB 48,--
 EVENT,26,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,28,2,A-4,WanderPluck,138,6,--,--
-EVENT,28,4,G-2,SkirmishBass,132,3,--,--
+EVENT,28,2,A-4,WanderPluck,142,6,--,--
+EVENT,28,4,G-2,SkirmishBass,130,3,--,--
 EVENT,28,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,28,7,A-4,EdgeHarp,132,3,--,--
-EVENT,30,4,G-2,SkirmishBass,132,3,--,--
-EVENT,30,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,30,4,G-2,SkirmishBass,130,3,--,--
+EVENT,30,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,30,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,32,0,F#4,HighlandWind,98,32,--,PAN 212
-EVENT,32,1,A-2,EarthDrone,136,16,--,PAN 128
-EVENT,32,2,A-3,WanderPluck,138,6,--,--
-EVENT,32,3,A-4,RuinsHorn,152,10,VIB 48,--
-EVENT,32,4,A-2,SkirmishBass,165,3,--,--
+EVENT,32,0,F#4,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,A-2,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,A-3,WanderPluck,142,6,--,--
+EVENT,32,3,A-4,RuinsHorn,156,10,VIB 48,--
+EVENT,32,4,A-2,SkirmishBass,162,3,--,--
 EVENT,32,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,32,7,C-5,EdgeHarp,132,3,--,--
 EVENT,34,6,E-6,WildShaker,82,2,--,PAN 84
 EVENT,34,7,A-4,EdgeHarp,132,3,--,--
-EVENT,36,2,E-4,WanderPluck,138,6,--,--
-EVENT,36,4,A-2,SkirmishBass,132,3,--,--
+EVENT,36,2,E-4,WanderPluck,142,6,--,--
+EVENT,36,4,A-2,SkirmishBass,130,3,--,--
 EVENT,36,6,E-6,WildShaker,82,2,--,PAN 172
-EVENT,38,4,A-2,SkirmishBass,132,3,--,--
-EVENT,38,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,40,2,C-5,WanderPluck,138,6,--,--
-EVENT,40,4,A-2,SkirmishBass,165,3,--,--
-EVENT,40,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,38,4,A-2,SkirmishBass,130,3,--,--
+EVENT,38,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,40,2,C-5,WanderPluck,142,6,--,--
+EVENT,40,4,A-2,SkirmishBass,162,3,--,--
+EVENT,40,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,40,7,E-4,EdgeHarp,132,3,--,--
-EVENT,42,3,G-4,RuinsHorn,152,6,VIB 48,--
+EVENT,42,3,G-4,RuinsHorn,156,6,VIB 48,--
 EVENT,42,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,44,2,B-4,WanderPluck,138,6,--,--
-EVENT,44,4,A-2,SkirmishBass,132,3,--,--
+EVENT,44,2,B-4,WanderPluck,142,6,--,--
+EVENT,44,4,A-2,SkirmishBass,130,3,--,--
 EVENT,44,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,44,7,G-4,EdgeHarp,132,3,--,--
-EVENT,46,4,A-2,SkirmishBass,132,3,--,--
-EVENT,46,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,46,4,A-2,SkirmishBass,130,3,--,--
+EVENT,46,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,46,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,48,1,B-1,EarthDrone,136,16,--,PAN 128
-EVENT,48,2,B-2,WanderPluck,138,6,--,--
-EVENT,48,3,F#4,RuinsHorn,152,14,VIB 48,--
-EVENT,48,4,B-1,SkirmishBass,165,3,--,--
+EVENT,48,1,B-1,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,B-2,WanderPluck,142,6,--,--
+EVENT,48,3,F#4,RuinsHorn,156,14,VIB 48,--
+EVENT,48,4,B-1,SkirmishBass,162,3,--,--
 EVENT,48,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,48,7,B-4,EdgeHarp,132,3,--,--
 EVENT,50,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,52,2,F#3,WanderPluck,138,6,--,--
-EVENT,52,4,B-1,SkirmishBass,132,3,--,--
+EVENT,52,2,F#3,WanderPluck,142,6,--,--
+EVENT,52,4,B-1,SkirmishBass,130,3,--,--
 EVENT,52,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,52,7,F#4,EdgeHarp,132,3,--,--
-EVENT,54,4,B-1,SkirmishBass,132,3,--,--
-EVENT,54,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,56,2,D#4,WanderPluck,138,6,--,--
-EVENT,56,4,B-1,SkirmishBass,165,3,--,--
-EVENT,56,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,54,4,B-1,SkirmishBass,130,3,--,--
+EVENT,54,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,56,2,D#4,WanderPluck,142,6,--,--
+EVENT,56,4,B-1,SkirmishBass,162,3,--,--
+EVENT,56,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,56,7,D#4,EdgeHarp,132,3,--,--
 EVENT,58,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,60,2,F#4,WanderPluck,138,6,--,--
-EVENT,60,4,B-1,SkirmishBass,132,3,--,--
+EVENT,60,2,F#4,WanderPluck,142,6,--,--
+EVENT,60,4,B-1,SkirmishBass,130,3,--,--
 EVENT,60,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,60,7,B-3,EdgeHarp,132,3,--,--
-EVENT,62,4,B-1,SkirmishBass,132,3,--,--
-EVENT,62,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,62,4,B-1,SkirmishBass,130,3,--,--
+EVENT,62,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,62,6,E-6,WildShaker,82,2,--,PAN 84
 PATTERN,C,64,84,4,16,E,Dorian,Dorian Ridge
-EVENT,0,0,G-3,HighlandWind,96,32,--,PAN 44
-EVENT,0,1,C-2,EarthDrone,136,16,--,PAN 128
-EVENT,0,2,C-3,WanderPluck,138,6,--,PAN 78
-EVENT,0,3,G-4,RuinsHorn,152,10,VIB 48,PAN 160
-EVENT,0,4,C-2,SkirmishBass,165,3,--,PAN 128
+EVENT,0,0,G-3,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,C-2,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,C-3,WanderPluck,142,6,--,PAN 78
+EVENT,0,3,G-4,RuinsHorn,156,10,VIB 48,PAN 160
+EVENT,0,4,C-2,SkirmishBass,162,3,--,PAN 128
 EVENT,0,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,0,7,E-4,EdgeHarp,132,3,--,PAN 186
 EVENT,2,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,4,2,G-3,WanderPluck,138,6,--,--
-EVENT,4,4,C-2,SkirmishBass,132,3,--,--
+EVENT,4,2,G-3,WanderPluck,142,6,--,--
+EVENT,4,4,C-2,SkirmishBass,130,3,--,--
 EVENT,4,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,4,7,G-4,EdgeHarp,132,3,--,--
-EVENT,6,4,C-2,SkirmishBass,132,3,--,--
-EVENT,6,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,8,2,E-4,WanderPluck,138,6,--,--
-EVENT,8,4,C-2,SkirmishBass,165,3,--,--
-EVENT,8,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,6,4,C-2,SkirmishBass,130,3,--,--
+EVENT,6,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,8,2,E-4,WanderPluck,142,6,--,--
+EVENT,8,4,C-2,SkirmishBass,162,3,--,--
+EVENT,8,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,8,7,C-5,EdgeHarp,132,3,--,--
-EVENT,10,3,E-4,RuinsHorn,152,6,VIB 48,--
+EVENT,10,3,E-4,RuinsHorn,156,6,VIB 48,--
 EVENT,10,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,12,2,D-4,WanderPluck,138,6,--,--
-EVENT,12,4,C-2,SkirmishBass,132,3,--,--
+EVENT,12,2,D-4,WanderPluck,142,6,--,--
+EVENT,12,4,C-2,SkirmishBass,130,3,--,--
 EVENT,12,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,12,7,B-4,EdgeHarp,132,3,--,--
-EVENT,14,4,C-2,SkirmishBass,132,3,--,--
-EVENT,14,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,14,4,C-2,SkirmishBass,130,3,--,--
+EVENT,14,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,14,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,16,1,D-2,EarthDrone,136,16,--,PAN 128
-EVENT,16,2,D-3,WanderPluck,138,6,--,--
-EVENT,16,3,F#4,RuinsHorn,152,10,VIB 48,--
-EVENT,16,4,D-2,SkirmishBass,165,3,--,--
+EVENT,16,1,D-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,D-3,WanderPluck,142,6,--,--
+EVENT,16,3,F#4,RuinsHorn,156,10,VIB 48,--
+EVENT,16,4,D-2,SkirmishBass,162,3,--,--
 EVENT,16,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,16,7,F#4,EdgeHarp,132,3,--,--
 EVENT,18,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,20,2,A-3,WanderPluck,138,6,--,--
-EVENT,20,4,D-2,SkirmishBass,132,3,--,--
+EVENT,20,2,A-3,WanderPluck,142,6,--,--
+EVENT,20,4,D-2,SkirmishBass,130,3,--,--
 EVENT,20,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,20,7,A-4,EdgeHarp,132,3,--,--
-EVENT,22,4,D-2,SkirmishBass,132,3,--,--
-EVENT,22,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,24,2,F#4,WanderPluck,138,6,--,--
-EVENT,24,4,D-2,SkirmishBass,165,3,--,--
-EVENT,24,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,22,4,D-2,SkirmishBass,130,3,--,--
+EVENT,22,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,24,2,F#4,WanderPluck,142,6,--,--
+EVENT,24,4,D-2,SkirmishBass,162,3,--,--
+EVENT,24,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,24,7,D-5,EdgeHarp,132,3,--,--
-EVENT,26,3,D-4,RuinsHorn,152,6,VIB 48,--
+EVENT,26,3,D-4,RuinsHorn,156,6,VIB 48,--
 EVENT,26,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,28,2,E-4,WanderPluck,138,6,--,--
-EVENT,28,4,D-2,SkirmishBass,132,3,--,--
+EVENT,28,2,E-4,WanderPluck,142,6,--,--
+EVENT,28,4,D-2,SkirmishBass,130,3,--,--
 EVENT,28,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,28,7,C-5,EdgeHarp,132,3,--,--
-EVENT,30,4,D-2,SkirmishBass,132,3,--,--
-EVENT,30,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,30,4,D-2,SkirmishBass,130,3,--,--
+EVENT,30,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,30,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,32,0,D-4,HighlandWind,98,32,--,PAN 212
-EVENT,32,1,E-2,EarthDrone,136,16,--,PAN 128
-EVENT,32,2,E-3,WanderPluck,138,6,--,--
-EVENT,32,3,E-4,RuinsHorn,152,14,VIB 48,--
-EVENT,32,4,E-2,SkirmishBass,165,3,--,--
+EVENT,32,0,D-4,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,E-3,WanderPluck,142,6,--,--
+EVENT,32,3,E-4,RuinsHorn,156,14,VIB 48,--
+EVENT,32,4,E-2,SkirmishBass,162,3,--,--
 EVENT,32,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,32,7,G-4,EdgeHarp,132,3,--,--
 EVENT,34,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,36,2,B-3,WanderPluck,138,6,--,--
-EVENT,36,4,E-2,SkirmishBass,132,3,--,--
+EVENT,36,2,B-3,WanderPluck,142,6,--,--
+EVENT,36,4,E-2,SkirmishBass,130,3,--,--
 EVENT,36,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,36,7,B-4,EdgeHarp,132,3,--,--
-EVENT,38,4,E-2,SkirmishBass,132,3,--,--
-EVENT,38,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,40,2,G-4,WanderPluck,138,6,--,--
-EVENT,40,4,E-2,SkirmishBass,165,3,--,--
-EVENT,40,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,38,4,E-2,SkirmishBass,130,3,--,--
+EVENT,38,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,40,2,G-4,WanderPluck,142,6,--,--
+EVENT,40,4,E-2,SkirmishBass,162,3,--,--
+EVENT,40,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,40,7,E-5,EdgeHarp,132,3,--,--
 EVENT,42,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,44,2,F#4,WanderPluck,138,6,--,--
-EVENT,44,4,E-2,SkirmishBass,132,3,--,--
+EVENT,44,2,F#4,WanderPluck,142,6,--,--
+EVENT,44,4,E-2,SkirmishBass,130,3,--,--
 EVENT,44,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,44,7,B-4,EdgeHarp,132,3,--,--
-EVENT,46,4,E-2,SkirmishBass,132,3,--,--
-EVENT,46,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,46,4,E-2,SkirmishBass,130,3,--,--
+EVENT,46,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,46,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,48,1,G-2,EarthDrone,136,16,--,PAN 128
-EVENT,48,2,G-3,WanderPluck,138,6,--,--
-EVENT,48,3,D-4,RuinsHorn,152,14,VIB 48,--
-EVENT,48,4,G-2,SkirmishBass,165,3,--,--
+EVENT,48,1,G-2,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,G-3,WanderPluck,142,6,--,--
+EVENT,48,3,D-4,RuinsHorn,156,14,VIB 48,--
+EVENT,48,4,G-2,SkirmishBass,162,3,--,--
 EVENT,48,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,48,7,D-5,EdgeHarp,132,3,--,--
 EVENT,50,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,52,2,D-4,WanderPluck,138,6,--,--
-EVENT,52,4,G-2,SkirmishBass,132,3,--,--
+EVENT,52,2,D-4,WanderPluck,142,6,--,--
+EVENT,52,4,G-2,SkirmishBass,130,3,--,--
 EVENT,52,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,52,7,B-4,EdgeHarp,132,3,--,--
-EVENT,54,4,G-2,SkirmishBass,132,3,--,--
-EVENT,54,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,56,2,B-4,WanderPluck,138,6,--,--
-EVENT,56,4,G-2,SkirmishBass,165,3,--,--
-EVENT,56,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,54,4,G-2,SkirmishBass,130,3,--,--
+EVENT,54,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,56,2,B-4,WanderPluck,142,6,--,--
+EVENT,56,4,G-2,SkirmishBass,162,3,--,--
+EVENT,56,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,56,7,G-4,EdgeHarp,132,3,--,--
 EVENT,58,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,60,2,A-4,WanderPluck,138,6,--,--
-EVENT,60,4,G-2,SkirmishBass,132,3,--,--
+EVENT,60,2,A-4,WanderPluck,142,6,--,--
+EVENT,60,4,G-2,SkirmishBass,130,3,--,--
 EVENT,60,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,60,7,F#4,EdgeHarp,132,3,--,--
-EVENT,62,4,G-2,SkirmishBass,132,3,--,--
-EVENT,62,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,62,4,G-2,SkirmishBass,130,3,--,--
+EVENT,62,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,62,6,E-6,WildShaker,82,2,--,PAN 84
 PATTERN,D,64,84,4,16,E,Minor,Watchfire Path
-EVENT,0,0,A-3,HighlandWind,96,32,--,PAN 44
-EVENT,0,1,A-1,EarthDrone,136,16,--,PAN 128
-EVENT,0,2,A-2,WanderPluck,138,6,--,PAN 78
-EVENT,0,3,C-4,RuinsHorn,152,10,VIB 48,PAN 160
-EVENT,0,4,A-1,SkirmishBass,165,3,--,PAN 128
+EVENT,0,0,A-3,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,A-1,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,A-2,WanderPluck,142,6,--,PAN 78
+EVENT,0,3,C-4,RuinsHorn,156,10,VIB 48,PAN 160
+EVENT,0,4,A-1,SkirmishBass,162,3,--,PAN 128
 EVENT,0,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,0,7,A-4,EdgeHarp,132,3,--,PAN 186
 EVENT,2,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,4,2,E-3,WanderPluck,138,6,--,--
-EVENT,4,4,A-1,SkirmishBass,132,3,--,--
+EVENT,4,2,E-3,WanderPluck,142,6,--,--
+EVENT,4,4,A-1,SkirmishBass,130,3,--,--
 EVENT,4,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,4,7,E-4,EdgeHarp,132,3,--,--
-EVENT,6,4,A-1,SkirmishBass,132,3,--,--
-EVENT,6,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,8,2,C-4,WanderPluck,138,6,--,--
-EVENT,8,4,A-1,SkirmishBass,165,3,--,--
-EVENT,8,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,6,4,A-1,SkirmishBass,130,3,--,--
+EVENT,6,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,8,2,C-4,WanderPluck,142,6,--,--
+EVENT,8,4,A-1,SkirmishBass,162,3,--,--
+EVENT,8,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,8,7,C-4,EdgeHarp,132,3,--,--
-EVENT,10,3,A-3,RuinsHorn,152,6,VIB 48,--
+EVENT,10,3,A-3,RuinsHorn,156,6,VIB 48,--
 EVENT,10,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,12,2,B-3,WanderPluck,138,6,--,--
-EVENT,12,4,A-1,SkirmishBass,132,3,--,--
+EVENT,12,2,B-3,WanderPluck,142,6,--,--
+EVENT,12,4,A-1,SkirmishBass,130,3,--,--
 EVENT,12,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,12,7,E-4,EdgeHarp,132,3,--,--
-EVENT,14,4,A-1,SkirmishBass,132,3,--,--
-EVENT,14,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,14,4,A-1,SkirmishBass,130,3,--,--
+EVENT,14,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,14,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,16,1,C-2,EarthDrone,136,16,--,PAN 128
-EVENT,16,2,C-3,WanderPluck,138,6,--,--
-EVENT,16,3,G-3,RuinsHorn,152,12,VIB 48,--
-EVENT,16,4,C-2,SkirmishBass,165,3,--,--
+EVENT,16,1,C-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,C-3,WanderPluck,142,6,--,--
+EVENT,16,3,G-3,RuinsHorn,156,12,VIB 48,--
+EVENT,16,4,C-2,SkirmishBass,162,3,--,--
 EVENT,16,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,16,7,G-4,EdgeHarp,132,3,--,--
 EVENT,18,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,20,2,G-3,WanderPluck,138,6,--,--
-EVENT,20,4,C-2,SkirmishBass,132,3,--,--
+EVENT,20,2,G-3,WanderPluck,142,6,--,--
+EVENT,20,4,C-2,SkirmishBass,130,3,--,--
 EVENT,20,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,20,7,E-4,EdgeHarp,132,3,--,--
-EVENT,22,4,C-2,SkirmishBass,132,3,--,--
-EVENT,22,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,24,2,E-4,WanderPluck,138,6,--,--
-EVENT,24,4,C-2,SkirmishBass,165,3,--,--
-EVENT,24,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,22,4,C-2,SkirmishBass,130,3,--,--
+EVENT,22,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,24,2,E-4,WanderPluck,142,6,--,--
+EVENT,24,4,C-2,SkirmishBass,162,3,--,--
+EVENT,24,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,24,7,C-4,EdgeHarp,132,3,--,--
 EVENT,26,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,28,2,D-4,WanderPluck,138,6,--,--
-EVENT,28,4,C-2,SkirmishBass,132,3,--,--
+EVENT,28,2,D-4,WanderPluck,142,6,--,--
+EVENT,28,4,C-2,SkirmishBass,130,3,--,--
 EVENT,28,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,28,7,E-4,EdgeHarp,132,3,--,--
-EVENT,30,4,C-2,SkirmishBass,132,3,--,--
-EVENT,30,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,30,4,C-2,SkirmishBass,130,3,--,--
+EVENT,30,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,30,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,32,0,B-3,HighlandWind,98,32,--,PAN 212
-EVENT,32,1,D-2,EarthDrone,136,16,--,PAN 128
-EVENT,32,2,D-3,WanderPluck,138,6,--,--
-EVENT,32,3,A-3,RuinsHorn,152,12,VIB 48,--
-EVENT,32,4,D-2,SkirmishBass,165,3,--,--
+EVENT,32,0,B-3,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,D-2,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,D-3,WanderPluck,142,6,--,--
+EVENT,32,3,A-3,RuinsHorn,156,12,VIB 48,--
+EVENT,32,4,D-2,SkirmishBass,162,3,--,--
 EVENT,32,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,32,7,F#4,EdgeHarp,132,3,--,--
 EVENT,34,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,36,2,A-3,WanderPluck,138,6,--,--
-EVENT,36,4,D-2,SkirmishBass,132,3,--,--
+EVENT,36,2,A-3,WanderPluck,142,6,--,--
+EVENT,36,4,D-2,SkirmishBass,130,3,--,--
 EVENT,36,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,36,7,D-4,EdgeHarp,132,3,--,--
-EVENT,38,4,D-2,SkirmishBass,132,3,--,--
-EVENT,38,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,40,2,F#4,WanderPluck,138,6,--,--
-EVENT,40,4,D-2,SkirmishBass,165,3,--,--
-EVENT,40,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,38,4,D-2,SkirmishBass,130,3,--,--
+EVENT,38,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,40,2,F#4,WanderPluck,142,6,--,--
+EVENT,40,4,D-2,SkirmishBass,162,3,--,--
+EVENT,40,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,40,7,A-4,EdgeHarp,132,3,--,--
 EVENT,42,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,44,2,E-4,WanderPluck,138,6,--,--
-EVENT,44,4,D-2,SkirmishBass,132,3,--,--
+EVENT,44,2,E-4,WanderPluck,142,6,--,--
+EVENT,44,4,D-2,SkirmishBass,130,3,--,--
 EVENT,44,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,44,7,F#4,EdgeHarp,132,3,--,--
-EVENT,46,4,D-2,SkirmishBass,132,3,--,--
-EVENT,46,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,46,4,D-2,SkirmishBass,130,3,--,--
+EVENT,46,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,46,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,48,1,B-1,EarthDrone,136,16,--,PAN 128
-EVENT,48,2,B-2,WanderPluck,138,6,--,--
-EVENT,48,3,F#3,RuinsHorn,152,14,VIB 48,--
-EVENT,48,4,B-1,SkirmishBass,165,3,--,--
+EVENT,48,1,B-1,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,B-2,WanderPluck,142,6,--,--
+EVENT,48,3,F#3,RuinsHorn,156,14,VIB 48,--
+EVENT,48,4,B-1,SkirmishBass,162,3,--,--
 EVENT,48,5,E-2,WildDrum,195,5,SDN 12,PAN 128
 EVENT,48,7,B-4,EdgeHarp,132,3,--,--
 EVENT,50,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,52,2,F#3,WanderPluck,138,6,--,--
-EVENT,52,4,B-1,SkirmishBass,132,3,--,--
+EVENT,52,2,F#3,WanderPluck,142,6,--,--
+EVENT,52,4,B-1,SkirmishBass,130,3,--,--
 EVENT,52,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,52,7,F#4,EdgeHarp,132,3,--,--
-EVENT,54,4,B-1,SkirmishBass,132,3,--,--
-EVENT,54,5,B-1,WildDrum,150,4,SDN 10,--
-EVENT,56,2,B-3,WanderPluck,138,6,--,--
-EVENT,56,4,B-1,SkirmishBass,165,3,--,--
-EVENT,56,5,E-2,WildDrum,175,4,SDN 12,--
+EVENT,54,4,B-1,SkirmishBass,130,3,--,--
+EVENT,54,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,56,2,B-3,WanderPluck,142,6,--,--
+EVENT,56,4,B-1,SkirmishBass,162,3,--,--
+EVENT,56,5,E-2,WildDrum,172,4,SDN 12,--
 EVENT,56,7,D#4,EdgeHarp,132,3,--,--
 EVENT,58,6,E-6,WildShaker,82,2,--,PAN 84
-EVENT,60,2,D#4,WanderPluck,138,6,--,--
-EVENT,60,4,B-1,SkirmishBass,132,3,--,--
+EVENT,60,2,D#4,WanderPluck,142,6,--,--
+EVENT,60,4,B-1,SkirmishBass,130,3,--,--
 EVENT,60,6,E-6,WildShaker,82,2,--,PAN 172
 EVENT,60,7,F#4,EdgeHarp,132,3,--,--
-EVENT,62,4,B-1,SkirmishBass,132,3,--,--
-EVENT,62,5,B-1,WildDrum,160,4,SDN 10,--
+EVENT,62,4,B-1,SkirmishBass,130,3,--,--
+EVENT,62,5,B-1,WildDrum,156,4,SDN 10,--
 EVENT,62,6,E-6,WildShaker,82,2,--,PAN 84
+PATTERN,E,64,84,4,16,E,Minor,Fog Over the Cairn
+EVENT,0,0,B-3,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,E-3,WanderPluck,142,6,ECH 64,PAN 78
+EVENT,0,4,E-2,SkirmishBass,162,4,--,PAN 128
+EVENT,0,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,0,7,E-4,EdgeHarp,122,3,--,PAN 186
+EVENT,4,3,B-3,RuinsHorn,156,12,VIB 48,PAN 160
+EVENT,4,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,8,2,B-3,WanderPluck,142,6,ECH 64,--
+EVENT,8,4,E-2,SkirmishBass,162,4,--,--
+EVENT,10,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,12,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,16,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,F#4,WanderPluck,142,6,ECH 64,--
+EVENT,16,4,E-2,SkirmishBass,162,4,--,--
+EVENT,16,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,16,7,B-4,EdgeHarp,122,3,--,--
+EVENT,20,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,24,2,G-4,WanderPluck,142,6,ECH 64,--
+EVENT,24,3,G-3,RuinsHorn,156,12,VIB 48,--
+EVENT,24,4,E-2,SkirmishBass,162,4,--,--
+EVENT,26,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,28,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,32,0,G-3,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,D-2,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,D-3,WanderPluck,142,6,ECH 64,--
+EVENT,32,4,D-2,SkirmishBass,162,4,--,--
+EVENT,32,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,32,7,A-4,EdgeHarp,122,3,--,--
+EVENT,36,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,40,2,A-3,WanderPluck,142,6,ECH 64,--
+EVENT,40,4,D-2,SkirmishBass,162,4,--,--
+EVENT,42,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,44,3,F#3,RuinsHorn,156,14,VIB 48,--
+EVENT,44,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,48,1,C-2,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,C-3,WanderPluck,142,6,ECH 64,--
+EVENT,48,4,C-2,SkirmishBass,162,4,--,--
+EVENT,48,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,48,7,G-4,EdgeHarp,122,3,--,--
+EVENT,52,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,56,2,E-4,WanderPluck,142,6,ECH 64,--
+EVENT,56,4,C-2,SkirmishBass,162,4,--,--
+EVENT,58,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,60,6,E-6,WildShaker,70,2,--,PAN 172
+PATTERN,F,64,84,4,16,E,Phrygian,Shadowed Road
+EVENT,0,0,F-4,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,E-3,WanderPluck,142,6,--,PAN 78
+EVENT,0,3,E-4,RuinsHorn,156,8,VIB 48,PAN 160
+EVENT,0,4,E-2,SkirmishBass,162,3,--,PAN 128
+EVENT,0,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,0,7,E-4,EdgeHarp,132,3,--,PAN 186
+EVENT,2,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,2,7,G-4,EdgeHarp,132,3,--,--
+EVENT,4,2,B-3,WanderPluck,142,6,--,--
+EVENT,4,4,E-2,SkirmishBass,130,3,--,--
+EVENT,4,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,4,7,B-4,EdgeHarp,132,3,--,--
+EVENT,6,4,E-2,SkirmishBass,130,3,--,--
+EVENT,6,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,8,2,G-4,WanderPluck,142,6,--,--
+EVENT,8,3,F-4,RuinsHorn,156,8,VIB 48,--
+EVENT,8,4,E-2,SkirmishBass,162,3,--,--
+EVENT,8,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,8,7,G-4,EdgeHarp,132,3,--,--
+EVENT,10,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,12,2,F-4,WanderPluck,142,6,--,--
+EVENT,12,4,E-2,SkirmishBass,130,3,--,--
+EVENT,12,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,12,7,F-4,EdgeHarp,132,3,--,--
+EVENT,14,4,E-2,SkirmishBass,130,3,--,--
+EVENT,14,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,14,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,16,1,F-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,F-3,WanderPluck,142,6,--,--
+EVENT,16,3,A-4,RuinsHorn,156,10,VIB 48,--
+EVENT,16,4,F-2,SkirmishBass,162,3,--,--
+EVENT,16,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,16,7,F-4,EdgeHarp,132,3,--,--
+EVENT,18,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,18,7,A-4,EdgeHarp,132,3,--,--
+EVENT,20,2,C-4,WanderPluck,142,6,--,--
+EVENT,20,4,F-2,SkirmishBass,130,3,--,--
+EVENT,20,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,20,7,C-5,EdgeHarp,132,3,--,--
+EVENT,22,4,F-2,SkirmishBass,130,3,--,--
+EVENT,22,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,24,2,A-4,WanderPluck,142,6,--,--
+EVENT,24,4,F-2,SkirmishBass,162,3,--,--
+EVENT,24,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,24,7,A-4,EdgeHarp,132,3,--,--
+EVENT,26,3,G-4,RuinsHorn,156,6,VIB 48,--
+EVENT,26,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,28,2,G-4,WanderPluck,142,6,--,--
+EVENT,28,4,F-2,SkirmishBass,130,3,--,--
+EVENT,28,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,28,7,G-4,EdgeHarp,132,3,--,--
+EVENT,30,4,F-2,SkirmishBass,130,3,--,--
+EVENT,30,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,30,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,32,0,B-3,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,G-2,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,G-3,WanderPluck,142,6,--,--
+EVENT,32,3,B-4,RuinsHorn,156,10,VIB 48,--
+EVENT,32,4,G-2,SkirmishBass,162,3,--,--
+EVENT,32,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,32,7,G-4,EdgeHarp,132,3,--,--
+EVENT,34,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,34,7,B-4,EdgeHarp,132,3,--,--
+EVENT,36,2,D-4,WanderPluck,142,6,--,--
+EVENT,36,4,G-2,SkirmishBass,130,3,--,--
+EVENT,36,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,36,7,D-5,EdgeHarp,132,3,--,--
+EVENT,38,4,G-2,SkirmishBass,130,3,--,--
+EVENT,38,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,40,2,B-4,WanderPluck,142,6,--,--
+EVENT,40,4,G-2,SkirmishBass,162,3,--,--
+EVENT,40,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,40,7,B-4,EdgeHarp,132,3,--,--
+EVENT,42,3,A-4,RuinsHorn,156,6,VIB 48,--
+EVENT,42,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,44,2,A-4,WanderPluck,142,6,--,--
+EVENT,44,4,G-2,SkirmishBass,130,3,--,--
+EVENT,44,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,44,7,A-4,EdgeHarp,132,3,--,--
+EVENT,46,4,G-2,SkirmishBass,130,3,--,--
+EVENT,46,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,46,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,48,1,B-1,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,B-2,WanderPluck,142,6,--,--
+EVENT,48,3,F#4,RuinsHorn,156,10,VIB 48,--
+EVENT,48,4,B-1,SkirmishBass,162,3,--,--
+EVENT,48,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,48,7,B-4,EdgeHarp,132,3,--,--
+EVENT,50,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,52,2,F#3,WanderPluck,142,6,--,--
+EVENT,52,4,B-1,SkirmishBass,130,3,--,--
+EVENT,52,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,52,7,F#4,EdgeHarp,132,3,--,--
+EVENT,54,4,B-1,SkirmishBass,130,3,--,--
+EVENT,54,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,56,2,D#4,WanderPluck,142,6,--,--
+EVENT,56,4,B-1,SkirmishBass,162,3,--,--
+EVENT,56,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,56,7,D#4,EdgeHarp,132,3,--,--
+EVENT,58,3,D#4,RuinsHorn,156,6,VIB 48,--
+EVENT,58,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,60,2,B-3,WanderPluck,142,6,--,--
+EVENT,60,4,B-1,SkirmishBass,130,3,--,--
+EVENT,60,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,60,7,F#4,EdgeHarp,132,3,--,--
+EVENT,62,4,B-1,SkirmishBass,130,3,--,--
+EVENT,62,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,62,6,E-6,WildShaker,82,2,--,PAN 84
+PATTERN,G,64,84,4,16,E,Minor,Highland Gale
+EVENT,0,0,E-4,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,E-2,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,E-3,WanderPluck,142,6,--,PAN 78
+EVENT,0,3,B-4,RuinsHorn,156,6,VIB 48,PAN 160
+EVENT,0,4,E-2,SkirmishBass,162,3,--,PAN 128
+EVENT,0,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,0,7,E-5,EdgeHarp,132,3,--,PAN 186
+EVENT,2,2,B-3,WanderPluck,142,6,--,--
+EVENT,2,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,4,2,G-4,WanderPluck,142,6,--,--
+EVENT,4,4,E-2,SkirmishBass,130,3,--,--
+EVENT,4,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,4,7,B-4,EdgeHarp,132,3,--,--
+EVENT,6,3,C-5,RuinsHorn,156,6,VIB 48,--
+EVENT,6,4,E-2,SkirmishBass,130,3,--,--
+EVENT,6,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,8,2,F#4,WanderPluck,142,6,--,--
+EVENT,8,4,E-2,SkirmishBass,162,3,--,--
+EVENT,8,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,8,7,G-4,EdgeHarp,132,3,--,--
+EVENT,10,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,12,2,E-4,WanderPluck,142,6,--,--
+EVENT,12,3,B-4,RuinsHorn,156,4,VIB 48,--
+EVENT,12,4,E-2,SkirmishBass,130,3,--,--
+EVENT,12,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,12,7,E-4,EdgeHarp,132,3,--,--
+EVENT,14,4,E-2,SkirmishBass,130,3,--,--
+EVENT,14,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,14,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,16,1,C-2,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,C-3,WanderPluck,142,6,--,--
+EVENT,16,3,G-4,RuinsHorn,156,8,VIB 48,--
+EVENT,16,4,C-2,SkirmishBass,162,3,--,--
+EVENT,16,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,16,7,E-5,EdgeHarp,132,3,--,--
+EVENT,18,2,G-3,WanderPluck,142,6,--,--
+EVENT,18,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,20,2,E-4,WanderPluck,142,6,--,--
+EVENT,20,4,C-2,SkirmishBass,130,3,--,--
+EVENT,20,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,20,7,C-5,EdgeHarp,132,3,--,--
+EVENT,22,4,C-2,SkirmishBass,130,3,--,--
+EVENT,22,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,24,2,D-4,WanderPluck,142,6,--,--
+EVENT,24,3,E-4,RuinsHorn,156,8,VIB 48,--
+EVENT,24,4,C-2,SkirmishBass,162,3,--,--
+EVENT,24,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,24,7,G-4,EdgeHarp,132,3,--,--
+EVENT,26,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,28,2,C-4,WanderPluck,142,6,--,--
+EVENT,28,4,C-2,SkirmishBass,130,3,--,--
+EVENT,28,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,28,7,E-4,EdgeHarp,132,3,--,--
+EVENT,30,4,C-2,SkirmishBass,130,3,--,--
+EVENT,30,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,30,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,32,0,B-4,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,A-1,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,A-2,WanderPluck,142,6,--,--
+EVENT,32,3,A-4,RuinsHorn,156,8,VIB 48,--
+EVENT,32,4,A-1,SkirmishBass,162,3,--,--
+EVENT,32,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,32,7,C-5,EdgeHarp,132,3,--,--
+EVENT,34,2,E-3,WanderPluck,142,6,--,--
+EVENT,34,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,36,2,C-4,WanderPluck,142,6,--,--
+EVENT,36,4,A-1,SkirmishBass,130,3,--,--
+EVENT,36,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,36,7,A-4,EdgeHarp,132,3,--,--
+EVENT,38,4,A-1,SkirmishBass,130,3,--,--
+EVENT,38,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,40,2,B-3,WanderPluck,142,6,--,--
+EVENT,40,3,C-5,RuinsHorn,156,8,VIB 48,--
+EVENT,40,4,A-1,SkirmishBass,162,3,--,--
+EVENT,40,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,40,7,E-4,EdgeHarp,132,3,--,--
+EVENT,42,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,44,2,A-3,WanderPluck,142,6,--,--
+EVENT,44,4,A-1,SkirmishBass,130,3,--,--
+EVENT,44,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,44,7,C-4,EdgeHarp,132,3,--,--
+EVENT,46,4,A-1,SkirmishBass,130,3,--,--
+EVENT,46,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,46,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,48,1,B-1,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,B-2,WanderPluck,142,6,--,--
+EVENT,48,3,B-4,RuinsHorn,156,10,VIB 48,--
+EVENT,48,4,B-1,SkirmishBass,162,3,--,--
+EVENT,48,5,E-2,WildDrum,195,5,SDN 12,PAN 128
+EVENT,48,7,B-4,EdgeHarp,132,3,--,--
+EVENT,50,2,F#3,WanderPluck,142,6,--,--
+EVENT,50,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,52,2,D#4,WanderPluck,142,6,--,--
+EVENT,52,4,B-1,SkirmishBass,130,3,--,--
+EVENT,52,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,52,7,F#4,EdgeHarp,132,3,--,--
+EVENT,54,4,B-1,SkirmishBass,130,3,--,--
+EVENT,54,5,B-1,WildDrum,148,4,SDN 10,--
+EVENT,56,2,F#4,WanderPluck,142,6,--,--
+EVENT,56,4,B-1,SkirmishBass,162,3,--,--
+EVENT,56,5,E-2,WildDrum,172,4,SDN 12,--
+EVENT,56,7,D#4,EdgeHarp,132,3,--,--
+EVENT,58,3,F#4,RuinsHorn,156,6,VIB 48,--
+EVENT,58,6,E-6,WildShaker,82,2,--,PAN 84
+EVENT,60,2,B-4,WanderPluck,142,6,--,--
+EVENT,60,4,B-1,SkirmishBass,130,3,--,--
+EVENT,60,6,E-6,WildShaker,82,2,--,PAN 172
+EVENT,60,7,B-3,EdgeHarp,132,3,--,--
+EVENT,62,4,B-1,SkirmishBass,130,3,--,--
+EVENT,62,5,B-1,WildDrum,156,4,SDN 10,--
+EVENT,62,6,E-6,WildShaker,82,2,--,PAN 84
+PATTERN,H,64,84,4,16,E,Minor,Weathered Stones
+EVENT,0,0,A-3,HighlandWind,100,32,--,PAN 44
+EVENT,0,1,A-1,EarthDrone,142,16,--,PAN 128
+EVENT,0,2,A-2,WanderPluck,142,6,ECH 64,PAN 78
+EVENT,0,3,E-4,RuinsHorn,156,12,VIB 48,PAN 160
+EVENT,0,4,A-1,SkirmishBass,162,4,--,PAN 128
+EVENT,0,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,0,7,A-4,EdgeHarp,122,3,--,PAN 186
+EVENT,4,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,6,2,E-3,WanderPluck,142,6,ECH 64,--
+EVENT,8,4,A-1,SkirmishBass,162,4,--,--
+EVENT,10,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,12,2,C-4,WanderPluck,142,6,ECH 64,--
+EVENT,12,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,16,1,G-1,EarthDrone,142,16,--,PAN 128
+EVENT,16,2,G-2,WanderPluck,142,6,ECH 64,--
+EVENT,16,3,D-4,RuinsHorn,156,12,VIB 48,--
+EVENT,16,4,G-1,SkirmishBass,162,4,--,--
+EVENT,16,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,16,7,G-4,EdgeHarp,122,3,--,--
+EVENT,20,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,22,2,D-3,WanderPluck,142,6,ECH 64,--
+EVENT,24,4,G-1,SkirmishBass,162,4,--,--
+EVENT,26,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,28,2,B-3,WanderPluck,142,6,ECH 64,--
+EVENT,28,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,32,0,F#3,HighlandWind,102,32,--,PAN 212
+EVENT,32,1,F#1,EarthDrone,142,16,--,PAN 128
+EVENT,32,2,F#2,WanderPluck,142,6,ECH 64,--
+EVENT,32,3,C-4,RuinsHorn,156,12,VIB 48,--
+EVENT,32,4,F#1,SkirmishBass,162,4,--,--
+EVENT,32,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,32,7,F#4,EdgeHarp,122,3,--,--
+EVENT,36,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,38,2,C-3,WanderPluck,142,6,ECH 64,--
+EVENT,40,4,F#1,SkirmishBass,162,4,--,--
+EVENT,42,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,44,2,A-3,WanderPluck,142,6,ECH 64,--
+EVENT,44,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,48,1,B-1,EarthDrone,142,16,--,PAN 128
+EVENT,48,2,B-2,WanderPluck,142,6,ECH 64,--
+EVENT,48,3,B-3,RuinsHorn,156,14,VIB 48,--
+EVENT,48,4,B-1,SkirmishBass,162,4,--,--
+EVENT,48,5,E-2,WildDrum,180,5,SDN 12,PAN 128
+EVENT,48,7,D#4,EdgeHarp,122,3,--,--
+EVENT,52,6,E-6,WildShaker,70,2,--,PAN 172
+EVENT,54,2,F#3,WanderPluck,142,6,ECH 64,--
+EVENT,56,4,B-1,SkirmishBass,162,4,--,--
+EVENT,58,5,B-1,WildDrum,132,4,SDN 10,--
+EVENT,60,2,B-3,WanderPluck,142,6,ECH 64,--
+EVENT,60,6,E-6,WildShaker,70,2,--,PAN 172
