@@ -33,6 +33,7 @@ function sendPacket(payload) {
 }
 
 const hud = new HUDController({
+  audio,
   sendPacket,
   onExitToMenu: exitToMainMenu
 });
@@ -145,28 +146,22 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
   };
 }
 
-function getStereoPan(worldX) {
-  if (typeof worldX !== 'number') return 0;
-  const centerX = renderer.camera.x + 120;
-  return Math.max(-0.85, Math.min(0.85, (worldX - centerX) / 140));
-}
-
 function processEvents(events) {
   if (!events) return;
   for (const ev of events) {
     if (ev.type === 'DAMAGE') {
       renderer.addFloatingText(ev.isCrit ? `${ev.damage}! CRIT` : `${ev.damage}`, ev.x, ev.y, ev.isCrit ? '#FACC15' : '#FFFFFF', ev.isCrit);
-      const pan = getStereoPan(ev.x);
       if (ev.attackerId) renderer.triggerEntityAnim(ev.attackerId, 'attack', 0.28);
       if (ev.id) renderer.triggerEntityAnim(ev.id, 'hurt', 0.2);
       if (ev.targetType === 'player' && ev.id === myPlayerId) {
         audio.play('player_hurt', { pan: 0, pitchJitter: 0.06 });
       } else {
-        audio.play(ev.isCrit ? 'crit' : 'hit', { pan, pitchJitter: 0.06 });
+        // Player proximity volume & stereo panning based on distance
+        audio.play(ev.isCrit ? 'crit' : 'hit', { x: ev.x, y: ev.y, pitchJitter: 0.06 });
       }
     } else if (ev.type === 'HEAL') {
       renderer.addFloatingText(`+${ev.amount} HP`, ev.x, ev.y, '#34D399');
-      audio.play('potion', { pan: getStereoPan(ev.x), pitchJitter: 0.03 });
+      audio.play('potion', { x: ev.x, y: ev.y, pitchJitter: 0.03 });
     } else if (ev.type === 'LEVEL_UP') {
       renderer.addFloatingText(`LEVEL ${ev.level}!`, ev.x, ev.y - 6, '#FACC15', true);
       audio.play('level_up', { pitchJitter: 0 });
@@ -175,7 +170,11 @@ function processEvents(events) {
       audio.play('overburdened', { pitchJitter: 0 });
     } else if (ev.type === 'PLAYER_DEATH') {
       if (ev.hardcore) renderer.addFloatingText(`${ev.name} HAS FALLEN!`, ev.x || 120, ev.y || 72, '#EF4444', true);
-      if (ev.id === myPlayerId || ev.hardcore) audio.play('player_death', { pitchJitter: 0 });
+      if (ev.id === myPlayerId) {
+        audio.play('player_death', { pitchJitter: 0 });
+      } else if (ev.hardcore) {
+        audio.play('player_death', { x: ev.x, y: ev.y, pitchJitter: 0 });
+      }
     } else if (ev.type === 'PLAYER_RESPAWN') {
       renderer.addFloatingText('RESPAWNED', ev.x, ev.y - 6, '#38BDF8', true);
     } else if (ev.type === 'FLOOR_DESCENT') {
@@ -191,6 +190,12 @@ function render(now) {
 
   const interp = interpolator.getInterpolatedEntities(dt);
   lastInterp = interp;
+
+  // Continuously track player position as the listener for spatial audio
+  const myP = interp.players.find(p => p.id === myPlayerId);
+  if (myP) {
+    audio.setListener(myP.rx ?? myP.x, myP.ry ?? myP.y);
+  }
 
   input.updateHoldMove(now);
   const { hoveredLoot, hoveredMob } = input.getHoverTargets(interp);

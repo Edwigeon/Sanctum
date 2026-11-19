@@ -78,6 +78,7 @@
         <div><strong class="text-cyan-400">RMB:</strong> Cast Spark Spell</div>
         <div><strong class="text-rose-400">1:</strong> Drink Health Potion</div>
         <div><strong class="text-emerald-400">C / I / ESC:</strong> Character Sheet / Inventory / Menu</div>
+        <div><strong class="text-slate-300">M:</strong> Toggle Audio Mute</div>
       </div>
     </div>
   </div>
@@ -301,6 +302,9 @@
       <button id="btn-copy-invite" type="button"
         class="hidden text-[10px] font-mono bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded border border-amber-700/60 transition"
         title="Copy Invite Link">Invite: —</button>
+      <button id="btn-quick-mute" type="button"
+        class="text-[10px] font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition flex items-center gap-1"
+        title="Toggle Audio Mute (Key: M)"><span id="icon-quick-mute">🔊</span><span id="label-quick-mute">Sound</span></button>
     </div>
     <div class="text-slate-400 font-mono text-[11px] hidden sm:flex gap-3">
       <span><strong class="text-amber-400">LMB:</strong> Move / Attack / Loot</span>
@@ -308,6 +312,7 @@
       <span><strong class="text-rose-400">1:</strong> Potion</span>
       <span><strong class="text-emerald-400">C:</strong> Char</span>
       <span><strong class="text-indigo-400">I:</strong> Inv</span>
+      <span><strong class="text-slate-300">M:</strong> Mute</span>
     </div>
   </header>
 
@@ -448,10 +453,60 @@
       <!-- IN-GAME PAUSE / ESC MENU -->
       <div id="panel-pause"
         class="hidden absolute inset-0 z-40 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center cursor-default">
-        <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 w-80 shadow-2xl text-center space-y-3">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 w-84 max-w-sm shadow-2xl text-center space-y-3">
           <h3 class="font-bold text-base tracking-widest text-amber-300">GAME MENU</h3>
           <button id="btn-pause-resume"
             class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded text-xs transition">Resume</button>
+
+          <!-- AUDIO & SOUND SETTINGS -->
+          <div class="pt-2 border-t border-slate-800 space-y-2.5 text-left">
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+              <span>Audio Settings</span>
+              <button id="btn-pause-mute-toggle" type="button"
+                class="text-[11px] text-amber-400 hover:text-amber-300 font-semibold transition cursor-pointer">🔊 Sound On</button>
+            </div>
+
+            <!-- Master Volume -->
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] font-mono text-slate-300">
+                <span>Master Volume</span>
+                <span id="label-vol-master" class="text-amber-300 font-bold">80%</span>
+              </div>
+              <input id="slider-vol-master" type="range" min="0" max="100" value="80"
+                class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-amber-500">
+            </div>
+
+            <!-- SFX Volume -->
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] font-mono text-slate-300">
+                <span>SFX Volume</span>
+                <span id="label-vol-sfx" class="text-indigo-300 font-bold">80%</span>
+              </div>
+              <input id="slider-vol-sfx" type="range" min="0" max="100" value="80"
+                class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            </div>
+
+            <!-- Music Volume -->
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-[10px] font-mono text-slate-300">
+                <span>Music Volume</span>
+                <span id="label-vol-music" class="text-emerald-300 font-bold">60%</span>
+              </div>
+              <input id="slider-vol-music" type="range" min="0" max="100" value="60"
+                class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+            </div>
+
+            <!-- Proximity SFX & Spatial Stereo Panning -->
+            <label class="flex items-center justify-between text-[10px] font-mono text-slate-300 cursor-pointer pt-1 border-t border-slate-800/60">
+              <div class="pr-2">
+                <div class="text-slate-200 font-semibold">Proximity SFX Volume</div>
+                <div class="text-[9px] text-slate-400 leading-tight">Player distance attenuation &amp; stereo panning</div>
+              </div>
+              <input id="chk-spatial-audio" type="checkbox" checked
+                class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-indigo-500 focus:ring-0 cursor-pointer">
+            </label>
+          </div>
+
           <div id="pause-share-box" class="hidden pt-2 border-t border-slate-800 space-y-1.5 text-left">
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase">
               <span>Invite Friends to This Game</span>

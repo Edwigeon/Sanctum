@@ -279,12 +279,78 @@ export class AudioPSG {
 
     this.ctx = null;
     this.masterGain = null;
-    this.volume = 0.35;
-    this.muted = false;
+    this.sfxGain = null;
+    this.musicGain = null;
+
+    // Load persisted settings
+    this.settings = this.loadSettings();
+
+    // Listener coordinates for 2D spatial audio
+    this.listenerX = 0;
+    this.listenerY = 0;
 
     this.patches = {};
     this.bufferCache = new Map(); // name -> AudioBuffer
     this.lastPlayedAt = new Map(); // name -> ms timestamp (anti-spam throttle)
+    this.listeners = new Set(); // Change event listeners
+  }
+
+  loadSettings() {
+    const defaults = {
+      master: 0.8,
+      sfx: 0.8,
+      music: 0.6,
+      muted: false,
+      spatial: true
+    };
+    try {
+      const raw = localStorage.getItem('sanctum_audio_settings');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return {
+          master: typeof parsed.master === 'number' ? Math.max(0, Math.min(1, parsed.master)) : defaults.master,
+          sfx: typeof parsed.sfx === 'number' ? Math.max(0, Math.min(1, parsed.sfx)) : defaults.sfx,
+          music: typeof parsed.music === 'number' ? Math.max(0, Math.min(1, parsed.music)) : defaults.music,
+          muted: typeof parsed.muted === 'boolean' ? parsed.muted : defaults.muted,
+          spatial: typeof parsed.spatial === 'boolean' ? parsed.spatial : defaults.spatial
+        };
+      }
+    } catch (_) {}
+    return defaults;
+  }
+
+  saveSettings() {
+    try {
+      localStorage.setItem('sanctum_audio_settings', JSON.stringify(this.settings));
+    } catch (_) {}
+    this.notifyListeners();
+  }
+
+  onSettingsChange(fn) {
+    this.listeners.add(fn);
+    return () => this.listeners.delete(fn);
+  }
+
+  notifyListeners() {
+    for (const fn of this.listeners) {
+      try { fn(this.settings); } catch (_) {}
+    }
+  }
+
+  get volume() {
+    return this.settings.master;
+  }
+
+  set volume(v) {
+    this.setMasterVolume(v);
+  }
+
+  get muted() {
+    return this.settings.muted;
+  }
+
+  set muted(m) {
+    this.setMuted(m);
   }
 
   ensureContext() {
@@ -292,9 +358,19 @@ export class AudioPSG {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return null;
       this.ctx = new AudioCtx();
+
+      // Audio Graph: SFX Gain & Music Gain -> Master Gain -> Destination
       this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.value = this.muted ? 0 : this.volume;
+      this.masterGain.gain.value = this.settings.muted ? 0 : this.settings.master;
       this.masterGain.connect(this.ctx.destination);
+
+      this.sfxGain = this.ctx.createGain();
+      this.sfxGain.gain.value = this.settings.sfx;
+      this.sfxGain.connect(this.masterGain);
+
+      this.musicGain = this.ctx.createGain();
+      this.musicGain.gain.value = this.settings.music;
+      this.musicGain.connect(this.masterGain);
     }
     if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
@@ -303,22 +379,82 @@ export class AudioPSG {
   }
 
   setMuted(muted) {
-    this.muted = !!muted;
+    this.settings.muted = !!muted;
     if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setValueAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(this.settings.muted ? 0 : this.settings.master, this.ctx.currentTime);
     }
-    return this.muted;
+    this.saveSettings();
+    return this.settings.muted;
   }
 
   toggleMute() {
-    return this.setMuted(!this.muted);
+    return this.setMuted(!this.settings.muted);
+  }
+
+  setMasterVolume(vol) {
+    this.settings.master = Math.max(0, Math.min(1, vol));
+    if (this.masterGain && this.ctx && !this.settings.muted) {
+      this.masterGain.gain.setValueAtTime(this.settings.master, this.ctx.currentTime);
+    }
+    this.saveSettings();
   }
 
   setVolume(vol) {
-    this.volume = Math.max(0, Math.min(1, vol));
-    if (this.masterGain && this.ctx && !this.muted) {
-      this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+    this.setMasterVolume(vol);
+  }
+
+  setSfxVolume(vol) {
+    this.settings.sfx = Math.max(0, Math.min(1, vol));
+    if (this.sfxGain && this.ctx) {
+      this.sfxGain.gain.setValueAtTime(this.settings.sfx, this.ctx.currentTime);
     }
+    this.saveSettings();
+  }
+
+  setMusicVolume(vol) {
+    this.settings.music = Math.max(0, Math.min(1, vol));
+    if (this.musicGain && this.ctx) {
+      this.musicGain.gain.setValueAtTime(this.settings.music, this.ctx.currentTime);
+    }
+    this.saveSettings();
+  }
+
+  setSpatialEnabled(enabled) {
+    this.settings.spatial = !!enabled;
+    this.saveSettings();
+  }
+
+  setListener(x, y) {
+    if (typeof x === 'number') this.listenerX = x;
+    if (typeof y === 'number') this.listenerY = y;
+  }
+
+  /**
+   * Calculates distance attenuation & stereo panning relative to listener (player).
+   */
+  calculateSpatial(sourceX, sourceY, maxDist = 260) {
+    if (!this.settings.spatial) {
+      return { gain: 1.0, pan: 0.0, audible: true };
+    }
+    if (typeof sourceX !== 'number' || typeof sourceY !== 'number') {
+      return { gain: 1.0, pan: 0.0, audible: true };
+    }
+    const dx = sourceX - this.listenerX;
+    const dy = sourceY - this.listenerY;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist >= maxDist) {
+      return { gain: 0, pan: 0, audible: false };
+    }
+
+    // Distance attenuation: natural dropoff with punchy center
+    const norm = 1.0 - (dist / maxDist);
+    const gain = Math.pow(norm, 1.4);
+
+    // Stereo panning based on X offset (-0.85 to +0.85)
+    const pan = Math.max(-0.85, Math.min(0.85, dx / 150));
+
+    return { gain, pan, audible: true };
   }
 
   async loadManifest(url = '/data/sfx.json') {
@@ -601,11 +737,30 @@ export class AudioPSG {
 
   /**
    * Plays a named SFX from the loaded manifest (caching its AudioBuffer on first play).
+   * Supports player-relative proximity attenuation & stereo panning if { x, y } are provided.
    */
-  play(name, { gain = 1.0, pitchJitter = 0.04, pan = 0.0, minIntervalMs = 35 } = {}) {
-    if (this.muted) return;
+  play(name, {
+    gain = 1.0,
+    pitchJitter = 0.04,
+    pan = 0.0,
+    minIntervalMs = 35,
+    x = null,
+    y = null,
+    maxDistance = 260
+  } = {}) {
+    if (this.settings.muted) return;
     const patch = this.patches[name];
     if (!patch) return;
+
+    // Spatial proximity & stereo panning if position provided
+    let spatialGain = 1.0;
+    let spatialPan = pan;
+    if (typeof x === 'number' && typeof y === 'number') {
+      const spatial = this.calculateSpatial(x, y, maxDistance);
+      if (!spatial.audible || spatial.gain <= 0.002) return; // Out of hearing range
+      spatialGain = spatial.gain;
+      spatialPan = spatial.pan;
+    }
 
     const now = performance.now();
     const last = this.lastPlayedAt.get(name) || 0;
@@ -629,17 +784,19 @@ export class AudioPSG {
     }
 
     const gNode = ctx.createGain();
-    gNode.gain.value = (patch.gain ?? 0.8) * gain;
+    gNode.gain.value = (patch.gain ?? 0.8) * gain * spatialGain;
 
-    if (pan !== 0 && ctx.createStereoPanner) {
+    const targetBus = this.sfxGain || this.masterGain;
+
+    if (spatialPan !== 0 && ctx.createStereoPanner) {
       const pNode = ctx.createStereoPanner();
-      pNode.pan.value = Math.max(-1, Math.min(1, pan));
+      pNode.pan.value = Math.max(-1, Math.min(1, spatialPan));
       src.connect(gNode);
       gNode.connect(pNode);
-      pNode.connect(this.masterGain);
+      pNode.connect(targetBus);
     } else {
       src.connect(gNode);
-      gNode.connect(this.masterGain);
+      gNode.connect(targetBus);
     }
 
     src.start();
@@ -657,8 +814,9 @@ export class AudioPSG {
     src.buffer = buffer;
     const gNode = ctx.createGain();
     gNode.gain.value = patch.gain ?? 0.8;
+    const targetBus = this.sfxGain || this.masterGain;
     src.connect(gNode);
-    gNode.connect(this.masterGain);
+    gNode.connect(targetBus);
     src.start();
     return samples;
   }

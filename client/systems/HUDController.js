@@ -9,7 +9,8 @@ function formatItemStats(stats) {
 }
 
 export class HUDController {
-  constructor({ sendPacket, onExitToMenu }) {
+  constructor({ audio, sendPacket, onExitToMenu }) {
+    this.audio = audio;
     this.sendPacket = sendPacket;
     this.onExitToMenu = onExitToMenu;
 
@@ -24,6 +25,51 @@ export class HUDController {
     this.currentInviteCode = '';
 
     this.bindEvents();
+    this.initAudioSettings();
+  }
+
+  initAudioSettings() {
+    if (!this.audio) return;
+    this.syncAudioUI(this.audio.settings);
+    this.audio.onSettingsChange((settings) => this.syncAudioUI(settings));
+  }
+
+  syncAudioUI(settings) {
+    if (!settings) return;
+    const isMuted = settings.muted;
+    const iconQuick = document.getElementById('icon-quick-mute');
+    const labelQuick = document.getElementById('label-quick-mute');
+    if (iconQuick) iconQuick.textContent = isMuted ? '🔇' : '🔊';
+    if (labelQuick) labelQuick.textContent = isMuted ? 'Muted' : 'Sound';
+
+    const btnPauseMute = document.getElementById('btn-pause-mute-toggle');
+    if (btnPauseMute) {
+      btnPauseMute.textContent = isMuted ? '🔇 Muted (Click to Unmute)' : '🔊 Sound On';
+      btnPauseMute.className = isMuted
+        ? 'text-[11px] text-rose-400 hover:text-rose-300 font-semibold transition cursor-pointer'
+        : 'text-[11px] text-amber-400 hover:text-amber-300 font-semibold transition cursor-pointer';
+    }
+
+    const sliderMaster = document.getElementById('slider-vol-master');
+    const labelMaster = document.getElementById('label-vol-master');
+    const masterVal = Math.round((settings.master ?? 0.8) * 100);
+    if (sliderMaster && document.activeElement !== sliderMaster) sliderMaster.value = masterVal;
+    if (labelMaster) labelMaster.textContent = `${masterVal}%`;
+
+    const sliderSfx = document.getElementById('slider-vol-sfx');
+    const labelSfx = document.getElementById('label-vol-sfx');
+    const sfxVal = Math.round((settings.sfx ?? 0.8) * 100);
+    if (sliderSfx && document.activeElement !== sliderSfx) sliderSfx.value = sfxVal;
+    if (labelSfx) labelSfx.textContent = `${sfxVal}%`;
+
+    const sliderMusic = document.getElementById('slider-vol-music');
+    const labelMusic = document.getElementById('label-vol-music');
+    const musicVal = Math.round((settings.music ?? 0.6) * 100);
+    if (sliderMusic && document.activeElement !== sliderMusic) sliderMusic.value = musicVal;
+    if (labelMusic) labelMusic.textContent = `${musicVal}%`;
+
+    const chkSpatial = document.getElementById('chk-spatial-audio');
+    if (chkSpatial) chkSpatial.checked = !!settings.spatial;
   }
 
   bindEvents() {
@@ -64,6 +110,38 @@ export class HUDController {
 
     document.getElementById('btn-copy-invite').addEventListener('click', copyInvite);
     document.getElementById('btn-pause-copy-invite')?.addEventListener('click', copyInvite);
+
+    // Audio Controls & Volume Sliders
+    const toggleMute = () => {
+      if (this.audio) this.audio.toggleMute();
+    };
+    document.getElementById('btn-quick-mute')?.addEventListener('click', toggleMute);
+    document.getElementById('btn-pause-mute-toggle')?.addEventListener('click', toggleMute);
+
+    document.getElementById('slider-vol-master')?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value) / 100;
+      if (this.audio) this.audio.setMasterVolume(val);
+      const lbl = document.getElementById('label-vol-master');
+      if (lbl) lbl.textContent = `${e.target.value}%`;
+    });
+
+    document.getElementById('slider-vol-sfx')?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value) / 100;
+      if (this.audio) this.audio.setSfxVolume(val);
+      const lbl = document.getElementById('label-vol-sfx');
+      if (lbl) lbl.textContent = `${e.target.value}%`;
+    });
+
+    document.getElementById('slider-vol-music')?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value) / 100;
+      if (this.audio) this.audio.setMusicVolume(val);
+      const lbl = document.getElementById('label-vol-music');
+      if (lbl) lbl.textContent = `${e.target.value}%`;
+    });
+
+    document.getElementById('chk-spatial-audio')?.addEventListener('change', (e) => {
+      if (this.audio) this.audio.setSpatialEnabled(e.target.checked);
+    });
   }
 
   isPaused() {

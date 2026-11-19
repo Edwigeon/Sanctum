@@ -359,17 +359,19 @@ export class LightingSystem {
             let flip = false;
 
             if (openN && openW) {
-              // Top-left interior room corner
+              // Wall on SE corner of void -> facing NW into room
               chosenSpr = wallCornerSpr;
-              rot = 2; // Face opening SE
+              rot = 2;
             } else if (openN && openE) {
+              // Wall on SW corner of void -> facing NE into room
               chosenSpr = wallCornerSpr;
               rot = 3;
             } else if (openS && openW) {
-              // Bottom-left room corner (where south wall meets west wall)
+              // Wall on NE corner of void -> facing SW into room
               chosenSpr = wallCornerSpr;
               rot = 1;
             } else if (openS && openE) {
+              // Top-left interior room corner (wall on NW corner of room, facing SE)
               chosenSpr = wallCornerSpr;
               rot = 0;
             } else if (openN) {
@@ -381,13 +383,13 @@ export class LightingSystem {
               chosenSpr = wallFrontSpr;
               flip = wallFrontSpr.allowFlip && (((r * 19 + c * 43) & 1) !== 0);
             } else if (openW) {
-              // Vertical right-hand wall (facing West into the floor)
+              // Wall on right-hand side of floor -> faces West into room
               chosenSpr = wallSideSpr;
-              flip = true; // Mirror to face west
+              flip = false; // Right rim 'dd' faces inward west toward room
             } else if (openE) {
-              // Vertical left-hand wall (facing East into the floor)
+              // Wall on left-hand side of floor -> faces East into room
               chosenSpr = wallSideSpr;
-              flip = false;
+              flip = true; // Flip so 'dd' rim faces east into room
             } else {
               // Fully interior hidden wall or void border
               chosenSpr = wallFrontSpr;
