@@ -330,27 +330,6 @@ export class AudioPSG {
     this.bufferCache = new Map(); // name -> AudioBuffer
     this.lastPlayedAt = new Map(); // name -> ms timestamp (anti-spam throttle)
     this.listeners = new Set(); // Change event listeners
-
-    this.initWorker();
-  }
-
-  initWorker() {
-    this.worker = null;
-    if (typeof Worker !== 'undefined') {
-      try {
-        this.worker = new Worker(new URL('./AudioWorker.js', import.meta.url), { type: 'module' });
-        this.worker.onmessage = (e) => {
-          const { id, type, name, samples } = e.data || {};
-          if (type === 'SFX_READY' && samples && this.ctx) {
-            const buf = this.float32ToAudioBuffer(this.ctx, samples);
-            this.bufferCache.set(name, buf);
-          }
-        };
-      } catch (_) {
-        // Fall back gracefully to inline DSP if worker is not permitted
-        this.worker = null;
-      }
-    }
   }
 
   loadSettings() {
@@ -430,10 +409,6 @@ export class AudioPSG {
     // Discard old sample-rate buffers
     this.bufferCache.clear();
     this.saveSettings();
-
-    if (this.worker) {
-      this.worker.postMessage({ type: 'SET_SAMPLE_RATE', sampleRate: this.sampleRate });
-    }
   }
 
   ensureContext() {
