@@ -134,7 +134,12 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
         hud.setFloorStatus(packet.data.floor);
       }
       const floorNum = packet.data.floor || 1;
-      const targetSuite = floorNum <= 2 ? 'crypts' : (floorNum <= 4 ? 'caverns' : 'cathedral');
+      let targetSuite = 'wilderness';
+      if (floorNum === 1) targetSuite = 'wilderness';
+      else if (floorNum === 2) targetSuite = 'crypts';
+      else if (floorNum <= 4) targetSuite = 'caverns';
+      else if (floorNum < 10) targetSuite = 'cathedral';
+      else targetSuite = 'boss';
       music.setBiome(targetSuite, { immediate: false, fadeSec: 1.5 });
     } else if (packet.type === PACKET_TYPES.WORLD_SNAPSHOT) {
       const snap = packet.data;
@@ -207,7 +212,8 @@ function render(now) {
 
     // Real-Time Macro FX: Low-Health Muffle (< 25% HP) and Cavern/Cathedral Environment Echo
     const isLowHp = (myP.maxHp > 0) && ((myP.hp / myP.maxHp) <= 0.25);
-    const env = (latestSnapshot?.floor ?? 1) >= 4 ? 'cavern' : 'cathedral';
+    const floor = latestSnapshot?.floor ?? 1;
+    const env = (floor >= 3 && floor <= 4) ? 'cavern' : (floor >= 5 ? 'cathedral' : 'none');
     audio.setMacroState({ lowHealth: isLowHp, environment: env });
 
     // Adaptive Music State with Hysteresis (smooth combat decay, no jitter)

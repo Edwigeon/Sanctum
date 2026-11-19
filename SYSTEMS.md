@@ -161,12 +161,21 @@ Sanctum embeds a sample-accurate, zero-dependency procedural audio engine ported
    * Utilizes zero-copy Transferable `ArrayBuffer` handoffs (`postMessage(..., [samples.buffer])`), keeping the main render loop locked at 60+ FPS without garbage collection pauses.
 
 6. **Interactive Tracker Music Player (`MusicPlayer.js`)**:
-   * Parses native Lanthorn-PSG v1.1 `.csv` tracker project files (`/data/music/sanctum_cathedral.csv`, `sanctum_town.csv`).
+   * **Unified Root = D Modal Architecture**: All 6 soundtrack projects share **Root = D** as their harmonic tonal center, allowing seamless horizontal crossfading between floors, biomes, and tension layers with zero dissonance or key clashing:
+     * `town` (`/data/music/sanctum_town.csv`): **D Dorian / D Minor** (76 BPM) — Warm campfire hearth, gentle lute, cello lament, mellow drone.
+     * `wilderness` (`/data/music/sanctum_wilderness.csv`): **D Aeolian** (84 BPM) — Moorland mist, ruins horn calls, driving percussion, wind.
+     * `crypts` (`/data/music/sanctum_crypts.csv`): **D Phrygian** (76 BPM) — Torchlit nave, bone ossuary, crypt cello, tension dread.
+     * `caverns` (`/data/music/sanctum_caverns.csv`): **D Phrygian / D Harmonic Minor** (70 BPM) — Obsidian fault, tritone chasm, subterranean viola, echoing bells.
+     * `cathedral` (`/data/music/sanctum_cathedral.csv`): **D Phrygian / D Harmonic Minor** (80 BPM) — Mist & toll, Tristram dusk 12-string guitar, Butcher's hall, cathedral arpeggios.
+     * `boss` (`/data/music/sanctum_boss.csv`): **D Harmonic Minor** (108 BPM) — Throne of ash, diminished wrath, doom bells, climactic boss decree.
+   * **Dual-Voice Gain Crossfader**: Uses alternating Web Audio `GainNode` voices (`voiceGainA` and `voiceGainB`) with equal-power exponential ramps (1.0–1.5s), eliminating audio clicks, abrupt cuts, and DC pops during biome and mood transitions.
    * **Event-Driven Modular Sections**:
-     * `explore`: Cycles atmospheric exploration patterns (`A`, `B`, `C`, `H` — *"Mist & Toll"*, *"Tristram Dusk"*, *"Cello Lament"*, *"Hollow Silence"*).
-     * `combat`: Engages seamlessly when hostile monsters aggro or enter melee range (`F`, `G` — *"The Butcher's Hall"*, *"Labyrinth Tension"*).
-     * `descent`: Immediate transition cue (`D` — *"Descent into Crypt"*) upon taking stairs down.
-     * `boss`: Climax battle patterns (`E`, `F` — *"Cathedral Arpeggio"*, *"The Butcher's Hall"*).
+     * `explore`: Atmospheric ambient exploration patterns (e.g. `A`, `C`, `H`).
+     * `combat`: Engages seamlessly with a 3.5s hysteresis decay when hostile monsters aggro (`B`, `F`, `G`).
+     * `tension`: Heightened suspense patterns during elite encounters or maze exploration (`C`, `E`, `F`).
+     * `descent`: Immediate non-interruptible transition cue locked for 4.0s (`lockMs: 4000`) upon taking stairs down (`D`).
+     * `climax`: Full orchestral/synth fury for multi-phase boss engagements (`F`, `I`, `J`).
+   * **Universal Rhythm & Drone Anchoring**: Drum downbeats consistently strike on $D_2$ (73.4 Hz) with secondary fifth ghost taps on $A_1$ (55.0 Hz); root pedal drones anchor on $D_2$ across all suites.
    * **Seamless Inter-Pattern Looping**: Disables the per-pattern brickwall limiter to ensure seamless volume continuity across pattern loops and state transitions without ducking.
 
 ### Snapshot Interpolation (`Interpolator.js`)

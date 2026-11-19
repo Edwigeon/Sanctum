@@ -1,4 +1,4 @@
-LANTHORN_V1.1,8,7,70,4,C#,Phrygian,16
+LANTHORN_V1.1,8,7,70,4,D,Phrygian,16
 PATCH,CavernLute,"{""name"": ""CavernLute"", ""wave_type"": ""triangle"", ""wave_type_2"": ""sawtooth"", ""mix"": 0.24, ""envelope"": {""attack"": 0.003, ""decay"": 0.48, ""sustain_level"": 0.1, ""release"": 0.55}, ""saturation"": 1.12, ""echo"": {""delay_time"": 0.36, ""feedback"": 0.36}}"
 PATCH,AbyssDrone,"{""name"": ""AbyssDrone"", ""wave_type"": ""sine"", ""wave_type_2"": ""triangle"", ""mix"": 0.45, ""envelope"": {""attack"": 0.55, ""decay"": 0.3, ""sustain_level"": 0.86, ""release"": 0.85}, ""lfo"": {""vibrato_speed"": 1.3, ""vibrato_depth"": 0.09}, ""saturation"": 1.18}"
 PATCH,CavernWind,"{""name"": ""CavernWind"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.19, ""envelope"": {""attack"": 0.7, ""decay"": 0.35, ""sustain_level"": 0.62, ""release"": 0.9}, ""lfo"": {""vibrato_speed"": 1.0, ""vibrato_depth"": 0.14, ""tremolo_speed"": 1.1, ""tremolo_depth"": 0.28}, ""echo"": {""delay_time"": 0.42, ""feedback"": 0.4}}"
@@ -17,589 +17,589 @@ SEQ,5,G
 SEQ,6,H
 SEQ,7,D
 --- PATTERNS ---,Type,ID,Length
-PATTERN,A,64,70,4,16,C#,Phrygian,Obsidian Fault
-EVENT,0,0,C#3,CavernLute,148,6,--,PAN 78
-EVENT,0,1,C#2,AbyssDrone,150,16,--,PAN 128
-EVENT,0,2,G#3,CavernWind,98,32,--,PAN 44
-EVENT,0,3,G#3,DepthViola,158,12,--,PAN 156
-EVENT,0,4,C#4,ChasmBell,124,16,--,PAN 196
-EVENT,0,6,C#2,CavernDrum,148,6,SDN 12,PAN 128
-EVENT,2,0,G#3,CavernLute,128,6,--,--
-EVENT,4,0,D#4,CavernLute,128,6,--,--
-EVENT,4,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,6,0,E-4,CavernLute,128,6,--,--
-EVENT,8,0,G#3,CavernLute,148,6,--,--
-EVENT,8,5,E-4,ObsidianHarp,112,3,--,PAN 186
-EVENT,10,0,D#4,CavernLute,128,6,--,--
-EVENT,10,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,12,0,D-4,CavernLute,128,6,--,--
-EVENT,12,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,14,0,G#3,CavernLute,128,6,--,--
-EVENT,16,0,D-3,CavernLute,148,6,--,PAN 78
-EVENT,16,1,D-2,AbyssDrone,150,16,--,PAN 128
-EVENT,16,3,A-3,DepthViola,154,12,PRT 48,--
-EVENT,16,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,18,0,A-3,CavernLute,128,6,--,--
-EVENT,20,0,C#4,CavernLute,128,6,--,--
-EVENT,20,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,22,0,F#4,CavernLute,128,6,--,--
-EVENT,24,0,A-3,CavernLute,148,6,--,--
-EVENT,24,5,F#4,ObsidianHarp,112,3,--,--
-EVENT,26,0,E-4,CavernLute,128,6,--,--
-EVENT,26,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,28,0,D-4,CavernLute,128,6,--,--
-EVENT,28,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,30,0,A-3,CavernLute,128,6,--,--
-EVENT,32,0,C#3,CavernLute,148,6,--,PAN 78
-EVENT,32,1,"C#2,G#2",AbyssDrone,150,16,--,PAN 128
-EVENT,32,2,D-4,CavernWind,102,32,--,PAN 212
-EVENT,32,3,G#3,DepthViola,158,12,--,--
-EVENT,32,4,G-4,ChasmBell,124,16,--,PAN 60
-EVENT,32,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,34,0,G#3,CavernLute,128,6,--,--
-EVENT,36,0,E-4,CavernLute,128,6,--,--
-EVENT,36,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,38,0,G-4,CavernLute,128,6,--,--
-EVENT,40,0,G#3,CavernLute,148,6,--,--
-EVENT,40,5,G-4,ObsidianHarp,112,3,--,--
-EVENT,42,0,E-4,CavernLute,128,6,--,--
-EVENT,42,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,44,0,D#4,CavernLute,128,6,--,--
-EVENT,44,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,46,0,C#4,CavernLute,128,6,--,--
-EVENT,48,0,G#2,CavernLute,148,6,--,PAN 78
-EVENT,48,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
-EVENT,48,3,F#3,DepthViola,152,8,--,--
-EVENT,48,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,50,0,D#3,CavernLute,128,6,--,--
-EVENT,52,0,A-3,CavernLute,128,6,--,--
-EVENT,52,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,54,0,C-4,CavernLute,128,6,--,--
-EVENT,56,0,D#4,CavernLute,148,6,--,--
-EVENT,56,3,D#3,DepthViola,150,8,--,--
-EVENT,56,5,C-4,ObsidianHarp,112,3,--,--
-EVENT,58,0,C-4,CavernLute,128,6,--,--
-EVENT,58,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,60,0,A-3,CavernLute,128,6,--,--
-EVENT,60,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,62,0,D#3,CavernLute,128,6,--,--
-PATTERN,B,64,70,4,16,C#,Phrygian,Tritone Chasm
-EVENT,0,0,C#3,CavernLute,148,6,--,PAN 78
-EVENT,0,1,"C#2,G#2",AbyssDrone,150,16,--,PAN 128
-EVENT,0,2,C#4,CavernWind,98,32,--,PAN 44
-EVENT,0,3,C#3,DepthViola,174,8,--,PAN 156
-EVENT,0,4,C#4,ChasmBell,124,16,--,PAN 192
-EVENT,0,6,C#2,CavernDrum,178,6,SDN 14,PAN 128
-EVENT,2,0,G#3,CavernLute,128,6,--,--
-EVENT,4,0,E-4,CavernLute,128,6,--,--
-EVENT,4,5,E-4,ObsidianHarp,124,3,--,PAN 186
-EVENT,4,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,6,0,D#4,CavernLute,128,6,--,--
-EVENT,6,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,8,0,G#3,CavernLute,148,6,--,--
-EVENT,8,3,E-3,DepthViola,178,6,PRT 42,--
-EVENT,8,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,10,0,C#4,CavernLute,128,6,--,--
-EVENT,12,0,E-4,CavernLute,128,6,--,--
-EVENT,12,5,D#4,ObsidianHarp,124,3,--,--
-EVENT,12,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,14,0,G#3,CavernLute,128,6,--,--
-EVENT,14,3,D#3,DepthViola,168,2,--,--
-EVENT,16,0,A-2,CavernLute,148,6,--,PAN 78
-EVENT,16,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
-EVENT,16,3,C#3,DepthViola,176,8,--,--
-EVENT,16,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,18,0,E-3,CavernLute,128,6,--,--
-EVENT,20,0,C#4,CavernLute,128,6,--,--
-EVENT,20,5,C#4,ObsidianHarp,124,3,--,--
-EVENT,20,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,22,0,B-3,CavernLute,128,6,--,--
-EVENT,22,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,24,0,E-3,CavernLute,148,6,--,--
-EVENT,24,3,A-2,DepthViola,168,8,--,--
-EVENT,24,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,26,0,A-3,CavernLute,128,6,--,--
-EVENT,28,0,C#4,CavernLute,128,6,--,--
-EVENT,28,5,B-3,ObsidianHarp,124,3,--,--
-EVENT,28,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,30,0,E-3,CavernLute,128,6,--,--
-EVENT,30,6,G#1,CavernDrum,136,4,SDN 10,--
-EVENT,32,0,F#2,CavernLute,148,6,--,PAN 78
-EVENT,32,1,"F#1,C#2",AbyssDrone,150,16,--,PAN 128
-EVENT,32,2,G#3,CavernWind,102,32,--,PAN 212
-EVENT,32,3,F#3,DepthViola,180,8,--,--
-EVENT,32,4,F#4,ChasmBell,124,16,--,PAN 64
-EVENT,32,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,34,0,C#3,CavernLute,128,6,--,--
-EVENT,36,0,A-3,CavernLute,128,6,--,--
-EVENT,36,5,A-3,ObsidianHarp,124,3,--,--
-EVENT,36,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,38,0,G#3,CavernLute,128,6,--,--
-EVENT,38,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,40,0,C#3,CavernLute,148,6,--,--
-EVENT,40,3,G-3,DepthViola,186,8,PRT 46,--
-EVENT,40,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,42,0,F#3,CavernLute,128,6,--,--
-EVENT,44,0,A-3,CavernLute,128,6,--,--
-EVENT,44,5,G#3,ObsidianHarp,124,3,--,--
-EVENT,44,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,46,0,C#4,CavernLute,128,6,--,--
-EVENT,48,0,G#2,CavernLute,148,6,--,PAN 78
-EVENT,48,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
-EVENT,48,3,G#3,DepthViola,184,10,--,--
-EVENT,48,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,50,0,D#3,CavernLute,128,6,--,--
-EVENT,52,0,C-4,CavernLute,128,6,--,--
-EVENT,52,5,F#3,ObsidianHarp,124,3,--,--
-EVENT,52,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,54,0,F#3,CavernLute,128,6,--,--
-EVENT,54,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,56,0,D#3,CavernLute,148,6,--,--
-EVENT,56,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,58,0,A-3,CavernLute,128,6,--,--
-EVENT,58,3,D#3,DepthViola,170,6,--,--
-EVENT,60,0,C-4,CavernLute,128,6,--,--
-EVENT,60,5,C-4,ObsidianHarp,124,3,--,--
-EVENT,60,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,62,0,D#4,CavernLute,128,6,--,--
-EVENT,62,6,G#1,CavernDrum,136,4,SDN 10,--
-PATTERN,C,64,70,4,16,C#,Harmonic Minor,Subterranean Lament
-EVENT,0,0,F#2,CavernLute,148,6,--,PAN 78
-EVENT,0,1,"F#1,C#2",AbyssDrone,150,16,--,PAN 128
+PATTERN,A,64,70,4,16,D,Phrygian,Obsidian Fault
+EVENT,0,0,D-3,CavernLute,148,6,--,PAN 78
+EVENT,0,1,D-2,AbyssDrone,150,16,--,PAN 128
 EVENT,0,2,A-3,CavernWind,98,32,--,PAN 44
-EVENT,0,3,A-3,DepthViola,182,8,--,PAN 156
-EVENT,0,4,F#4,ChasmBell,124,16,--,PAN 64
-EVENT,0,6,C#2,CavernDrum,178,6,SDN 14,PAN 128
-EVENT,2,0,C#3,CavernLute,128,6,--,--
-EVENT,2,5,C#5,ObsidianHarp,124,3,--,PAN 186
-EVENT,4,0,A-3,CavernLute,128,6,--,--
-EVENT,4,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,6,0,C#4,CavernLute,128,6,--,--
-EVENT,6,5,A-4,ObsidianHarp,124,3,--,--
-EVENT,6,6,G#1,CavernDrum,132,4,SDN 10,--
+EVENT,0,3,A-3,DepthViola,158,12,--,PAN 156
+EVENT,0,4,D-4,ChasmBell,124,16,--,PAN 196
+EVENT,0,6,D-2,CavernDrum,148,6,SDN 12,PAN 128
+EVENT,2,0,A-3,CavernLute,128,6,--,--
+EVENT,4,0,E-4,CavernLute,128,6,--,--
+EVENT,4,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,6,0,F-4,CavernLute,128,6,--,--
 EVENT,8,0,A-3,CavernLute,148,6,--,--
-EVENT,8,3,F#3,DepthViola,176,8,--,--
-EVENT,8,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,10,0,G#3,CavernLute,128,6,--,--
-EVENT,10,5,G#4,ObsidianHarp,124,3,--,--
-EVENT,12,0,F#3,CavernLute,128,6,--,--
-EVENT,12,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,14,0,C#3,CavernLute,128,6,--,--
-EVENT,14,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,16,0,E-2,CavernLute,148,6,--,PAN 78
-EVENT,16,1,"E-1,B-1",AbyssDrone,150,16,--,PAN 128
-EVENT,16,3,G#3,DepthViola,182,8,--,--
-EVENT,16,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,18,0,B-2,CavernLute,128,6,--,--
-EVENT,18,5,B-4,ObsidianHarp,124,3,--,--
-EVENT,20,0,G#3,CavernLute,128,6,--,--
-EVENT,20,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,22,0,B-3,CavernLute,128,6,--,--
-EVENT,22,5,G#4,ObsidianHarp,124,3,--,--
-EVENT,22,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,24,0,G#3,CavernLute,148,6,--,--
-EVENT,24,3,E-3,DepthViola,174,8,--,--
-EVENT,24,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,26,0,F#3,CavernLute,128,6,--,--
-EVENT,26,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,28,0,E-3,CavernLute,128,6,--,--
-EVENT,28,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,30,0,B-2,CavernLute,128,6,--,--
-EVENT,30,5,E-4,ObsidianHarp,124,3,--,--
-EVENT,30,6,G#1,CavernDrum,136,4,SDN 10,--
-EVENT,32,0,D-2,CavernLute,148,6,--,PAN 78
-EVENT,32,1,"D-1,A-1",AbyssDrone,150,16,--,PAN 128
-EVENT,32,2,D#3,CavernWind,102,32,--,PAN 212
-EVENT,32,3,F#3,DepthViola,184,8,PRT 42,--
-EVENT,32,4,D-4,ChasmBell,124,16,--,PAN 192
-EVENT,32,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,34,0,A-2,CavernLute,128,6,--,--
-EVENT,34,5,A-4,ObsidianHarp,124,3,--,--
-EVENT,36,0,F#3,CavernLute,128,6,--,--
-EVENT,36,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,38,0,A-3,CavernLute,128,6,--,--
-EVENT,38,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,38,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,40,0,C#4,CavernLute,148,6,--,--
-EVENT,40,3,D-3,DepthViola,178,8,--,--
-EVENT,40,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,42,0,A-3,CavernLute,128,6,--,--
-EVENT,42,5,E-4,ObsidianHarp,124,3,--,--
-EVENT,44,0,F#3,CavernLute,128,6,--,--
-EVENT,44,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,46,0,D-3,CavernLute,128,6,--,--
-EVENT,46,5,D-4,ObsidianHarp,124,3,--,--
-EVENT,48,0,G#2,CavernLute,148,6,--,PAN 78
-EVENT,48,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
-EVENT,48,3,D#3,DepthViola,186,8,--,--
-EVENT,48,4,C-4,ChasmBell,124,16,--,PAN 128
-EVENT,48,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,50,0,D#3,CavernLute,128,6,--,--
-EVENT,50,5,C-5,ObsidianHarp,124,3,--,--
-EVENT,52,0,C-4,CavernLute,128,6,--,--
-EVENT,52,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,54,0,F#4,CavernLute,128,6,--,--
-EVENT,54,5,A-4,ObsidianHarp,124,3,--,--
-EVENT,54,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,56,0,D#4,CavernLute,148,6,--,--
-EVENT,56,3,C-4,DepthViola,190,8,--,--
-EVENT,56,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,58,0,C-4,CavernLute,128,6,--,--
-EVENT,58,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,60,0,A-3,CavernLute,128,6,--,--
-EVENT,60,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,62,0,D#3,CavernLute,128,6,--,--
-EVENT,62,5,D#4,ObsidianHarp,124,3,--,--
-EVENT,62,6,G#1,CavernDrum,136,4,SDN 10,--
-PATTERN,D,64,70,4,16,C#,Phrygian,Abyss Turnaround
-EVENT,0,0,C#3,CavernLute,148,6,--,PAN 78
-EVENT,0,1,"C#2,G#2",AbyssDrone,150,16,--,PAN 128
-EVENT,0,2,G#3,CavernWind,98,32,--,PAN 44
-EVENT,0,3,E-3,DepthViola,172,12,--,PAN 156
-EVENT,0,4,C#4,ChasmBell,124,16,--,PAN 192
-EVENT,0,6,C#2,CavernDrum,148,6,SDN 12,PAN 128
-EVENT,2,0,G#3,CavernLute,128,6,--,--
-EVENT,4,0,D#4,CavernLute,128,6,--,--
-EVENT,4,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,6,0,E-4,CavernLute,128,6,--,--
-EVENT,8,0,G#3,CavernLute,148,6,--,--
-EVENT,8,5,E-4,ObsidianHarp,112,3,--,PAN 186
-EVENT,10,0,D#4,CavernLute,128,6,--,--
-EVENT,10,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,12,0,C#4,CavernLute,128,6,--,--
-EVENT,12,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,14,0,G#3,CavernLute,128,6,--,--
-EVENT,16,0,D-3,CavernLute,148,6,--,PAN 78
-EVENT,16,1,"D-2,A-2",AbyssDrone,150,16,--,PAN 128
-EVENT,16,3,D-3,DepthViola,170,12,--,--
-EVENT,16,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,18,0,A-3,CavernLute,128,6,--,--
-EVENT,20,0,F#4,CavernLute,128,6,--,--
-EVENT,20,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,22,0,E-4,CavernLute,128,6,--,--
-EVENT,24,0,A-3,CavernLute,148,6,--,--
-EVENT,24,5,D-4,ObsidianHarp,112,3,--,--
-EVENT,26,0,D-4,CavernLute,128,6,--,--
-EVENT,26,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,28,0,C#4,CavernLute,128,6,--,--
-EVENT,28,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,30,0,A-3,CavernLute,128,6,--,--
-EVENT,32,0,F#2,CavernLute,148,6,--,PAN 78
-EVENT,32,1,"F#1,C#2",AbyssDrone,150,16,--,PAN 128
+EVENT,8,5,F-4,ObsidianHarp,112,3,--,PAN 186
+EVENT,10,0,E-4,CavernLute,128,6,--,--
+EVENT,10,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,12,0,D#4,CavernLute,128,6,--,--
+EVENT,12,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,14,0,A-3,CavernLute,128,6,--,--
+EVENT,16,0,D#3,CavernLute,148,6,--,PAN 78
+EVENT,16,1,D#2,AbyssDrone,150,16,--,PAN 128
+EVENT,16,3,A#3,DepthViola,154,12,PRT 48,--
+EVENT,16,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,18,0,A#3,CavernLute,128,6,--,--
+EVENT,20,0,D-4,CavernLute,128,6,--,--
+EVENT,20,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,22,0,G-4,CavernLute,128,6,--,--
+EVENT,24,0,A#3,CavernLute,148,6,--,--
+EVENT,24,5,G-4,ObsidianHarp,112,3,--,--
+EVENT,26,0,F-4,CavernLute,128,6,--,--
+EVENT,26,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,28,0,D#4,CavernLute,128,6,--,--
+EVENT,28,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,30,0,A#3,CavernLute,128,6,--,--
+EVENT,32,0,D-3,CavernLute,148,6,--,PAN 78
+EVENT,32,1,"D-2,A-2",AbyssDrone,150,16,--,PAN 128
 EVENT,32,2,D#4,CavernWind,102,32,--,PAN 212
-EVENT,32,3,C#3,DepthViola,172,12,--,--
-EVENT,32,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,34,0,C#3,CavernLute,128,6,--,--
-EVENT,36,0,A-3,CavernLute,128,6,--,--
-EVENT,36,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,38,0,G#3,CavernLute,128,6,--,--
-EVENT,40,0,C#3,CavernLute,148,6,--,--
-EVENT,40,5,A-3,ObsidianHarp,112,3,--,--
-EVENT,42,0,F#3,CavernLute,128,6,--,--
-EVENT,42,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,44,0,E-3,CavernLute,128,6,--,--
-EVENT,44,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,46,0,C#3,CavernLute,128,6,--,--
-EVENT,48,0,G#2,CavernLute,148,6,--,PAN 78
-EVENT,48,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
-EVENT,48,3,D#3,DepthViola,176,14,--,--
-EVENT,48,4,C-4,ChasmBell,124,16,--,PAN 64
-EVENT,48,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,50,0,D#3,CavernLute,128,6,--,--
-EVENT,52,0,A-3,CavernLute,128,6,--,--
-EVENT,52,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,54,0,C-4,CavernLute,128,6,--,--
-EVENT,56,0,D#4,CavernLute,148,6,--,--
-EVENT,56,5,C-4,ObsidianHarp,112,3,--,--
-EVENT,58,0,C-4,CavernLute,128,6,--,--
-EVENT,58,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,60,0,G#3,CavernLute,128,6,--,--
-EVENT,60,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,62,0,D#3,CavernLute,128,6,--,--
-PATTERN,E,64,70,4,16,C#,Phrygian,Hollow Abyss
-EVENT,0,0,C#3,CavernLute,142,6,ECH 66,PAN 78
-EVENT,0,1,C#2,AbyssDrone,150,32,--,PAN 128
-EVENT,0,2,G#3,CavernWind,98,32,--,PAN 44
-EVENT,0,4,C#4,ChasmBell,124,16,--,PAN 196
-EVENT,0,6,C#2,CavernDrum,148,6,SDN 12,PAN 128
-EVENT,4,0,G#3,CavernLute,122,6,ECH 66,--
-EVENT,4,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,8,0,D#4,CavernLute,142,6,ECH 66,--
-EVENT,8,3,G#3,DepthViola,148,14,--,PAN 156
-EVENT,10,0,E-4,CavernLute,122,6,ECH 66,--
-EVENT,10,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,12,5,E-4,ObsidianHarp,112,3,--,PAN 186
-EVENT,12,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,16,0,C#3,CavernLute,142,6,ECH 66,PAN 78
-EVENT,16,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,20,0,G#3,CavernLute,122,6,ECH 66,--
-EVENT,20,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,24,0,D-4,CavernLute,142,6,ECH 66,--
-EVENT,26,0,C#4,CavernLute,122,6,ECH 66,--
-EVENT,26,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,28,5,D-4,ObsidianHarp,112,3,--,--
-EVENT,28,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,32,0,G#2,CavernLute,142,6,ECH 66,PAN 78
-EVENT,32,1,G#1,AbyssDrone,150,32,--,PAN 128
-EVENT,32,2,D-4,CavernWind,102,32,--,PAN 212
-EVENT,32,4,G-4,ChasmBell,124,16,--,PAN 56
-EVENT,32,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,36,0,D#3,CavernLute,122,6,ECH 66,--
-EVENT,36,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,40,0,A-3,CavernLute,142,6,ECH 66,--
-EVENT,40,3,F#3,DepthViola,146,14,PRT 50,--
-EVENT,42,0,C-4,CavernLute,122,6,ECH 66,--
-EVENT,42,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,44,5,C-4,ObsidianHarp,112,3,--,--
-EVENT,44,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,48,0,C#3,CavernLute,142,6,ECH 66,PAN 78
-EVENT,48,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,52,0,G#3,CavernLute,122,6,ECH 66,--
-EVENT,52,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,56,0,E-4,CavernLute,142,6,ECH 66,--
-EVENT,58,0,D#4,CavernLute,122,6,ECH 66,--
-EVENT,58,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,60,5,G#3,ObsidianHarp,112,3,--,--
-EVENT,60,7,C#6,StoneShaker,54,2,--,PAN 88
-PATTERN,F,64,70,4,16,C#,Harmonic Minor,Sunken Relics
+EVENT,32,3,A-3,DepthViola,158,12,--,--
+EVENT,32,4,G#4,ChasmBell,124,16,--,PAN 60
+EVENT,32,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,34,0,A-3,CavernLute,128,6,--,--
+EVENT,36,0,F-4,CavernLute,128,6,--,--
+EVENT,36,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,38,0,G#4,CavernLute,128,6,--,--
+EVENT,40,0,A-3,CavernLute,148,6,--,--
+EVENT,40,5,G#4,ObsidianHarp,112,3,--,--
+EVENT,42,0,F-4,CavernLute,128,6,--,--
+EVENT,42,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,44,0,E-4,CavernLute,128,6,--,--
+EVENT,44,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,46,0,D-4,CavernLute,128,6,--,--
+EVENT,48,0,A-2,CavernLute,148,6,--,PAN 78
+EVENT,48,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
+EVENT,48,3,G-3,DepthViola,152,8,--,--
+EVENT,48,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,50,0,E-3,CavernLute,128,6,--,--
+EVENT,52,0,A#3,CavernLute,128,6,--,--
+EVENT,52,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,54,0,C#4,CavernLute,128,6,--,--
+EVENT,56,0,E-4,CavernLute,148,6,--,--
+EVENT,56,3,E-3,DepthViola,150,8,--,--
+EVENT,56,5,C#4,ObsidianHarp,112,3,--,--
+EVENT,58,0,C#4,CavernLute,128,6,--,--
+EVENT,58,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,60,0,A#3,CavernLute,128,6,--,--
+EVENT,60,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,62,0,E-3,CavernLute,128,6,--,--
+PATTERN,B,64,70,4,16,D,Phrygian,Tritone Chasm
 EVENT,0,0,D-3,CavernLute,148,6,--,PAN 78
 EVENT,0,1,"D-2,A-2",AbyssDrone,150,16,--,PAN 128
 EVENT,0,2,D-4,CavernWind,98,32,--,PAN 44
-EVENT,0,3,A-3,DepthViola,180,8,--,PAN 156
+EVENT,0,3,D-3,DepthViola,174,8,--,PAN 156
 EVENT,0,4,D-4,ChasmBell,124,16,--,PAN 192
-EVENT,0,5,D-5,ObsidianHarp,124,3,--,PAN 186
-EVENT,0,6,C#2,CavernDrum,178,6,SDN 14,PAN 128
+EVENT,0,6,D-2,CavernDrum,178,6,SDN 14,PAN 128
 EVENT,2,0,A-3,CavernLute,128,6,--,--
-EVENT,4,0,F#4,CavernLute,128,6,--,--
-EVENT,4,5,A-4,ObsidianHarp,124,3,--,--
-EVENT,4,7,C#6,StoneShaker,66,2,--,PAN 172
+EVENT,4,0,F-4,CavernLute,128,6,--,--
+EVENT,4,5,F-4,ObsidianHarp,124,3,--,PAN 186
+EVENT,4,7,D-6,StoneShaker,66,2,--,PAN 172
 EVENT,6,0,E-4,CavernLute,128,6,--,--
-EVENT,6,6,G#1,CavernDrum,132,4,SDN 10,--
+EVENT,6,6,A-1,CavernDrum,132,4,SDN 10,--
 EVENT,8,0,A-3,CavernLute,148,6,--,--
-EVENT,8,3,D-4,DepthViola,184,8,PRT 40,--
-EVENT,8,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,8,6,C#2,CavernDrum,154,5,SDN 12,--
+EVENT,8,3,F-3,DepthViola,178,6,PRT 42,--
+EVENT,8,6,D-2,CavernDrum,154,5,SDN 12,--
 EVENT,10,0,D-4,CavernLute,128,6,--,--
-EVENT,12,0,F#4,CavernLute,128,6,--,--
-EVENT,12,5,D-4,ObsidianHarp,124,3,--,--
-EVENT,12,7,C#6,StoneShaker,66,2,--,PAN 84
+EVENT,12,0,F-4,CavernLute,128,6,--,--
+EVENT,12,5,E-4,ObsidianHarp,124,3,--,--
+EVENT,12,7,D-6,StoneShaker,66,2,--,PAN 84
 EVENT,14,0,A-3,CavernLute,128,6,--,--
-EVENT,16,0,E-3,CavernLute,148,6,--,PAN 78
-EVENT,16,1,"E-2,B-2",AbyssDrone,150,16,--,PAN 128
-EVENT,16,3,B-3,DepthViola,182,8,--,--
-EVENT,16,5,E-5,ObsidianHarp,124,3,--,--
-EVENT,16,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,18,0,B-3,CavernLute,128,6,--,--
-EVENT,20,0,G#4,CavernLute,128,6,--,--
-EVENT,20,5,B-4,ObsidianHarp,124,3,--,--
-EVENT,20,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,22,0,F#4,CavernLute,128,6,--,--
-EVENT,22,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,24,0,B-3,CavernLute,148,6,--,--
-EVENT,24,3,E-4,DepthViola,186,8,PRT 40,--
-EVENT,24,5,G#4,ObsidianHarp,124,3,--,--
-EVENT,24,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,26,0,E-4,CavernLute,128,6,--,--
-EVENT,28,0,G#4,CavernLute,128,6,--,--
-EVENT,28,5,E-4,ObsidianHarp,124,3,--,--
-EVENT,28,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,30,0,B-3,CavernLute,128,6,--,--
-EVENT,30,6,G#1,CavernDrum,136,4,SDN 10,--
-EVENT,32,0,F#3,CavernLute,148,6,--,PAN 78
-EVENT,32,1,"F#2,C#3",AbyssDrone,150,16,--,PAN 128
-EVENT,32,2,G#3,CavernWind,102,32,--,PAN 212
-EVENT,32,3,C#4,DepthViola,188,8,--,--
-EVENT,32,4,F#4,ChasmBell,124,16,--,PAN 60
-EVENT,32,5,F#5,ObsidianHarp,124,3,--,--
-EVENT,32,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,34,0,C#4,CavernLute,128,6,--,--
-EVENT,36,0,A-4,CavernLute,128,6,--,--
-EVENT,36,5,C#5,ObsidianHarp,124,3,--,--
-EVENT,36,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,38,0,G#4,CavernLute,128,6,--,--
-EVENT,38,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,40,0,C#4,CavernLute,148,6,--,--
-EVENT,40,3,F#4,DepthViola,192,8,--,--
-EVENT,40,5,A-4,ObsidianHarp,124,3,--,--
-EVENT,40,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,42,0,F#4,CavernLute,128,6,--,--
-EVENT,44,0,A-4,CavernLute,128,6,--,--
-EVENT,44,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,44,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,46,0,C#4,CavernLute,128,6,--,--
-EVENT,48,0,G#2,CavernLute,148,6,--,PAN 78
-EVENT,48,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
-EVENT,48,3,D#4,DepthViola,190,10,--,--
-EVENT,48,4,G#4,ChasmBell,124,16,--,PAN 196
-EVENT,48,5,D#5,ObsidianHarp,124,3,--,--
-EVENT,48,6,C#2,CavernDrum,178,6,SDN 14,--
-EVENT,50,0,D#3,CavernLute,128,6,--,--
-EVENT,52,0,C-4,CavernLute,128,6,--,--
-EVENT,52,5,C-5,ObsidianHarp,124,3,--,--
-EVENT,52,7,C#6,StoneShaker,66,2,--,PAN 172
-EVENT,54,0,D#4,CavernLute,128,6,--,--
-EVENT,54,6,G#1,CavernDrum,132,4,SDN 10,--
-EVENT,56,0,A-3,CavernLute,148,6,--,--
-EVENT,56,5,A-4,ObsidianHarp,124,3,--,--
-EVENT,56,6,C#2,CavernDrum,154,5,SDN 12,--
-EVENT,58,0,F#3,CavernLute,128,6,--,--
-EVENT,58,3,C-4,DepthViola,178,6,--,--
-EVENT,60,0,D#3,CavernLute,128,6,--,--
-EVENT,60,5,F#4,ObsidianHarp,124,3,--,--
-EVENT,60,7,C#6,StoneShaker,66,2,--,PAN 84
-EVENT,62,0,C-3,CavernLute,128,6,--,--
-EVENT,62,6,G#1,CavernDrum,136,4,SDN 10,--
-PATTERN,G,64,70,4,16,C#,Phrygian,Heart of the Depths
-EVENT,0,0,C#3,CavernLute,154,6,--,PAN 78
-EVENT,0,1,"C#2,G#2",AbyssDrone,150,16,--,PAN 128
-EVENT,0,2,C#4,CavernWind,98,32,--,PAN 44
-EVENT,0,3,C#4,DepthViola,194,6,--,PAN 156
-EVENT,0,4,C#4,ChasmBell,136,16,--,PAN 196
-EVENT,0,5,C#5,ObsidianHarp,134,3,--,PAN 186
-EVENT,0,6,C#2,CavernDrum,202,6,SDN 16,PAN 128
-EVENT,2,0,G#3,CavernLute,134,6,--,--
-EVENT,2,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,4,0,E-4,CavernLute,134,6,--,--
-EVENT,4,5,G#4,ObsidianHarp,134,3,--,--
-EVENT,4,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,6,0,G#3,CavernLute,134,6,--,--
-EVENT,6,3,E-4,DepthViola,190,6,--,--
-EVENT,6,6,G#1,CavernDrum,148,4,SDN 12,--
-EVENT,8,0,G-4,CavernLute,154,6,--,--
-EVENT,8,5,E-4,ObsidianHarp,134,3,--,--
-EVENT,8,6,C#2,CavernDrum,178,5,SDN 14,--
-EVENT,10,0,E-4,CavernLute,134,6,--,--
-EVENT,10,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,12,0,D#4,CavernLute,134,6,--,--
-EVENT,12,3,D#4,DepthViola,184,4,--,--
-EVENT,12,5,C#4,ObsidianHarp,134,3,--,--
-EVENT,12,6,G#1,CavernDrum,152,4,SDN 12,--
-EVENT,12,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,14,0,G#3,CavernLute,134,6,--,--
-EVENT,14,6,D-2,CavernDrum,176,4,SDN 12,--
-EVENT,14,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,16,0,D-3,CavernLute,154,6,--,PAN 78
-EVENT,16,1,"D-2,A-2",AbyssDrone,150,16,--,PAN 128
-EVENT,16,3,D-4,DepthViola,196,8,--,--
-EVENT,16,5,D-5,ObsidianHarp,134,3,--,--
-EVENT,16,6,C#2,CavernDrum,202,6,SDN 16,--
-EVENT,18,0,A-3,CavernLute,134,6,--,--
-EVENT,18,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,20,0,F#4,CavernLute,134,6,--,--
-EVENT,20,5,A-4,ObsidianHarp,134,3,--,--
-EVENT,20,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,22,0,A-3,CavernLute,134,6,--,--
-EVENT,22,6,G#1,CavernDrum,148,4,SDN 12,--
-EVENT,24,0,E-4,CavernLute,154,6,--,--
-EVENT,24,3,A-3,DepthViola,182,8,--,--
-EVENT,24,5,F#4,ObsidianHarp,134,3,--,--
-EVENT,24,6,C#2,CavernDrum,178,5,SDN 14,--
-EVENT,26,0,D-4,CavernLute,134,6,--,--
-EVENT,26,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,28,0,C#4,CavernLute,134,6,--,--
-EVENT,28,5,D-4,ObsidianHarp,134,3,--,--
-EVENT,28,6,G#1,CavernDrum,152,4,SDN 12,--
-EVENT,28,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,30,0,A-3,CavernLute,134,6,--,--
-EVENT,30,6,D-2,CavernDrum,176,4,SDN 12,--
-EVENT,30,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,32,0,G-2,CavernLute,154,6,--,PAN 78
+EVENT,14,3,E-3,DepthViola,168,2,--,--
+EVENT,16,0,A#2,CavernLute,148,6,--,PAN 78
+EVENT,16,1,"A#1,F-2",AbyssDrone,150,16,--,PAN 128
+EVENT,16,3,D-3,DepthViola,176,8,--,--
+EVENT,16,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,18,0,F-3,CavernLute,128,6,--,--
+EVENT,20,0,D-4,CavernLute,128,6,--,--
+EVENT,20,5,D-4,ObsidianHarp,124,3,--,--
+EVENT,20,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,22,0,C-4,CavernLute,128,6,--,--
+EVENT,22,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,24,0,F-3,CavernLute,148,6,--,--
+EVENT,24,3,A#2,DepthViola,168,8,--,--
+EVENT,24,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,26,0,A#3,CavernLute,128,6,--,--
+EVENT,28,0,D-4,CavernLute,128,6,--,--
+EVENT,28,5,C-4,ObsidianHarp,124,3,--,--
+EVENT,28,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,30,0,F-3,CavernLute,128,6,--,--
+EVENT,30,6,A-1,CavernDrum,136,4,SDN 10,--
+EVENT,32,0,G-2,CavernLute,148,6,--,PAN 78
 EVENT,32,1,"G-1,D-2",AbyssDrone,150,16,--,PAN 128
-EVENT,32,2,G-3,CavernWind,102,32,--,PAN 212
-EVENT,32,3,E-4,DepthViola,198,8,PRT 38,--
-EVENT,32,4,G-4,ChasmBell,136,16,--,PAN 56
-EVENT,32,5,G-4,ObsidianHarp,134,3,--,--
-EVENT,32,6,C#2,CavernDrum,202,6,SDN 16,--
-EVENT,34,0,D-3,CavernLute,134,6,--,--
-EVENT,34,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,36,0,A#3,CavernLute,134,6,--,--
-EVENT,36,5,A#4,ObsidianHarp,134,3,--,--
-EVENT,36,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,38,0,D-3,CavernLute,134,6,--,--
-EVENT,38,6,G#1,CavernDrum,148,4,SDN 12,--
-EVENT,40,0,G-3,CavernLute,154,6,--,--
-EVENT,40,3,G-4,DepthViola,204,8,--,--
-EVENT,40,5,D-5,ObsidianHarp,134,3,--,--
-EVENT,40,6,C#2,CavernDrum,178,5,SDN 14,--
-EVENT,42,0,F-3,CavernLute,134,6,--,--
-EVENT,42,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,44,0,D-3,CavernLute,134,6,--,--
-EVENT,44,5,G-4,ObsidianHarp,134,3,--,--
-EVENT,44,6,G#1,CavernDrum,152,4,SDN 12,--
-EVENT,44,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,46,0,A#2,CavernLute,134,6,--,--
-EVENT,46,6,D-2,CavernDrum,176,4,SDN 12,--
-EVENT,46,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,48,0,G#2,CavernLute,154,6,--,PAN 78
-EVENT,48,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
-EVENT,48,3,G#4,DepthViola,206,10,--,--
-EVENT,48,4,G#4,ChasmBell,136,16,--,PAN 128
-EVENT,48,5,D#5,ObsidianHarp,134,3,--,--
-EVENT,48,6,C#2,CavernDrum,202,6,SDN 16,--
-EVENT,50,0,D#3,CavernLute,134,6,--,--
-EVENT,50,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,52,0,C-4,CavernLute,134,6,--,--
-EVENT,52,5,C-5,ObsidianHarp,134,3,--,--
-EVENT,52,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,54,0,D#3,CavernLute,134,6,--,--
-EVENT,54,6,G#1,CavernDrum,148,4,SDN 12,--
-EVENT,56,0,A-3,CavernLute,154,6,--,--
-EVENT,56,5,A-4,ObsidianHarp,134,3,--,--
-EVENT,56,6,C#2,CavernDrum,178,5,SDN 14,--
-EVENT,58,0,F#3,CavernLute,134,6,--,--
-EVENT,58,3,F#4,DepthViola,186,6,--,--
-EVENT,58,7,C#6,StoneShaker,80,2,--,PAN 84
-EVENT,60,0,D#3,CavernLute,134,6,--,--
-EVENT,60,5,F#4,ObsidianHarp,134,3,--,--
-EVENT,60,6,G#1,CavernDrum,152,4,SDN 12,--
-EVENT,60,7,C#6,StoneShaker,80,2,--,PAN 172
-EVENT,62,0,C-3,CavernLute,134,6,--,--
-EVENT,62,6,D-2,CavernDrum,176,4,SDN 12,--
-EVENT,62,7,C#6,StoneShaker,80,2,--,PAN 84
-PATTERN,H,64,70,4,16,C#,Phrygian,Deep Stillness
-EVENT,0,0,G#2,CavernLute,138,6,ECH 65,PAN 78
-EVENT,0,1,G#1,AbyssDrone,150,32,--,PAN 128
+EVENT,32,2,A-3,CavernWind,102,32,--,PAN 212
+EVENT,32,3,G-3,DepthViola,180,8,--,--
+EVENT,32,4,G-4,ChasmBell,124,16,--,PAN 64
+EVENT,32,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,34,0,D-3,CavernLute,128,6,--,--
+EVENT,36,0,A#3,CavernLute,128,6,--,--
+EVENT,36,5,A#3,ObsidianHarp,124,3,--,--
+EVENT,36,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,38,0,A-3,CavernLute,128,6,--,--
+EVENT,38,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,40,0,D-3,CavernLute,148,6,--,--
+EVENT,40,3,G#3,DepthViola,186,8,PRT 46,--
+EVENT,40,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,42,0,G-3,CavernLute,128,6,--,--
+EVENT,44,0,A#3,CavernLute,128,6,--,--
+EVENT,44,5,A-3,ObsidianHarp,124,3,--,--
+EVENT,44,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,46,0,D-4,CavernLute,128,6,--,--
+EVENT,48,0,A-2,CavernLute,148,6,--,PAN 78
+EVENT,48,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
+EVENT,48,3,A-3,DepthViola,184,10,--,--
+EVENT,48,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,50,0,E-3,CavernLute,128,6,--,--
+EVENT,52,0,C#4,CavernLute,128,6,--,--
+EVENT,52,5,G-3,ObsidianHarp,124,3,--,--
+EVENT,52,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,54,0,G-3,CavernLute,128,6,--,--
+EVENT,54,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,56,0,E-3,CavernLute,148,6,--,--
+EVENT,56,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,58,0,A#3,CavernLute,128,6,--,--
+EVENT,58,3,E-3,DepthViola,170,6,--,--
+EVENT,60,0,C#4,CavernLute,128,6,--,--
+EVENT,60,5,C#4,ObsidianHarp,124,3,--,--
+EVENT,60,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,62,0,E-4,CavernLute,128,6,--,--
+EVENT,62,6,A-1,CavernDrum,136,4,SDN 10,--
+PATTERN,C,64,70,4,16,D,Harmonic Minor,Subterranean Lament
+EVENT,0,0,G-2,CavernLute,148,6,--,PAN 78
+EVENT,0,1,"G-1,D-2",AbyssDrone,150,16,--,PAN 128
+EVENT,0,2,A#3,CavernWind,98,32,--,PAN 44
+EVENT,0,3,A#3,DepthViola,182,8,--,PAN 156
+EVENT,0,4,G-4,ChasmBell,124,16,--,PAN 64
+EVENT,0,6,D-2,CavernDrum,178,6,SDN 14,PAN 128
+EVENT,2,0,D-3,CavernLute,128,6,--,--
+EVENT,2,5,D-5,ObsidianHarp,124,3,--,PAN 186
+EVENT,4,0,A#3,CavernLute,128,6,--,--
+EVENT,4,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,6,0,D-4,CavernLute,128,6,--,--
+EVENT,6,5,A#4,ObsidianHarp,124,3,--,--
+EVENT,6,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,8,0,A#3,CavernLute,148,6,--,--
+EVENT,8,3,G-3,DepthViola,176,8,--,--
+EVENT,8,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,10,0,A-3,CavernLute,128,6,--,--
+EVENT,10,5,A-4,ObsidianHarp,124,3,--,--
+EVENT,12,0,G-3,CavernLute,128,6,--,--
+EVENT,12,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,14,0,D-3,CavernLute,128,6,--,--
+EVENT,14,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,16,0,F-2,CavernLute,148,6,--,PAN 78
+EVENT,16,1,"F-1,C-2",AbyssDrone,150,16,--,PAN 128
+EVENT,16,3,A-3,DepthViola,182,8,--,--
+EVENT,16,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,18,0,C-3,CavernLute,128,6,--,--
+EVENT,18,5,C-5,ObsidianHarp,124,3,--,--
+EVENT,20,0,A-3,CavernLute,128,6,--,--
+EVENT,20,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,22,0,C-4,CavernLute,128,6,--,--
+EVENT,22,5,A-4,ObsidianHarp,124,3,--,--
+EVENT,22,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,24,0,A-3,CavernLute,148,6,--,--
+EVENT,24,3,F-3,DepthViola,174,8,--,--
+EVENT,24,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,26,0,G-3,CavernLute,128,6,--,--
+EVENT,26,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,28,0,F-3,CavernLute,128,6,--,--
+EVENT,28,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,30,0,C-3,CavernLute,128,6,--,--
+EVENT,30,5,F-4,ObsidianHarp,124,3,--,--
+EVENT,30,6,A-1,CavernDrum,136,4,SDN 10,--
+EVENT,32,0,D#2,CavernLute,148,6,--,PAN 78
+EVENT,32,1,"D#1,A#1",AbyssDrone,150,16,--,PAN 128
+EVENT,32,2,E-3,CavernWind,102,32,--,PAN 212
+EVENT,32,3,G-3,DepthViola,184,8,PRT 42,--
+EVENT,32,4,D#4,ChasmBell,124,16,--,PAN 192
+EVENT,32,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,34,0,A#2,CavernLute,128,6,--,--
+EVENT,34,5,A#4,ObsidianHarp,124,3,--,--
+EVENT,36,0,G-3,CavernLute,128,6,--,--
+EVENT,36,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,38,0,A#3,CavernLute,128,6,--,--
+EVENT,38,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,38,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,40,0,D-4,CavernLute,148,6,--,--
+EVENT,40,3,D#3,DepthViola,178,8,--,--
+EVENT,40,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,42,0,A#3,CavernLute,128,6,--,--
+EVENT,42,5,F-4,ObsidianHarp,124,3,--,--
+EVENT,44,0,G-3,CavernLute,128,6,--,--
+EVENT,44,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,46,0,D#3,CavernLute,128,6,--,--
+EVENT,46,5,D#4,ObsidianHarp,124,3,--,--
+EVENT,48,0,A-2,CavernLute,148,6,--,PAN 78
+EVENT,48,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
+EVENT,48,3,E-3,DepthViola,186,8,--,--
+EVENT,48,4,C#4,ChasmBell,124,16,--,PAN 128
+EVENT,48,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,50,0,E-3,CavernLute,128,6,--,--
+EVENT,50,5,C#5,ObsidianHarp,124,3,--,--
+EVENT,52,0,C#4,CavernLute,128,6,--,--
+EVENT,52,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,54,0,G-4,CavernLute,128,6,--,--
+EVENT,54,5,A#4,ObsidianHarp,124,3,--,--
+EVENT,54,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,56,0,E-4,CavernLute,148,6,--,--
+EVENT,56,3,C#4,DepthViola,190,8,--,--
+EVENT,56,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,58,0,C#4,CavernLute,128,6,--,--
+EVENT,58,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,60,0,A#3,CavernLute,128,6,--,--
+EVENT,60,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,62,0,E-3,CavernLute,128,6,--,--
+EVENT,62,5,E-4,ObsidianHarp,124,3,--,--
+EVENT,62,6,A-1,CavernDrum,136,4,SDN 10,--
+PATTERN,D,64,70,4,16,D,Phrygian,Abyss Turnaround
+EVENT,0,0,D-3,CavernLute,148,6,--,PAN 78
+EVENT,0,1,"D-2,A-2",AbyssDrone,150,16,--,PAN 128
+EVENT,0,2,A-3,CavernWind,98,32,--,PAN 44
+EVENT,0,3,F-3,DepthViola,172,12,--,PAN 156
+EVENT,0,4,D-4,ChasmBell,124,16,--,PAN 192
+EVENT,0,6,D-2,CavernDrum,148,6,SDN 12,PAN 128
+EVENT,2,0,A-3,CavernLute,128,6,--,--
+EVENT,4,0,E-4,CavernLute,128,6,--,--
+EVENT,4,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,6,0,F-4,CavernLute,128,6,--,--
+EVENT,8,0,A-3,CavernLute,148,6,--,--
+EVENT,8,5,F-4,ObsidianHarp,112,3,--,PAN 186
+EVENT,10,0,E-4,CavernLute,128,6,--,--
+EVENT,10,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,12,0,D-4,CavernLute,128,6,--,--
+EVENT,12,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,14,0,A-3,CavernLute,128,6,--,--
+EVENT,16,0,D#3,CavernLute,148,6,--,PAN 78
+EVENT,16,1,"D#2,A#2",AbyssDrone,150,16,--,PAN 128
+EVENT,16,3,D#3,DepthViola,170,12,--,--
+EVENT,16,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,18,0,A#3,CavernLute,128,6,--,--
+EVENT,20,0,G-4,CavernLute,128,6,--,--
+EVENT,20,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,22,0,F-4,CavernLute,128,6,--,--
+EVENT,24,0,A#3,CavernLute,148,6,--,--
+EVENT,24,5,D#4,ObsidianHarp,112,3,--,--
+EVENT,26,0,D#4,CavernLute,128,6,--,--
+EVENT,26,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,28,0,D-4,CavernLute,128,6,--,--
+EVENT,28,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,30,0,A#3,CavernLute,128,6,--,--
+EVENT,32,0,G-2,CavernLute,148,6,--,PAN 78
+EVENT,32,1,"G-1,D-2",AbyssDrone,150,16,--,PAN 128
+EVENT,32,2,E-4,CavernWind,102,32,--,PAN 212
+EVENT,32,3,D-3,DepthViola,172,12,--,--
+EVENT,32,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,34,0,D-3,CavernLute,128,6,--,--
+EVENT,36,0,A#3,CavernLute,128,6,--,--
+EVENT,36,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,38,0,A-3,CavernLute,128,6,--,--
+EVENT,40,0,D-3,CavernLute,148,6,--,--
+EVENT,40,5,A#3,ObsidianHarp,112,3,--,--
+EVENT,42,0,G-3,CavernLute,128,6,--,--
+EVENT,42,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,44,0,F-3,CavernLute,128,6,--,--
+EVENT,44,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,46,0,D-3,CavernLute,128,6,--,--
+EVENT,48,0,A-2,CavernLute,148,6,--,PAN 78
+EVENT,48,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
+EVENT,48,3,E-3,DepthViola,176,14,--,--
+EVENT,48,4,C#4,ChasmBell,124,16,--,PAN 64
+EVENT,48,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,50,0,E-3,CavernLute,128,6,--,--
+EVENT,52,0,A#3,CavernLute,128,6,--,--
+EVENT,52,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,54,0,C#4,CavernLute,128,6,--,--
+EVENT,56,0,E-4,CavernLute,148,6,--,--
+EVENT,56,5,C#4,ObsidianHarp,112,3,--,--
+EVENT,58,0,C#4,CavernLute,128,6,--,--
+EVENT,58,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,60,0,A-3,CavernLute,128,6,--,--
+EVENT,60,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,62,0,E-3,CavernLute,128,6,--,--
+PATTERN,E,64,70,4,16,D,Phrygian,Hollow Abyss
+EVENT,0,0,D-3,CavernLute,142,6,ECH 66,PAN 78
+EVENT,0,1,D-2,AbyssDrone,150,32,--,PAN 128
+EVENT,0,2,A-3,CavernWind,98,32,--,PAN 44
+EVENT,0,4,D-4,ChasmBell,124,16,--,PAN 196
+EVENT,0,6,D-2,CavernDrum,148,6,SDN 12,PAN 128
+EVENT,4,0,A-3,CavernLute,122,6,ECH 66,--
+EVENT,4,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,8,0,E-4,CavernLute,142,6,ECH 66,--
+EVENT,8,3,A-3,DepthViola,148,14,--,PAN 156
+EVENT,10,0,F-4,CavernLute,122,6,ECH 66,--
+EVENT,10,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,12,5,F-4,ObsidianHarp,112,3,--,PAN 186
+EVENT,12,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,16,0,D-3,CavernLute,142,6,ECH 66,PAN 78
+EVENT,16,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,20,0,A-3,CavernLute,122,6,ECH 66,--
+EVENT,20,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,24,0,D#4,CavernLute,142,6,ECH 66,--
+EVENT,26,0,D-4,CavernLute,122,6,ECH 66,--
+EVENT,26,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,28,5,D#4,ObsidianHarp,112,3,--,--
+EVENT,28,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,32,0,A-2,CavernLute,142,6,ECH 66,PAN 78
+EVENT,32,1,A-1,AbyssDrone,150,32,--,PAN 128
+EVENT,32,2,D#4,CavernWind,102,32,--,PAN 212
+EVENT,32,4,G#4,ChasmBell,124,16,--,PAN 56
+EVENT,32,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,36,0,E-3,CavernLute,122,6,ECH 66,--
+EVENT,36,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,40,0,A#3,CavernLute,142,6,ECH 66,--
+EVENT,40,3,G-3,DepthViola,146,14,PRT 50,--
+EVENT,42,0,C#4,CavernLute,122,6,ECH 66,--
+EVENT,42,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,44,5,C#4,ObsidianHarp,112,3,--,--
+EVENT,44,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,48,0,D-3,CavernLute,142,6,ECH 66,PAN 78
+EVENT,48,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,52,0,A-3,CavernLute,122,6,ECH 66,--
+EVENT,52,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,56,0,F-4,CavernLute,142,6,ECH 66,--
+EVENT,58,0,E-4,CavernLute,122,6,ECH 66,--
+EVENT,58,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,60,5,A-3,ObsidianHarp,112,3,--,--
+EVENT,60,7,D-6,StoneShaker,54,2,--,PAN 88
+PATTERN,F,64,70,4,16,D,Harmonic Minor,Sunken Relics
+EVENT,0,0,D#3,CavernLute,148,6,--,PAN 78
+EVENT,0,1,"D#2,A#2",AbyssDrone,150,16,--,PAN 128
 EVENT,0,2,D#4,CavernWind,98,32,--,PAN 44
-EVENT,0,4,D#4,ChasmBell,124,16,--,PAN 200
-EVENT,0,6,C#2,CavernDrum,148,6,SDN 12,PAN 128
-EVENT,2,0,D#3,CavernLute,118,6,ECH 65,--
-EVENT,4,3,D#3,DepthViola,150,12,--,PAN 156
-EVENT,4,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,6,0,A-3,CavernLute,118,6,ECH 65,--
-EVENT,8,0,C-4,CavernLute,138,6,ECH 65,--
-EVENT,10,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,12,0,D#3,CavernLute,118,6,ECH 65,--
-EVENT,12,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,16,0,G#2,CavernLute,138,6,ECH 65,PAN 78
-EVENT,16,5,C-4,ObsidianHarp,112,3,--,PAN 186
-EVENT,16,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,18,0,D#3,CavernLute,118,6,ECH 65,--
-EVENT,20,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,22,0,F#3,CavernLute,118,6,ECH 65,--
-EVENT,24,0,E-3,CavernLute,138,6,ECH 65,--
-EVENT,26,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,28,0,D#3,CavernLute,118,6,ECH 65,--
-EVENT,28,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,32,0,C#3,CavernLute,138,6,ECH 65,PAN 78
-EVENT,32,1,C#2,AbyssDrone,150,32,--,PAN 128
-EVENT,32,2,D-4,CavernWind,102,32,--,PAN 212
-EVENT,32,4,C#4,ChasmBell,124,16,--,PAN 60
-EVENT,32,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,34,0,G#3,CavernLute,118,6,ECH 65,--
-EVENT,36,3,E-3,DepthViola,152,14,PRT 48,--
-EVENT,36,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,38,0,D#4,CavernLute,118,6,ECH 65,--
-EVENT,40,0,E-4,CavernLute,138,6,ECH 65,--
-EVENT,42,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,44,0,G#3,CavernLute,118,6,ECH 65,--
-EVENT,44,7,C#6,StoneShaker,54,2,--,PAN 88
-EVENT,48,0,C#3,CavernLute,138,6,ECH 65,PAN 78
-EVENT,48,5,D-4,ObsidianHarp,112,3,--,--
-EVENT,48,6,C#2,CavernDrum,148,6,SDN 12,--
-EVENT,50,0,G#3,CavernLute,118,6,ECH 65,--
-EVENT,52,7,C#6,StoneShaker,54,2,--,PAN 168
-EVENT,54,0,D-4,CavernLute,118,6,ECH 65,--
-EVENT,56,0,C#4,CavernLute,138,6,ECH 65,--
-EVENT,58,6,G#1,CavernDrum,118,4,SDN 10,--
-EVENT,60,0,G#3,CavernLute,118,6,ECH 65,--
-EVENT,60,7,C#6,StoneShaker,54,2,--,PAN 88
+EVENT,0,3,A#3,DepthViola,180,8,--,PAN 156
+EVENT,0,4,D#4,ChasmBell,124,16,--,PAN 192
+EVENT,0,5,D#5,ObsidianHarp,124,3,--,PAN 186
+EVENT,0,6,D-2,CavernDrum,178,6,SDN 14,PAN 128
+EVENT,2,0,A#3,CavernLute,128,6,--,--
+EVENT,4,0,G-4,CavernLute,128,6,--,--
+EVENT,4,5,A#4,ObsidianHarp,124,3,--,--
+EVENT,4,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,6,0,F-4,CavernLute,128,6,--,--
+EVENT,6,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,8,0,A#3,CavernLute,148,6,--,--
+EVENT,8,3,D#4,DepthViola,184,8,PRT 40,--
+EVENT,8,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,8,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,10,0,D#4,CavernLute,128,6,--,--
+EVENT,12,0,G-4,CavernLute,128,6,--,--
+EVENT,12,5,D#4,ObsidianHarp,124,3,--,--
+EVENT,12,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,14,0,A#3,CavernLute,128,6,--,--
+EVENT,16,0,F-3,CavernLute,148,6,--,PAN 78
+EVENT,16,1,"F-2,C-3",AbyssDrone,150,16,--,PAN 128
+EVENT,16,3,C-4,DepthViola,182,8,--,--
+EVENT,16,5,F-5,ObsidianHarp,124,3,--,--
+EVENT,16,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,18,0,C-4,CavernLute,128,6,--,--
+EVENT,20,0,A-4,CavernLute,128,6,--,--
+EVENT,20,5,C-5,ObsidianHarp,124,3,--,--
+EVENT,20,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,22,0,G-4,CavernLute,128,6,--,--
+EVENT,22,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,24,0,C-4,CavernLute,148,6,--,--
+EVENT,24,3,F-4,DepthViola,186,8,PRT 40,--
+EVENT,24,5,A-4,ObsidianHarp,124,3,--,--
+EVENT,24,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,26,0,F-4,CavernLute,128,6,--,--
+EVENT,28,0,A-4,CavernLute,128,6,--,--
+EVENT,28,5,F-4,ObsidianHarp,124,3,--,--
+EVENT,28,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,30,0,C-4,CavernLute,128,6,--,--
+EVENT,30,6,A-1,CavernDrum,136,4,SDN 10,--
+EVENT,32,0,G-3,CavernLute,148,6,--,PAN 78
+EVENT,32,1,"G-2,D-3",AbyssDrone,150,16,--,PAN 128
+EVENT,32,2,A-3,CavernWind,102,32,--,PAN 212
+EVENT,32,3,D-4,DepthViola,188,8,--,--
+EVENT,32,4,G-4,ChasmBell,124,16,--,PAN 60
+EVENT,32,5,G-5,ObsidianHarp,124,3,--,--
+EVENT,32,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,34,0,D-4,CavernLute,128,6,--,--
+EVENT,36,0,A#4,CavernLute,128,6,--,--
+EVENT,36,5,D-5,ObsidianHarp,124,3,--,--
+EVENT,36,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,38,0,A-4,CavernLute,128,6,--,--
+EVENT,38,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,40,0,D-4,CavernLute,148,6,--,--
+EVENT,40,3,G-4,DepthViola,192,8,--,--
+EVENT,40,5,A#4,ObsidianHarp,124,3,--,--
+EVENT,40,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,42,0,G-4,CavernLute,128,6,--,--
+EVENT,44,0,A#4,CavernLute,128,6,--,--
+EVENT,44,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,44,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,46,0,D-4,CavernLute,128,6,--,--
+EVENT,48,0,A-2,CavernLute,148,6,--,PAN 78
+EVENT,48,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
+EVENT,48,3,E-4,DepthViola,190,10,--,--
+EVENT,48,4,A-4,ChasmBell,124,16,--,PAN 196
+EVENT,48,5,E-5,ObsidianHarp,124,3,--,--
+EVENT,48,6,D-2,CavernDrum,178,6,SDN 14,--
+EVENT,50,0,E-3,CavernLute,128,6,--,--
+EVENT,52,0,C#4,CavernLute,128,6,--,--
+EVENT,52,5,C#5,ObsidianHarp,124,3,--,--
+EVENT,52,7,D-6,StoneShaker,66,2,--,PAN 172
+EVENT,54,0,E-4,CavernLute,128,6,--,--
+EVENT,54,6,A-1,CavernDrum,132,4,SDN 10,--
+EVENT,56,0,A#3,CavernLute,148,6,--,--
+EVENT,56,5,A#4,ObsidianHarp,124,3,--,--
+EVENT,56,6,D-2,CavernDrum,154,5,SDN 12,--
+EVENT,58,0,G-3,CavernLute,128,6,--,--
+EVENT,58,3,C#4,DepthViola,178,6,--,--
+EVENT,60,0,E-3,CavernLute,128,6,--,--
+EVENT,60,5,G-4,ObsidianHarp,124,3,--,--
+EVENT,60,7,D-6,StoneShaker,66,2,--,PAN 84
+EVENT,62,0,C#3,CavernLute,128,6,--,--
+EVENT,62,6,A-1,CavernDrum,136,4,SDN 10,--
+PATTERN,G,64,70,4,16,D,Phrygian,Heart of the Depths
+EVENT,0,0,D-3,CavernLute,154,6,--,PAN 78
+EVENT,0,1,"D-2,A-2",AbyssDrone,150,16,--,PAN 128
+EVENT,0,2,D-4,CavernWind,98,32,--,PAN 44
+EVENT,0,3,D-4,DepthViola,194,6,--,PAN 156
+EVENT,0,4,D-4,ChasmBell,136,16,--,PAN 196
+EVENT,0,5,D-5,ObsidianHarp,134,3,--,PAN 186
+EVENT,0,6,D-2,CavernDrum,202,6,SDN 16,PAN 128
+EVENT,2,0,A-3,CavernLute,134,6,--,--
+EVENT,2,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,4,0,F-4,CavernLute,134,6,--,--
+EVENT,4,5,A-4,ObsidianHarp,134,3,--,--
+EVENT,4,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,6,0,A-3,CavernLute,134,6,--,--
+EVENT,6,3,F-4,DepthViola,190,6,--,--
+EVENT,6,6,A-1,CavernDrum,148,4,SDN 12,--
+EVENT,8,0,G#4,CavernLute,154,6,--,--
+EVENT,8,5,F-4,ObsidianHarp,134,3,--,--
+EVENT,8,6,D-2,CavernDrum,178,5,SDN 14,--
+EVENT,10,0,F-4,CavernLute,134,6,--,--
+EVENT,10,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,12,0,E-4,CavernLute,134,6,--,--
+EVENT,12,3,E-4,DepthViola,184,4,--,--
+EVENT,12,5,D-4,ObsidianHarp,134,3,--,--
+EVENT,12,6,A-1,CavernDrum,152,4,SDN 12,--
+EVENT,12,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,14,0,A-3,CavernLute,134,6,--,--
+EVENT,14,6,D#2,CavernDrum,176,4,SDN 12,--
+EVENT,14,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,16,0,D#3,CavernLute,154,6,--,PAN 78
+EVENT,16,1,"D#2,A#2",AbyssDrone,150,16,--,PAN 128
+EVENT,16,3,D#4,DepthViola,196,8,--,--
+EVENT,16,5,D#5,ObsidianHarp,134,3,--,--
+EVENT,16,6,D-2,CavernDrum,202,6,SDN 16,--
+EVENT,18,0,A#3,CavernLute,134,6,--,--
+EVENT,18,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,20,0,G-4,CavernLute,134,6,--,--
+EVENT,20,5,A#4,ObsidianHarp,134,3,--,--
+EVENT,20,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,22,0,A#3,CavernLute,134,6,--,--
+EVENT,22,6,A-1,CavernDrum,148,4,SDN 12,--
+EVENT,24,0,F-4,CavernLute,154,6,--,--
+EVENT,24,3,A#3,DepthViola,182,8,--,--
+EVENT,24,5,G-4,ObsidianHarp,134,3,--,--
+EVENT,24,6,D-2,CavernDrum,178,5,SDN 14,--
+EVENT,26,0,D#4,CavernLute,134,6,--,--
+EVENT,26,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,28,0,D-4,CavernLute,134,6,--,--
+EVENT,28,5,D#4,ObsidianHarp,134,3,--,--
+EVENT,28,6,A-1,CavernDrum,152,4,SDN 12,--
+EVENT,28,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,30,0,A#3,CavernLute,134,6,--,--
+EVENT,30,6,D#2,CavernDrum,176,4,SDN 12,--
+EVENT,30,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,32,0,G#2,CavernLute,154,6,--,PAN 78
+EVENT,32,1,"G#1,D#2",AbyssDrone,150,16,--,PAN 128
+EVENT,32,2,G#3,CavernWind,102,32,--,PAN 212
+EVENT,32,3,F-4,DepthViola,198,8,PRT 38,--
+EVENT,32,4,G#4,ChasmBell,136,16,--,PAN 56
+EVENT,32,5,G#4,ObsidianHarp,134,3,--,--
+EVENT,32,6,D-2,CavernDrum,202,6,SDN 16,--
+EVENT,34,0,D#3,CavernLute,134,6,--,--
+EVENT,34,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,36,0,B-3,CavernLute,134,6,--,--
+EVENT,36,5,B-4,ObsidianHarp,134,3,--,--
+EVENT,36,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,38,0,D#3,CavernLute,134,6,--,--
+EVENT,38,6,A-1,CavernDrum,148,4,SDN 12,--
+EVENT,40,0,G#3,CavernLute,154,6,--,--
+EVENT,40,3,G#4,DepthViola,204,8,--,--
+EVENT,40,5,D#5,ObsidianHarp,134,3,--,--
+EVENT,40,6,D-2,CavernDrum,178,5,SDN 14,--
+EVENT,42,0,F#3,CavernLute,134,6,--,--
+EVENT,42,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,44,0,D#3,CavernLute,134,6,--,--
+EVENT,44,5,G#4,ObsidianHarp,134,3,--,--
+EVENT,44,6,A-1,CavernDrum,152,4,SDN 12,--
+EVENT,44,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,46,0,B-2,CavernLute,134,6,--,--
+EVENT,46,6,D#2,CavernDrum,176,4,SDN 12,--
+EVENT,46,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,48,0,A-2,CavernLute,154,6,--,PAN 78
+EVENT,48,1,"A-1,E-2",AbyssDrone,150,16,--,PAN 128
+EVENT,48,3,A-4,DepthViola,206,10,--,--
+EVENT,48,4,A-4,ChasmBell,136,16,--,PAN 128
+EVENT,48,5,E-5,ObsidianHarp,134,3,--,--
+EVENT,48,6,D-2,CavernDrum,202,6,SDN 16,--
+EVENT,50,0,E-3,CavernLute,134,6,--,--
+EVENT,50,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,52,0,C#4,CavernLute,134,6,--,--
+EVENT,52,5,C#5,ObsidianHarp,134,3,--,--
+EVENT,52,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,54,0,E-3,CavernLute,134,6,--,--
+EVENT,54,6,A-1,CavernDrum,148,4,SDN 12,--
+EVENT,56,0,A#3,CavernLute,154,6,--,--
+EVENT,56,5,A#4,ObsidianHarp,134,3,--,--
+EVENT,56,6,D-2,CavernDrum,178,5,SDN 14,--
+EVENT,58,0,G-3,CavernLute,134,6,--,--
+EVENT,58,3,G-4,DepthViola,186,6,--,--
+EVENT,58,7,D-6,StoneShaker,80,2,--,PAN 84
+EVENT,60,0,E-3,CavernLute,134,6,--,--
+EVENT,60,5,G-4,ObsidianHarp,134,3,--,--
+EVENT,60,6,A-1,CavernDrum,152,4,SDN 12,--
+EVENT,60,7,D-6,StoneShaker,80,2,--,PAN 172
+EVENT,62,0,C#3,CavernLute,134,6,--,--
+EVENT,62,6,D#2,CavernDrum,176,4,SDN 12,--
+EVENT,62,7,D-6,StoneShaker,80,2,--,PAN 84
+PATTERN,H,64,70,4,16,D,Phrygian,Deep Stillness
+EVENT,0,0,A-2,CavernLute,138,6,ECH 65,PAN 78
+EVENT,0,1,A-1,AbyssDrone,150,32,--,PAN 128
+EVENT,0,2,E-4,CavernWind,98,32,--,PAN 44
+EVENT,0,4,E-4,ChasmBell,124,16,--,PAN 200
+EVENT,0,6,D-2,CavernDrum,148,6,SDN 12,PAN 128
+EVENT,2,0,E-3,CavernLute,118,6,ECH 65,--
+EVENT,4,3,E-3,DepthViola,150,12,--,PAN 156
+EVENT,4,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,6,0,A#3,CavernLute,118,6,ECH 65,--
+EVENT,8,0,C#4,CavernLute,138,6,ECH 65,--
+EVENT,10,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,12,0,E-3,CavernLute,118,6,ECH 65,--
+EVENT,12,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,16,0,A-2,CavernLute,138,6,ECH 65,PAN 78
+EVENT,16,5,C#4,ObsidianHarp,112,3,--,PAN 186
+EVENT,16,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,18,0,E-3,CavernLute,118,6,ECH 65,--
+EVENT,20,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,22,0,G-3,CavernLute,118,6,ECH 65,--
+EVENT,24,0,F-3,CavernLute,138,6,ECH 65,--
+EVENT,26,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,28,0,E-3,CavernLute,118,6,ECH 65,--
+EVENT,28,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,32,0,D-3,CavernLute,138,6,ECH 65,PAN 78
+EVENT,32,1,D-2,AbyssDrone,150,32,--,PAN 128
+EVENT,32,2,D#4,CavernWind,102,32,--,PAN 212
+EVENT,32,4,D-4,ChasmBell,124,16,--,PAN 60
+EVENT,32,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,34,0,A-3,CavernLute,118,6,ECH 65,--
+EVENT,36,3,F-3,DepthViola,152,14,PRT 48,--
+EVENT,36,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,38,0,E-4,CavernLute,118,6,ECH 65,--
+EVENT,40,0,F-4,CavernLute,138,6,ECH 65,--
+EVENT,42,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,44,0,A-3,CavernLute,118,6,ECH 65,--
+EVENT,44,7,D-6,StoneShaker,54,2,--,PAN 88
+EVENT,48,0,D-3,CavernLute,138,6,ECH 65,PAN 78
+EVENT,48,5,D#4,ObsidianHarp,112,3,--,--
+EVENT,48,6,D-2,CavernDrum,148,6,SDN 12,--
+EVENT,50,0,A-3,CavernLute,118,6,ECH 65,--
+EVENT,52,7,D-6,StoneShaker,54,2,--,PAN 168
+EVENT,54,0,D#4,CavernLute,118,6,ECH 65,--
+EVENT,56,0,D-4,CavernLute,138,6,ECH 65,--
+EVENT,58,6,A-1,CavernDrum,118,4,SDN 10,--
+EVENT,60,0,A-3,CavernLute,118,6,ECH 65,--
+EVENT,60,7,D-6,StoneShaker,54,2,--,PAN 88

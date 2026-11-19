@@ -36,8 +36,8 @@ export class MusicPlayer {
       wilderness: {
         explore: ['A', 'C', 'H'],
         combat: ['B', 'G'],
-        tension: ['D', 'E', 'F'],
-        descent: ['A']
+        tension: ['E', 'F'],
+        descent: ['D']
       },
       crypts: {
         explore: ['A', 'C', 'H'],
@@ -46,9 +46,9 @@ export class MusicPlayer {
         descent: ['D']
       },
       caverns: {
-        explore: ['A', 'C', 'H'],
+        explore: ['A', 'E', 'H'],
         combat: ['B', 'G'],
-        tension: ['E', 'F'],
+        tension: ['C', 'F'],
         descent: ['D']
       },
       cathedral: {
