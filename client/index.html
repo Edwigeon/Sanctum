@@ -481,35 +481,59 @@
           </div>
 
           <div>
-            <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Equipped Gear</div>
-            <div class="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
-              <div id="slot-weapon" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+            <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">
+              <span>Equipped Paperdoll</span>
+              <span class="text-slate-500 normal-case">LMB: Unequip • RMB: Drop</span>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
+              <!-- Row 1: Crest / Helm / Amulet -->
+              <div id="slot-crest" class="paperdoll-socket flex flex-col items-center justify-center p-1 min-h-[54px] opacity-75">
+                <span id="crest-class" class="text-[9px] font-bold text-amber-400 uppercase tracking-tight text-center leading-none">HERO</span>
+                <span id="crest-level" class="text-[8px] text-slate-500 font-mono mt-0.5">LVL 1</span>
+              </div>
+              <div id="slot-helm" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="helm">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Helm">
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Helm</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              </div>
+              <div id="slot-amulet" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="amulet">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Amulet">
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Amulet</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              </div>
+
+              <!-- Row 2: Weapon / Armor / Offhand -->
+              <div id="slot-weapon" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="weapon">
                 <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Weapon">
-                <div class="min-w-0 flex-1">
-                  <div class="text-[9px] text-slate-500 uppercase">Weapon</div>
-                  <div class="slot-name text-slate-400 truncate">—</div>
-                </div>
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Weapon</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
               </div>
-              <div id="slot-armor" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+              <div id="slot-armor" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="armor">
                 <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Armor">
-                <div class="min-w-0 flex-1">
-                  <div class="text-[9px] text-slate-500 uppercase">Armor</div>
-                  <div class="slot-name text-slate-400 truncate">—</div>
-                </div>
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Armor</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
               </div>
-              <div id="slot-gloves" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+              <div id="slot-offhand" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="offhand">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Off-hand">
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Off-hand</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              </div>
+
+              <!-- Row 3: Gloves / Boots / Ring -->
+              <div id="slot-gloves" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="gloves">
                 <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Gloves">
-                <div class="min-w-0 flex-1">
-                  <div class="text-[9px] text-slate-500 uppercase">Gloves</div>
-                  <div class="slot-name text-slate-400 truncate">—</div>
-                </div>
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Gloves</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
               </div>
-              <div id="slot-ring" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+              <div id="slot-boots" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="boots">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Boots">
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Boots</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              </div>
+              <div id="slot-ring" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="ring">
                 <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Ring">
-                <div class="min-w-0 flex-1">
-                  <div class="text-[9px] text-slate-500 uppercase">Ring</div>
-                  <div class="slot-name text-slate-400 truncate">—</div>
-                </div>
+                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Ring</div>
+                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
               </div>
             </div>
           </div>
@@ -533,6 +557,35 @@
           </div>
         </div>
       </aside>
+
+      <!-- COMPARATIVE ITEM TOOLTIP (DIABLO II STYLE) -->
+      <div id="tooltip-item-compare" class="hidden fixed pointer-events-none z-50 flex gap-2 font-mono">
+        <!-- Equipped Item Card -->
+        <div id="compare-equipped-card" class="item-card item-card-equipped p-2.5 text-xs shadow-2xl min-w-[190px] max-w-[220px]">
+          <div class="text-[9px] uppercase tracking-wider text-slate-400 font-bold border-b border-slate-800 pb-1 mb-1.5 flex justify-between">
+            <span>EQUIPPED</span>
+            <span id="compare-eq-slot" class="text-amber-500/80">WEAPON</span>
+          </div>
+          <div id="compare-eq-name" class="font-bold text-sm text-slate-200 mb-0.5 leading-tight">—</div>
+          <div id="compare-eq-type" class="text-[10px] text-slate-400 mb-1.5">—</div>
+          <div id="compare-eq-stats" class="space-y-0.5 text-[11px] text-slate-300"></div>
+        </div>
+
+        <!-- Hovered/New Item Card -->
+        <div id="compare-hover-card" class="item-card p-2.5 text-xs shadow-2xl min-w-[200px] max-w-[240px]">
+          <div class="text-[9px] uppercase tracking-wider text-amber-300 font-bold border-b border-slate-800 pb-1 mb-1.5 flex justify-between">
+            <span id="compare-hover-badge">INSPECTING</span>
+            <span id="compare-hover-slot" class="text-amber-400">WEAPON</span>
+          </div>
+          <div id="compare-hover-name" class="font-bold text-sm text-amber-200 mb-0.5 leading-tight">—</div>
+          <div id="compare-hover-type" class="text-[10px] text-slate-400 mb-1.5">—</div>
+          <div id="compare-hover-stats" class="space-y-0.5 text-[11px] text-slate-200"></div>
+          <div id="compare-hover-actions" class="mt-2 pt-1.5 border-t border-slate-800/80 text-[9px] text-amber-400/90 flex justify-between">
+            <span>[LMB] Equip</span>
+            <span class="text-slate-400">[RMB] Drop</span>
+          </div>
+        </div>
+      </div>
 
       <!-- IN-GAME PAUSE / ESC MENU -->
       <div id="panel-pause"

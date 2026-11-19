@@ -103,7 +103,7 @@ class ModService {
     // Sanitize equipment to valid gear slots
     const safeEquipment = { ...existing.equipment };
     if (patch.equipment && typeof patch.equipment === 'object' && !Array.isArray(patch.equipment)) {
-      for (const slot of ['weapon', 'armor', 'gloves', 'ring']) {
+      for (const slot of ['helm', 'amulet', 'weapon', 'armor', 'offhand', 'gloves', 'boots', 'ring']) {
         if (patch.equipment[slot] === null) {
           safeEquipment[slot] = null;
         } else if (patch.equipment[slot] && typeof patch.equipment[slot] === 'object') {

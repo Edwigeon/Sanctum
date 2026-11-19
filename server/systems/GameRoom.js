@@ -143,7 +143,9 @@ export class GameRoom {
       statPoints: savedChar?.statPoints || 0,
       gold: 0,
       stats: savedChar?.stats ? { ...savedChar.stats } : { ...cls.stats },
-      equipment: savedChar?.equipment ? { ...savedChar.equipment } : { weapon: null, armor: null, gloves: null, ring: null },
+      equipment: savedChar?.equipment
+        ? Object.assign({ helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring: null }, savedChar.equipment)
+        : { helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring: null },
       inventory: savedChar?.inventory ? [...savedChar.inventory] : [],
       x: sx, y: sy, targetX: sx, targetY: sy,
       targetMonsterId: null, targetLootId: null, holdAttack: false,
@@ -260,6 +262,9 @@ export class GameRoom {
     } else if (packet.type === PACKET_TYPES.EQUIP_ITEM) {
       if (!Number.isInteger(packet.itemId)) return;
       this.handleEquipItem(p, packet.itemId);
+    } else if (packet.type === PACKET_TYPES.UNEQUIP_ITEM) {
+      if (typeof packet.slot !== 'string') return;
+      this.handleUnequipItem(p, packet.slot);
     } else if (packet.type === PACKET_TYPES.DROP_ITEM) {
       if (!Number.isInteger(packet.itemId)) return;
       this.handleDropItem(p, packet.itemId);
@@ -285,6 +290,18 @@ export class GameRoom {
     p.equipment[item.slot] = item;
     p.inventory.splice(idx, 1);
     if (prev) p.inventory.push(prev);
+    this.recalculateStats(p, false);
+    p.dirtyState = true;
+    saveManager.saveFromPlayer(p, this.floor);
+  }
+
+  handleUnequipItem(p, slot) {
+    if (!slot || !(slot in p.equipment)) return;
+    const item = p.equipment[slot];
+    if (!item) return;
+    if (p.inventory.length >= 40) return;
+    p.equipment[slot] = null;
+    p.inventory.push(item);
     this.recalculateStats(p, false);
     p.dirtyState = true;
     saveManager.saveFromPlayer(p, this.floor);

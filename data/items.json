@@ -1,5 +1,17 @@
 {
   "bases": {
+    "helm": [
+      { "name": "Bascinet", "weight": 3.5, "baseStats": { "armor": 2, "might": 1 } },
+      { "name": "Sallet", "weight": 3.0, "baseStats": { "armor": 2 } },
+      { "name": "Crown", "weight": 1.5, "baseStats": { "focus": 2, "armor": 1 } },
+      { "name": "Coif", "weight": 2.0, "baseStats": { "armor": 1, "agility": 1 } }
+    ],
+    "amulet": [
+      { "name": "Choker", "weight": 0.5, "baseStats": { "vitality": 2 } },
+      { "name": "Talisman", "weight": 0.5, "baseStats": { "focus": 2 } },
+      { "name": "Medallion", "weight": 0.5, "baseStats": { "might": 2 } },
+      { "name": "Periapt", "weight": 0.5, "baseStats": { "armor": 2 } }
+    ],
     "weapon": [
       { "name": "Cleaver", "weight": 5.5, "baseStats": { "dmg": 3 } },
       { "name": "Wand", "weight": 2.0, "baseStats": { "dmg": 2, "focus": 1 } },
@@ -12,11 +24,23 @@
       { "name": "Cuirass", "weight": 9.0, "baseStats": { "armor": 4 } },
       { "name": "Vestments", "weight": 3.5, "baseStats": { "armor": 2, "focus": 1 } }
     ],
+    "offhand": [
+      { "name": "Buckler", "weight": 3.5, "baseStats": { "armor": 2, "agility": 1 } },
+      { "name": "Kite Shield", "weight": 6.0, "baseStats": { "armor": 4 } },
+      { "name": "Tome", "weight": 2.0, "baseStats": { "spellDmg": 2, "focus": 2 } },
+      { "name": "Orb", "weight": 1.5, "baseStats": { "focus": 2, "crit": 0.02 } }
+    ],
     "gloves": [
       { "name": "Spikegloves", "weight": 3.0, "baseStats": { "dmg": 1, "armor": 1 } },
       { "name": "Gauntlets", "weight": 3.5, "baseStats": { "armor": 2, "might": 1 } },
       { "name": "Bracers", "weight": 2.0, "baseStats": { "armor": 1, "agility": 1 } },
       { "name": "Grips", "weight": 2.5, "baseStats": { "dmg": 2 } }
+    ],
+    "boots": [
+      { "name": "Greaves", "weight": 4.0, "baseStats": { "armor": 2, "might": 1 } },
+      { "name": "Treads", "weight": 2.0, "baseStats": { "speed": 0.2, "armor": 1 } },
+      { "name": "Sabatons", "weight": 4.5, "baseStats": { "armor": 3 } },
+      { "name": "Boots", "weight": 2.5, "baseStats": { "agility": 1, "armor": 1 } }
     ],
     "ring": [
       { "name": "Signet", "weight": 0.5, "baseStats": { "might": 1 } },

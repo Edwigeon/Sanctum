@@ -1102,3 +1102,68 @@ input[type=range]::-webkit-slider-thumb {
   border-top-color: #86efac;
   border-left-color: #4ade80;
 }
+
+/* ==========================================================================
+   PAPERDOLL & COMPARATIVE TOOLTIPS (DIABLO II / DUNGEON SIEGE STYLE)
+   ========================================================================== */
+.paperdoll-socket {
+  background: linear-gradient(180deg, #0b0e14 0%, #111622 100%) !important;
+  border: 2px solid var(--bronze-dark) !important;
+  box-shadow: inset 2px 2px 5px #000, 0 1px 0 rgba(247, 198, 103, 0.1) !important;
+  min-height: 58px;
+  position: relative;
+  transition: border-color 100ms ease, background-color 100ms ease, transform 60ms ease !important;
+  user-select: none;
+}
+
+.paperdoll-socket:hover {
+  border-color: var(--bronze-bright) !important;
+  background: linear-gradient(180deg, #131926 0%, #1a2233 100%) !important;
+}
+
+.paperdoll-socket:active {
+  transform: translateY(1px) !important;
+  box-shadow: inset 3px 3px 6px #000 !important;
+}
+
+.paperdoll-socket.socket-occupied {
+  border-color: var(--bronze-mid) !important;
+}
+
+.paperdoll-socket.socket-occupied:hover {
+  border-color: var(--brass-gold) !important;
+}
+
+.paperdoll-socket .slot-icon {
+  filter: drop-shadow(1px 1px 0px #000);
+}
+
+.item-card {
+  background: linear-gradient(180deg, #121622 0%, #080b12 100%) !important;
+  border: 3px solid var(--bronze-mid) !important;
+  box-shadow:
+    0 0 0 1px #000000,
+    inset 1px 1px 0 var(--bronze-highlight),
+    inset -1px -1px 0 var(--bronze-darkest),
+    0 12px 32px rgba(0, 0, 0, 0.95) !important;
+}
+
+.item-card-equipped {
+  border-color: var(--iron-600) !important;
+  opacity: 0.9;
+}
+
+.stat-delta-pos {
+  color: #4ade80 !important;
+  font-weight: 700;
+}
+
+.stat-delta-neg {
+  color: #f43f5e !important;
+  font-weight: 700;
+}
+
+.stat-delta-neu {
+  color: #94a3b8 !important;
+}
+

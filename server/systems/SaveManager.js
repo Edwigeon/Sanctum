@@ -3,6 +3,17 @@ import { GAME_MODES } from '../../shared/Constants.js';
 import { dataRegistry } from './DataRegistry.js';
 import { db } from './Database.js';
 
+const DEFAULT_EQUIPMENT = {
+  helm: null,
+  amulet: null,
+  weapon: null,
+  armor: null,
+  offhand: null,
+  gloves: null,
+  boots: null,
+  ring: null
+};
+
 function rowToCharacter(row) {
   if (!row) return null;
   let data = { stats: {}, equipment: {}, inventory: [] };
@@ -23,7 +34,7 @@ function rowToCharacter(row) {
     isDead: !!row.is_dead,
     highestFloor: row.highest_floor,
     stats: data.stats || {},
-    equipment: data.equipment || { weapon: null, armor: null, gloves: null, ring: null },
+    equipment: Object.assign({ ...DEFAULT_EQUIPMENT }, data.equipment),
     inventory: data.inventory || [],
     updatedAt: row.updated_at
   };
@@ -49,7 +60,7 @@ class SaveManager {
     const now = Date.now();
     const dataJson = JSON.stringify({
       stats: { ...cls.stats },
-      equipment: { weapon: null, armor: null, gloves: null, ring: null },
+      equipment: { ...DEFAULT_EQUIPMENT },
       inventory: []
     });
 

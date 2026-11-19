@@ -96,9 +96,9 @@ Phase 2D: UI Refactor, Custom Dark-Fantasy CSS & Paperdoll Overhaul
  [x] Zero-Dependency Custom Retro CSS Stylesheet (`client/style.css`):
      - Completely purged external Tailwind CDN runtime across `index.html`, `dev.html`, and `mod.html` in favor of a handcrafted, high-performance static stylesheet with zero network dependencies (< 20 KB uncompressed).
      - PICO-8 16-color CSS variable design tokens (`--p8-0` through `--p8-15`), subtle iron/stone bevels, custom scrollbars, and dark-fantasy parchment/iron aesthetics.
- [ ] Inventory & Paperdoll Overhaul:
-     - Dedicated visual paperdoll layout with crisp equipment slots (Weapon, Off-hand/Shield, Armor, Gloves, Boots, Ring 1, Ring 2, Amulet).
-     - Modern ARPG ergonomics: 1-click equip/swap, right-click to drop, and click-to-unequip back to bag.
+ [x] Inventory & Paperdoll Overhaul:
+     - Dedicated visual paperdoll layout with crisp equipment sockets (Helm, Amulet, Weapon, Armor, Off-hand/Shield, Gloves, Boots, Ring) styled with sunken stone sockets.
+     - Modern ARPG ergonomics: 1-click equip/swap, right-click to drop, and click-to-unequip back to bag via server-authoritative UNEQUIP_ITEM packet.
      - Dynamic Carry Weight meter with visual overburden thresholds and warning tooltips.
      - Comparative hover tooltips: side-by-side inspection comparing hovered gear with currently equipped slot, displaying clean colored stat deltas (+4 Armor, -2 Focus).
  [ ] Character Sheet (`C`) Deepening:
