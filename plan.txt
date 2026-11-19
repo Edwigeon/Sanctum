@@ -17,11 +17,12 @@ Engine mechanics (/shared/, /server/, /client/) are strictly decoupled from cont
 Stories, acts, monster stats, skill curves, and item affixes can be expanded or modded without rewriting core simulation code.
 Deterministic 32-Bit Simulation:
 All procedural dungeon seeds and RNG use 32-bit integer arithmetic (PRNG), ensuring identical map generation across server and clients with minimal network bandwidth (sending a 32-bit seed instead of map data).
-2. Gameplay Loop, Scale & Progression
-Campaign Scale: The ~2-Hour Run
-3 Thematic Acts: Each Act spans 3 compact procedural floors + 1 Boss encounter (~30–40 minutes per Act).
-Compact Floors: 40×30 tile dungeons keep encounter density high and eliminate tedious backtracking.
-Town Hub & Portals: Quick return to camp to stash, sell, identify, and restock between floors.
+2. Gameplay Loop, World Structure & Progression
+Campaign Scale & Interconnected World:
+Overworld & Dungeons (Diablo-Inspired World Graph): An interconnected overworld of distinct biomes (Camp/Town Hub, Highlands, Ruined Courtyard, Graveyard, etc.) with a dynamic Day/Night cycle that transitions seamlessly into multi-floor subterranean dungeons (Crypts, Caverns, Sanctum Depths).
+Cell / Chunk Streaming Architecture: Large areas and the interconnected overworld are divided into deterministic spatial cells/chunks (e.g., 32×32 or 40×30 tile cells) streamed and activated on demand around players, giving a continuous, interconnected world feel without loading barriers.
+Constrained Biome & Location Generation: Rather than generic random rooms everywhere, each area uses constrained procedural generation tailored to its biome (e.g., road/river/clearing constraints in overworld cells, BSP rooms + doors in keeps/crypts, cellular automata in caverns, fixed set-piece landmarks for boss lairs and town hubs).
+Town Hub, Waypoints & Portals: Seamless walk-out transitions from the camp into the overworld, plus Town Portals (TILES.PORTAL_TOWN) and waypoints for quick returns to stash, identify, and restock.
 Triple-Tier Progression
 Timeline	Mechanics	Player Payoff
 Seconds	Kiting, stutter-stepping, targeting packs, belt potions	Tactile combat, chiptune hit feedback, crisp floating damage
@@ -50,7 +51,7 @@ JavaScript (ES Modules) across both Node.js server and browser client.
 Shared /shared/ modules (Constants.js, MathUtils.js, DungeonGen.js, CombatMath.js) guarantee identical physics, RNG, and damage math on both sides.
 Modular Client & Server Systems:
 Server systems (/server/systems/): GameRoom, DataRegistry, LootGenerator, Database, AuthService, SaveManager, ModService, DemoSeeder.
-Client systems (/client/systems/): Renderer (offscreen floor baking + dual-canvas pipeline), Interpolator, HUDController, InputController, MenuController.
+Client systems (/client/systems/): LightingSystem (merged-wall analytical shadowcasting + 9-band Bayer dither + additive 16-color lights + subpixel entity stamping), Renderer, Interpolator, HUDController, InputController, MenuController.
 Detailed documentation of implemented systems lives in SYSTEMS.md.
 Server-Authoritative Simulation (15 Hz):
 Clients send lightweight input intents (MOVE, ATTACK, SKILL, POTION, PICKUP).
@@ -64,10 +65,26 @@ Optional Native Executables: Can be wrapped later with Tauri (< 8 MB binary) for
 
 5. Future Roadmap (Remaining Items Only — See SYSTEMS.md for Implemented Systems)
 
-Phase 2B: Visibility, Town Loop & NG+ Transitions
- [ ] Radial retro torchlight / fog-of-war Bayer dithering on the low-res world canvas + explored tile memory.
- [ ] Town Hub & Portal loop (TILES.PORTAL_TOWN) to return to camp, identify/sell gear, restock potions, and access mode-partitioned shared stashes.
- [ ] Act final floor completion & New Game+ (ngCycle) Torment tier transitions.
+Phase 2B: Real-Time 2D Lighting, Interactive World Objects, Developer Asset Studio (/dev) & Micro-Sprites
+ [x] Real-time 2D shadowcast lighting / fog-of-war (client/systems/LightingSystem.js): greedy merged continuous wall segments (`buildMergedWallSegments`) + exact analytical ray-segment occlusion (zero 12×12 tile-seam notches or ray-step shimmer), 9-band warm `SHADE_U32` palette ramp + world-locked 1×1 Bayer dithering, and static object occluders (`setStaticOccluder`).
+ [x] Additive 16-color palette lighting (`PALETTE`, `PALETTE_INDEX`, `PALETTE_RGB` in `shared/Constants.js`) & subpixel entity stamping (`drawLitEntityStamp`): overlapping lights add brightness and RGB photons cleanly (`ORANGE` torch, `BLUE` Spark projectiles, `YELLOW` stairs & unique drops, `PINK` rare loot, `RED` elite monsters), with entities shaded into a contiguous 24×24 offscreen stamp and blitted at exact subpixel screen coordinates (60+ FPS smooth motion, zero grid seams).
+ [x] Toggleable personal torch (`T`), smooth ambient light transitions (`L` daylight preview), and visibility-based monster/loot hover culling.
+ [ ] Interactive Static World Objects: Shrines (granting temporary buffs and toggling off their colored shrine light beacon when activated), Chests/Containers (casting shadows as static occluders until opened/broken), and Toggleable Braziers/Torches.
+ [ ] Developer Sprite & Asset Digitizer Suite (/dev -> client/dev.html & client/dev.js, backed by /api/dev/sprites):
+     - Image-to-Sanctum Digitizer: drag/drop or paste reference images (.png/.jpg/.webp), interactive crop/resize (8×8, 12×12 tile/pawn/object, 16×16 elite, 24×24 boss), perceptual 16-color palette quantizer with alpha threshold, contrast, and optional Bayer dither toggle.
+     - Interactive Pixel, Rotation & Animation Editor: 16-color palette picker, pencil/eraser/fill/line/mirror tools, rotation preview (0°..360° & 90° steps), multi-frame animation preview (Idle/Walk/Active frames), and 3×3 tiled floor/wall preview under simulated torchlight across all brightness bands.
+     - Direct Export & Live Reload: one-click save directly to /data/sprites.json via local server API or JSON snippet copy.
+ [ ] Data-driven Palette-Indexed Micro-Sprites (/data/sprites.json): compact 16-color hex-grid definitions baked at runtime into rotatable stamps for textured tiles, doors, shrines, chests, items, and 2-frame entity animations (zero external .png bloat).
+
+Phase 2C: Interconnected Cell/Chunk World, Constrained Biomes & Day/Night Cycle
+ [ ] Spatial Cell / Chunk loading system: stitch adjacent deterministic cells into an interconnected world graph, streaming active cells around players on both server and client.
+ [ ] Constrained procedural generators per biome (/data/biomes.json):
+     - Overworld cells (paths, walls/fences, ruins, wilderness clearings, dungeon entrances).
+     - Crypt / Keep algorithm (BSP rooms, pillars, interactable doors TILES.DOOR).
+     - Cavern / Catacomb algorithm (Cellular Automata organic tunnels).
+     - Set-piece / Landmark constraints (Town Camp, Shrines, Boss Arenas).
+ [ ] Overworld Day/Night cycle: time-of-day ambient light curve & palette shifting on outdoor cells (daylight visibility vs. nightfall torch-only visibility and tougher nocturnal spawns) contrasted with permanent darkness underground.
+ [ ] Seamless cell transitions, Dungeon Entrances / Stairs (Up & Down), Town Portals (TILES.PORTAL_TOWN), and New Game+ (ngCycle) transitions.
 
 Phase 3B: Class Skills, Elite Monsters, Bosses & Audio
  [ ] Class-distinct right-click and hotbar active skills (e.g., Vanguard Cleave/Leap, Arcanist Spark/Nova, Shadow Dash/Fan of Knives) defined in data/classes.json or data/skills.json.

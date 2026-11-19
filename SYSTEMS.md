@@ -10,7 +10,7 @@
 ```text
 Sanctum/
 ├── shared/                     # Deterministic modules shared by Node.js server & browser client
-│   ├── Constants.js            # Engine specs, tile IDs, rarities, modes, WebSocket packet types
+│   ├── Constants.js            # Engine specs, 16-color PALETTE/PALETTE_INDEX/PALETTE_RGB, tiles, rarities, packets
 │   ├── MathUtils.js            # 32-bit deterministic PRNG (Mulberry32), dist(), clamp()
 │   ├── DungeonGen.js           # Seeded 40×30 procedural dungeon generator with BFS connectivity check
 │   └── CombatMath.js           # Damage rolls, primary stat scaling, armor mitigation, NG+ scaling
@@ -31,10 +31,11 @@ Sanctum/
 │   ├── mod.html                # Moderator Portal UI (/mod)
 │   ├── mod.js                  # Moderator Portal controller
 │   └── systems/
-│       ├── Renderer.js         # Dual-canvas rendering pipeline & offscreen floor buffer
+│       ├── LightingSystem.js   # Merged-wall analytical 2D lighting, 9-band Bayer dither, additive 16-color RGB
+│       ├── Renderer.js         # Dual-canvas rendering pipeline, camera lock, subpixel entity stamping, UI overlay
 │       ├── Interpolator.js     # 15 Hz snapshot buffer -> smooth 60+ FPS entity interpolation
 │       ├── HUDController.js    # In-game DOM HUD, Character Sheet (C), Inventory (I), Pause/Invite
-│       ├── InputController.js  # Mouse world projection, LMB move/attack lock, RMB skill, hotkeys
+│       ├── InputController.js  # Mouse world projection, LMB move/attack lock, RMB skill, visibility culling, hotkeys
 │       └── MenuController.js   # Auth flow, Hero Roster, Multiplayer Lobby Browser, Invite links
 └── data/                       # Moddable JSON content tables & SQLite storage
     ├── classes.json            # Playable archetypes (VANGUARD, ARCANIST, SHADOW)
@@ -54,6 +55,8 @@ Sanctum/
   * `TICK_RATE: 15` (`66.67 ms` per server tick).
   * `TILE_SIZE: 12` pixels per tile.
   * `INTERNAL_WIDTH: 240`, `INTERNAL_HEIGHT: 144` (`20×12` visible tiles, `5:3` aspect ratio).
+* **Canonical 16-Color Palette (`PALETTE`, `PALETTE_INDEX`, `PALETTE_RGB`)**:
+  * Single source of truth for the PICO-8 16-color palette (`BLACK: 0` through `PEACH: 15`), used across floor rendering, dynamic light hues, entity stamps, and future digitized micro-sprites.
 * **Game Modes**: `CLASSIC` (normal respawn with 10% XP penalty) and `HARDCORE` (permadeath).
 * **Tiles**: `EMPTY (0)`, `FLOOR (1)`, `WALL (2)`, `DOOR (3)`, `STAIRS_DOWN (4)`, `PORTAL_TOWN (5)`.
 * **Rarities & Colors**: `NORMAL (#FFFFFF)`, `MAGIC (#60A5FA)`, `RARE (#FACC15)`, `UNIQUE (#FB923C)`.
@@ -78,44 +81,56 @@ Sanctum/
 
 ---
 
-## 3. Dual-Resolution Client Architecture (`/client`)
+## 3. Dual-Resolution Client & Real-Time 2D Lighting (`/client`)
 
-### Dual-Canvas Pipeline (`Renderer.js`)
-Sanctum separates world tile rendering from high-DPI entities and typography:
-1. **Offscreen Floor Baking (`mapBufferCanvas`)**:
-   * When `ROOM_INIT` arrives (or the party descends a floor), `bakeDungeonBuffer()` renders the entire `40×30` floor (`480×360` pixels) once onto an offscreen canvas (`alpha: false`) using the 16-color PICO-8 palette (`PAL`).
-2. **Low-Res World Layer (`#pixelCanvas`, `242×146`)**:
-   * Upscaled via CSS `image-rendering: pixelated`.
-   * Includes a 2px margin over the `240×144` internal viewport so fractional subpixel camera offsets can be shifted smoothly on the GPU via CSS `translate3d(-fracX * stageScale, -fracY * stageScale, 0)`.
-   * **Dirty-Checked Blit**: `pixelCanvas` is only redrawn when the integer camera coordinate (`Math.floor(camera.x)`, `Math.floor(camera.y)`) changes, performing a single `pCtx.drawImage(mapBufferCanvas, ...)` copy.
-3. **High-DPI Entity & Typography Layer (`#highResCanvas`)**:
-   * Sized to the physical display resolution (`stageW * devicePixelRatio` × `stageH * devicePixelRatio`).
-   * **Camera-to-Player Lock**: The camera locks directly to the local player's interpolated position (`myP.rx`, `myP.ry`) clamped to dungeon bounds, preventing player/camera phase jitter.
-   * **Subpixel-Anchored Pawns (`drawAnchoredRect`)**: Entities are positioned at their exact floating-point screen anchor `(ax - camera.x) * stageScale`, while internal multi-block body offsets (`ox`, `oy`, `w`, `h`) are integer-rounded relative to that anchor so multi-part sprites glide smoothly across pixels without internal seams.
-   * **Crisp Text Shadows**: Renders player nametags, floating combat text (`DAMAGE`, `CRIT`, `HEAL`, `LEVEL UP!`, `Too Heavy!`), and hovered loot tooltips with crisp 1px offset drop shadows (avoiding expensive Canvas 2D Gaussian `shadowBlur`).
+### Real-Time 2D Shadowcast Lighting (`LightingSystem.js`)
+Sanctum uses a pure real-time 2D line-of-sight lighting engine (no explored/unexplored memory state — unlit areas fall back into pitch black):
+1. **Merged Continuous Wall Segments (`buildMergedWallSegments`)**:
+   * On `ROOM_INIT`, adjacent `WALL` tiles touching open `FLOOR` are merged into single continuous horizontal/vertical line segments (`~30–40` segments per `40×30` floor instead of 1,200 tiles).
+   * `computeVisibility()` runs exact analytical ray-segment intersection against those merged segments (with AABB rejection), eliminating discrete raymarch stepping and `12×12` wall-seam scalloping/shimmer.
+   * Angle-independent perpendicular surface depth (`getWallSurfaceDepth`) fades wall faces smoothly into darkness across the back of the wall.
+2. **Additive 16-Color RGB Light Accumulation**:
+   * Every light source resolves its color directly from the canonical 16-color palette (`PALETTE_INDEX`):
+     * Players & Co-op Allies: `ORANGE` (warm torchlight)
+     * `Spark` Projectiles: `BLUE` (`#29ADFF` electric glow illuminating dark corridors)
+     * `STAIRS_DOWN` & `Unique ★` Loot: `YELLOW`
+     * `Rare` Loot: `PINK`
+     * Glowing/Elite Monsters: `RED`
+   * Overlapping lights combine additively in both intensity (`lightGrid`) and colored photons (`lightR/G/B`), ensuring colored lights always brighten and tint rather than darkening existing torchlight.
+3. **9-Band `SHADE_U32` + World-Locked `1×1` Bayer Dithering**:
+   * Bilinearly interpolates `lightGrid` across every `1×1` pixel of the `242×146` `pixelCanvas` buffer and quantizes transitions with a world-locked `4×4` Bayer matrix (`(wx & 3, wy & 3)`).
+4. **Static Object Occluders, Torch Toggles & Ambient Transitions**:
+   * Supports toggleable static lights (`setStaticLight` / `toggleStaticLight`), static object shadow occluders (`setStaticOccluder` for future chests/pillars/shrines), personal torch toggle (`T`), and smooth ambient light interpolation (`setAmbientLight`, previewed via `L`).
+
+### Dual-Canvas Pipeline & Subpixel Entity Stamping (`Renderer.js`)
+1. **Low-Res World Layer (`#pixelCanvas`, `242×146`)**:
+   * Upscaled via CSS `image-rendering: pixelated` with a 2px margin shifted on the GPU via `translate3d(-fracX * stageScale, -fracY * stageScale, 0)` for smooth subpixel scrolling.
+2. **Subpixel-Smooth Dithered Entity Stamping (`drawLitEntityStamp`)**:
+   * Entities (players, monsters, projectiles, loot) are shaded pixel-by-pixel via `sampleLitPixelU32()` into a contiguous `24×24` offscreen `ImageData` scratch buffer (`stampU32`), then blitted onto `#highResCanvas` with a single `drawImage()` call at exact floating-point subpixel screen coordinates `(wx - camera.x) * stageScale`.
+   * Gives 60+ FPS subpixel-smooth entity motion with the exact same pixelated Bayer-dithered + additive colored lighting as the floor and zero internal grid seams.
+3. **High-DPI UI Overlay (`#highResCanvas`)**:
+   * Camera locks directly to the local player's interpolated position (`myP.rx`, `myP.ry`).
+   * Renders crisp selection rings, monster health bars, player nametags, floating combat text (`DAMAGE`, `CRIT`, `HEAL`, `LEVEL UP!`, `Too Heavy!`), and hovered loot tooltips with 1px offset drop shadows.
 
 ### Snapshot Interpolation (`Interpolator.js`)
 * Buffers up to 6 incoming `WORLD_SNAPSHOT` packets (broadcast at 15 Hz).
-* Maintains a continuous `renderTick` targeting `latest.tick - 1.25` ticks behind the server head.
-* Advances `renderTick` by `dt * 15` each animation frame with a gentle two-tier proportional drift correction (`gain = 0.8` within normal bounds, `3.0` if drift exceeds `0.5` ticks) to eliminate networkarrival micro-stutter.
+* Maintains a continuous `renderTick` targeting `latest.tick - 1.25` ticks behind the server head with gentle two-tier proportional drift correction (`gain = 0.8` within normal bounds, `3.0` if drift exceeds `0.5` ticks).
 
 ### Controls & Input (`InputController.js`)
-* **Left Mouse Button (LMB)**:
-  * Clicking ground loot sends `PICKUP_LOOT` (walking to the item automatically if out of range).
-  * Clicking/holding on a monster locks onto `targetMonsterId` (`INPUT_ATTACK` with `hold: true`), pursuing and auto-attacking until mouse release or monster death.
-  * Clicking/dragging empty floor enters continuous move steering (`holdMode = 'move'`), sending `INPUT_MOVE` packets every `66 ms` toward the cursor.
-* **Right Mouse Button (RMB)**: Casts the active projectile skill (`INPUT_SKILL`) toward the cursor angle (`10 MP` cost).
+* **Visibility-Aware Hover Culling**: `findLootAt` and `findMonsterAt` ignore entities in unlit tiles (`sampleLightAtWorld <= 0.25`) so players cannot hover-scan dark rooms.
+* **Left Mouse Button (LMB)**: Click ground loot to pick up; click/hold monster to pursue & auto-attack; click/drag floor for continuous movement steering (`66 ms` cadence).
+* **Right Mouse Button (RMB)**: Cast active skill (`Spark` projectile, `10 MP` cost) toward cursor angle.
 * **Keyboard Shortcuts**:
   * `1`: Drink Health Potion (`+40 HP`).
-  * `C`: Toggle Character Sheet & Attribute Allocation panel.
-  * `I`: Toggle Inventory & Equipment Paperdoll panel.
-  * `ESC`: Close open side panels, or toggle the In-Game Pause & Invite Menu.
+  * `T`: Toggle personal torch on/off.
+  * `L`: Toggle smooth Daylight / Dungeon Darkness ambient lighting preview.
+  * `C` / `I` / `ESC`: Toggle Character Sheet, Inventory & Paperdoll, or Pause/Invite Menu.
 
 ### In-Game HUD & Menus (`HUDController.js` & `MenuController.js`)
 * **Dirty-Checked DOM Updates**: `HUDController` hashes vitals (`hp|maxHp|mp|maxMp|isDead`) and inventory JSON so DOM nodes are only mutated when values change.
-* **Character Sheet (`C`)**: Displays level, XP bar, core attributes (`Might`, `Focus`, `Agility`, `Vitality`), interactive `+` allocation buttons when `statPoints > 0`, and derived combat stats (`Melee Dmg`, `Spell Power`, `Armor`, `Crit Chance`, `Move Speed`).
-* **Inventory & Paperdoll (`I`)**: Displays 4 equipment slots (`Weapon`, `Armor`, `Gloves`, `Ring`) color-coded by rarity, a dynamic Carry Weight bar (`lb`), and the pack list (Left-click to equip/swap, Right-click to drop onto the floor).
-* **Invite Links**: Every active room (including `Quick Play (Private)` rooms) has a 6-character uppercase `inviteCode`. Players can click **`Copy Invite: <CODE>`** in the top bar or inside the `ESC` Pause Menu to copy a `http://.../?join=<CODE>` link, or paste a friend's code directly in the Pause Menu to hop rooms.
+* **Character Sheet (`C`)**: Level, XP bar, core attributes (`Might`, `Focus`, `Agility`, `Vitality`), interactive `+` stat allocation buttons, and derived combat stats.
+* **Inventory & Paperdoll (`I`)**: 4 equipment slots (`Weapon`, `Armor`, `Gloves`, `Ring`), dynamic Carry Weight bar (`lb`), and pack list (Left-click to equip/swap, Right-click to drop).
+* **Invite Links**: Every active room (including `Quick Play (Private)` rooms) has a 6-character uppercase `inviteCode` with **`Copy Invite`** buttons in both the top status bar and the `ESC` Pause Menu.
 
 ---
 
@@ -129,7 +144,7 @@ Each active room runs an independent `15 Hz` (`66.67 ms`) update loop:
    * Regenerates mana (`+0.1 MP/tick`) and decrements attack cooldowns.
    * Triggers `advanceFloor()` when any living player steps within `12 px` of `TILES.STAIRS_DOWN`.
 2. **Projectiles**:
-   * Moves Spark projectiles at `3.5 px/tick` (lifetime `40 ticks`), stopping on walls or dealing `p.spellDmg` upon hitting a monster within `10 px`.
+   * Moves `Spark` projectiles at `3.5 px/tick` (lifetime `40 ticks`), stopping on walls or dealing `p.spellDmg` upon hitting a monster within `10 px`.
 3. **Monster AI**:
    * Scans for the closest living player within `aggroRange` (`85–90 px`).
    * Moves toward the target with wall-sliding collision or performs a melee strike within `10 px` (cooldown `18 ticks`).
@@ -164,4 +179,4 @@ Stored at `data/saves/sanctum.db` with `WAL` journaling and `FOREIGN KEY` cascad
 * Every login or authenticated session validation rolls the account's `expires_at` forward by **180 days** (`RETENTION_MS`).
 * A daily background sweep (`pruneExpiredData`) deletes non-moderator accounts past `expires_at` (cascading their characters and sessions).
 * **Default Moderator**: Bootstrapped automatically on first run (`username: "admin"`, `password: "sanctum-mod"`, or via `SANCTUM_MOD_USER` / `SANCTUM_MOD_PASS`).
-* **Moderator Portal (`/mod`)**: Allows moderators to view database counters, manually prune expired accounts, search/ban/promote/extend accounts, and inspect or edit any character's level, stats, hardcore death state, or raw inventory JSON.
+* **Moderator Portal (`/mod`)**: View database counters, manually prune expired accounts, search/ban/promote/extend accounts, and inspect or edit any character's level, stats, hardcore death state, or raw inventory JSON.

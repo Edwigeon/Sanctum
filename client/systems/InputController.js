@@ -23,11 +23,19 @@ export class InputController {
   }
 
   findLootAt(wx, wy, lootList) {
-    return (lootList || []).find(l => Math.abs(l.x - wx) <= 5 && Math.abs(l.y - wy) <= 5);
+    return (lootList || []).find(l =>
+      Math.abs(l.x - wx) <= 5 &&
+      Math.abs(l.y - wy) <= 5 &&
+      this.renderer.isWorldPointVisible(l.x, l.y)
+    );
   }
 
   findMonsterAt(wx, wy, monsterList) {
-    return (monsterList || []).find(m => Math.abs(m.rx - wx) <= 5 && Math.abs(m.ry - wy) <= 6);
+    return (monsterList || []).find(m =>
+      Math.abs(m.rx - wx) <= 5 &&
+      Math.abs(m.ry - wy) <= 6 &&
+      this.renderer.isWorldPointVisible(m.rx, m.ry)
+    );
   }
 
   getHoverTargets(interp) {
@@ -125,6 +133,13 @@ export class InputController {
       const k = e.key.toLowerCase();
       if (k === '1') {
         this.sendPacket({ type: PACKET_TYPES.INPUT_POTION });
+      } else if (k === 't') {
+        const on = this.renderer.lighting.togglePlayerTorch();
+        this.renderer.addFloatingText(on ? 'Torch Lit' : 'Torch Snuffed', this.mouse.worldX, this.mouse.worldY - 8, on ? '#FACC15' : '#94A3B8');
+      } else if (k === 'l') {
+        const nextAmb = this.renderer.lighting.targetAmbientLight > 0 ? 0.0 : 5.5;
+        this.renderer.lighting.setAmbientLight(nextAmb);
+        this.renderer.addFloatingText(nextAmb > 0 ? 'Daylight Preview' : 'Dungeon Darkness', this.mouse.worldX, this.mouse.worldY - 8, '#38BDF8');
       } else if (k === 'c') {
         this.hud.toggleChar();
       } else if (k === 'i') {

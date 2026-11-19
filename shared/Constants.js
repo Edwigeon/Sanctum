@@ -9,6 +9,51 @@ export const ENGINE = {
   SUBPIXEL_SCALE: 100
 };
 
+// Canonical 16-Color PICO-8 Palette (shared across renderer, lighting, sprites, and /dev studio)
+export const PALETTE = [
+  '#000000', // 0: BLACK
+  '#1D2B53', // 1: DARK_BLUE
+  '#7E2553', // 2: DARK_PURPLE
+  '#008751', // 3: DARK_GREEN
+  '#AB5236', // 4: BROWN
+  '#5F574F', // 5: DARK_GRAY
+  '#C2C3C7', // 6: LIGHT_GRAY
+  '#FFF1E8', // 7: WHITE
+  '#FF004D', // 8: RED
+  '#FFA300', // 9: ORANGE
+  '#FFEC27', // 10: YELLOW
+  '#00E436', // 11: GREEN
+  '#29ADFF', // 12: BLUE
+  '#83769C', // 13: INDIGO
+  '#FF77A8', // 14: PINK
+  '#FFCCAA'  // 15: PEACH
+];
+
+export const PALETTE_INDEX = {
+  BLACK: 0,
+  DARK_BLUE: 1,
+  DARK_PURPLE: 2,
+  DARK_GREEN: 3,
+  BROWN: 4,
+  DARK_GRAY: 5,
+  LIGHT_GRAY: 6,
+  WHITE: 7,
+  RED: 8,
+  ORANGE: 9,
+  YELLOW: 10,
+  GREEN: 11,
+  BLUE: 12,
+  INDIGO: 13,
+  PINK: 14,
+  PEACH: 15
+};
+
+export const PALETTE_RGB = PALETTE.map((hex) => [
+  parseInt(hex.slice(1, 3), 16),
+  parseInt(hex.slice(3, 5), 16),
+  parseInt(hex.slice(5, 7), 16)
+]);
+
 export const GAME_MODES = {
   CLASSIC: 'CLASSIC',
   HARDCORE: 'HARDCORE'
