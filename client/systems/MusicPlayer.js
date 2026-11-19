@@ -308,14 +308,13 @@ export class MusicPlayer {
     }
 
     const sampleRate = this.audio.sampleRate;
-    // Fast path: Retrieve pre-rendered binary PCM buffer from IndexedDB database
+    // Fast path: Retrieve pre-rendered binary PCM buffer from IndexedDB database (16-bit packed)
     if (this.db) {
       try {
-        const pcmBuffer = await this.db.getPatternPCM(this.currentSuiteName, patternId, sampleRate);
-        if (pcmBuffer && pcmBuffer.byteLength > 0) {
+        const floatArr = await this.db.getPatternPCM(this.currentSuiteName, patternId, sampleRate);
+        if (floatArr && floatArr.length > 0) {
           const ctx = this.audio.ensureContext();
           if (ctx) {
-            const floatArr = new Float32Array(pcmBuffer);
             const buf = ctx.createBuffer(1, floatArr.length, sampleRate);
             buf.copyToChannel(floatArr, 0);
             suiteData.patternBuffers.set(patternId, buf);
@@ -377,11 +376,10 @@ export class MusicPlayer {
     buf.copyToChannel(mixed, 0);
     suiteData.patternBuffers.set(patternId, buf);
 
-    // Save binary Float32Array ArrayBuffer to IndexedDB database for instant future reads
+    // Save compact 16-bit Int16 binary buffer to IndexedDB database (50% storage reduction)
     if (this.db) {
       try {
-        const copyBuffer = mixed.buffer.slice(0);
-        this.db.savePatternPCM(this.currentSuiteName, patternId, sampleRate, copyBuffer).catch(() => {});
+        this.db.savePatternPCM(this.currentSuiteName, patternId, sampleRate, mixed).catch(() => {});
       } catch (_) {}
     }
 
