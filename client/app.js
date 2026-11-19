@@ -133,14 +133,10 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       if (packet.data.floor) {
         hud.setFloorStatus(packet.data.floor);
       }
-      const floorNum = packet.data.floor || 1;
-      let targetSuite = 'wilderness';
-      if (floorNum === 1) targetSuite = 'wilderness';
-      else if (floorNum === 2) targetSuite = 'crypts';
-      else if (floorNum <= 4) targetSuite = 'caverns';
-      else if (floorNum < 10) targetSuite = 'cathedral';
-      else targetSuite = 'boss';
-      music.setBiome(targetSuite, { immediate: false, fadeSec: 1.5 });
+      // Enter dungeon audio suite only when transitioning from town/menu or initial start
+      if (music.currentSuiteName === 'town' || !music.isPlaying) {
+        music.setBiome('cathedral', { immediate: false, fadeSec: 1.5 });
+      }
     } else if (packet.type === PACKET_TYPES.WORLD_SNAPSHOT) {
       const snap = packet.data;
       latestSnapshot = snap;
@@ -193,7 +189,6 @@ function processEvents(events) {
     } else if (ev.type === 'FLOOR_DESCENT') {
       hud.setFloorStatus(ev.floor);
       audio.play('floor_descent', { pitchJitter: 0 });
-      music.playSection('descent', { immediate: true, fadeSec: 1.0, lockMs: 4000 });
     }
   }
 }
@@ -216,14 +211,19 @@ function render(now) {
     const env = (floor >= 3 && floor <= 4) ? 'cavern' : (floor >= 5 ? 'cathedral' : 'none');
     audio.setMacroState({ lowHealth: isLowHp, environment: env });
 
-    // Adaptive Music State with Hysteresis (smooth combat decay, no jitter)
+    // Adaptive Tonal System: Seamless transitions across Explore, Tension, and Combat
     if (!music.isLocked()) {
-      const hasNearbyMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 95);
-      if (input.lockedMonsterId !== null || hasNearbyMob) {
+      const closeMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 95);
+      const sensingMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 155);
+
+      if (input.lockedMonsterId !== null || closeMob) {
         lastCombatAt = now;
       }
+
       if (now - lastCombatAt < 3500) {
         music.playSection('combat');
+      } else if (sensingMob || isLowHp) {
+        music.playSection('tension');
       } else {
         music.playSection('explore');
       }

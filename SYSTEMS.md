@@ -161,20 +161,19 @@ Sanctum embeds a sample-accurate, zero-dependency procedural audio engine ported
    * Utilizes zero-copy Transferable `ArrayBuffer` handoffs (`postMessage(..., [samples.buffer])`), keeping the main render loop locked at 60+ FPS without garbage collection pauses.
 
 6. **Interactive Tracker Music Player (`MusicPlayer.js`)**:
-   * **Unified Root = D Modal Architecture**: All 6 soundtrack projects share **Root = D** as their harmonic tonal center, allowing seamless horizontal crossfading between floors, biomes, and tension layers with zero dissonance or key clashing:
+   * **Area & Natural Tonal Flow**: Music suites are anchored to distinct major areas (`town` for Sanctuary lobby/menus, `cathedral` for the dungeon descent). Artificial floor-change crossfades and mid-phrase track cuts have been removed: the soundtrack plays continuously across floor descents, changing mood organically through the real-time tonal system.
+   * **Natural Tonal Shift System (Beat-Quantized on Pattern Boundaries)**:
+     * `explore`: Atmospheric ambient exploration patterns (e.g. `A`, `B`, `C`, `H`) when roaming safe or cleared halls.
+     * `tension`: Heightened suspense patterns (`E`, `F`) when hostile mobs are lurking in shadow radius (95–155 px) or local player HP $\le 25\%$.
+     * `combat`: Driving combat patterns (`F`, `G`) engaging smoothly during close-quarters combat (< 95 px or locked target) with a 3.5s hysteresis cooldown.
+     * **Zero Crossfade Interruption**: Tone shifts are queued on pattern loop boundaries (`pendingSection`), transitioning sample-accurately on measure starts without dipping volume, ducking, or DC pops.
+   * **Unified Root = D Modal Architecture**: All 6 soundtrack projects share **Root = D** as their harmonic tonal center, allowing seamless horizontal transitions with zero dissonance or key clashing:
      * `town` (`/data/music/sanctum_town.csv`): **D Dorian / D Minor** (76 BPM) — Warm campfire hearth, gentle lute, cello lament, mellow drone.
      * `wilderness` (`/data/music/sanctum_wilderness.csv`): **D Aeolian** (84 BPM) — Moorland mist, ruins horn calls, driving percussion, wind.
      * `crypts` (`/data/music/sanctum_crypts.csv`): **D Phrygian** (76 BPM) — Torchlit nave, bone ossuary, crypt cello, tension dread.
      * `caverns` (`/data/music/sanctum_caverns.csv`): **D Phrygian / D Harmonic Minor** (70 BPM) — Obsidian fault, tritone chasm, subterranean viola, echoing bells.
      * `cathedral` (`/data/music/sanctum_cathedral.csv`): **D Phrygian / D Harmonic Minor** (80 BPM) — Mist & toll, Tristram dusk 12-string guitar, Butcher's hall, cathedral arpeggios.
      * `boss` (`/data/music/sanctum_boss.csv`): **D Harmonic Minor** (108 BPM) — Throne of ash, diminished wrath, doom bells, climactic boss decree.
-   * **Dual-Voice Gain Crossfader**: Uses alternating Web Audio `GainNode` voices (`voiceGainA` and `voiceGainB`) with equal-power exponential ramps (1.0–1.5s), eliminating audio clicks, abrupt cuts, and DC pops during biome and mood transitions.
-   * **Event-Driven Modular Sections**:
-     * `explore`: Atmospheric ambient exploration patterns (e.g. `A`, `C`, `H`).
-     * `combat`: Engages seamlessly with a 3.5s hysteresis decay when hostile monsters aggro (`B`, `F`, `G`).
-     * `tension`: Heightened suspense patterns during elite encounters or maze exploration (`C`, `E`, `F`).
-     * `descent`: Immediate non-interruptible transition cue locked for 4.0s (`lockMs: 4000`) upon taking stairs down (`D`).
-     * `climax`: Full orchestral/synth fury for multi-phase boss engagements (`F`, `I`, `J`).
    * **Universal Rhythm & Drone Anchoring**: Drum downbeats consistently strike on $D_2$ (73.4 Hz) with secondary fifth ghost taps on $A_1$ (55.0 Hz); root pedal drones anchor on $D_2$ across all suites.
    * **Seamless Inter-Pattern Looping**: Disables the per-pattern brickwall limiter to ensure seamless volume continuity across pattern loops and state transitions without ducking.
 
