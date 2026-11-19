@@ -31,7 +31,19 @@ export class GameRoom {
     this.nextEntityId = 1;
     this.tick = 0;
     this.spawnInitialMonsters();
-    this.tickInterval = setInterval(() => this.update(), ENGINE.TICK_INTERVAL_MS);
+    this.tickInterval = null;
+  }
+
+  destroy() {
+    if (this.tickInterval) {
+      clearInterval(this.tickInterval);
+      this.tickInterval = null;
+    }
+    this.players.clear();
+    this.monsters.clear();
+    this.projectiles = [];
+    this.groundLoot = [];
+    this.events = [];
   }
 
   getSummary() {
@@ -52,11 +64,17 @@ export class GameRoom {
     const maxC = Math.floor((x + radius) / ENGINE.TILE_SIZE);
     const minR = Math.floor((y - radius) / ENGINE.TILE_SIZE);
     const maxR = Math.floor((y + radius) / ENGINE.TILE_SIZE);
+
+    if (minC < 0 || maxC >= this.dungeon.width || minR < 0 || maxR >= this.dungeon.height) {
+      return false;
+    }
+
     for (let r = minR; r <= maxR; r++) {
-      if (!this.dungeon.map[r]) return false;
+      const row = this.dungeon.map[r];
+      if (!row) return false;
       for (let c = minC; c <= maxC; c++) {
-        const t = this.dungeon.map[r][c];
-        if (t === TILES.WALL || t === TILES.EMPTY) return false;
+        const t = row[c];
+        if (t === undefined || t === TILES.WALL || t === TILES.EMPTY) return false;
       }
     }
     return true;
@@ -480,7 +498,8 @@ export class GameRoom {
 
     for (const m of this.monsters.values()) {
       let closestP = null;
-      let closestDist = 90;
+      const maxAggro = typeof m.aggroRange === 'number' ? m.aggroRange : 90;
+      let closestDist = maxAggro;
       for (const p of this.players.values()) {
         if (p.isDead) continue;
         const d = dist(m.x, m.y, p.x, p.y);
@@ -545,8 +564,8 @@ export class GameRoom {
         }));
       }
     }
-    this.broadcastSnapshot();
     this.events.push({ type: 'FLOOR_DESCENT', floor: this.floor });
+    this.broadcastSnapshot();
   }
 
   handlePlayerDeath(player) {

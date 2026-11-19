@@ -351,6 +351,7 @@ wss.on('connection', (ws) => {
       currentRoom.removePlayer(ws.id);
       if (currentRoom.players.size === 0) {
         console.log(`[Lobby] Room ${currentRoom.roomId} empty, cleaning up`);
+        currentRoom.destroy();
         rooms.delete(currentRoom.roomId);
       }
     }

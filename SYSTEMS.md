@@ -46,6 +46,9 @@ Sanctum/
 │       ├── HUDController.js    # In-game DOM HUD, Character Sheet (C), Inventory (I), Audio Settings, Pause/Invite
 │       ├── InputController.js  # Mouse world projection, LMB move/attack lock, RMB skill, visibility culling, hotkeys
 │       └── MenuController.js   # Auth flow, Hero Roster, Multiplayer Lobby Browser, Invite links
+├── scripts/                    # Build & verification toolchain
+│   ├── pack_soundtrack.js      # Bundles 6 tracker projects into compact AST JSON
+│   └── verify_technical_plan.js# Regression test suite for collision, interpolation, lighting & lifecycle
 └── data/                       # Moddable JSON content tables, tracker CSVs & SQLite storage
     ├── classes.json            # Playable archetypes (VANGUARD, ARCANIST, SHADOW)
     ├── monsters.json           # Monster definitions (crawler, brute)
@@ -111,6 +114,7 @@ Sanctum uses a pure real-time 2D line-of-sight lighting engine (no explored/unex
      * `Rare` Loot: `PINK`
      * Glowing/Elite Monsters: `RED`
    * Overlapping lights combine additively in both intensity (`lightGrid`) and colored photons (`lightR/G/B`), ensuring colored lights always brighten and tint rather than darkening existing torchlight.
+   * **4-Sample Colored Light Interpolation**: Bilinear interpolation samples all four contributing grid corners ($i_{00}, i_{10}, i_{01}, i_{11}$) and checks interpolated RGB values, preventing colored lights from dropping across grid-cell boundaries when $i_{00}$ is uncolored.
 3. **9-Band `SHADE_U32` + World-Locked `1×1` Bayer Dithering**:
    * Bilinearly interpolates `lightGrid` across every `1×1` pixel of the `242×146` `pixelCanvas` buffer and quantizes transitions with a world-locked `4×4` Bayer matrix (`(wx & 3, wy & 3)`).
 4. **Static Object Occluders, Torch Toggles & Ambient Transitions**:

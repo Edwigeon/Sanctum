@@ -27,9 +27,34 @@ export class Interpolator {
   }
 
   pushSnapshot(snap) {
-    this.snapshotBuffer.push(snap);
-    if (this.snapshotBuffer.length > 6) this.snapshotBuffer.shift();
-    if (this.renderTick === null && typeof snap.tick === 'number') {
+    if (!snap || typeof snap.tick !== 'number') return;
+
+    const buf = this.snapshotBuffer;
+    const len = buf.length;
+
+    // Fast path: incoming tick is strictly greater than latest
+    if (len === 0 || snap.tick > buf[len - 1].tick) {
+      buf.push(snap);
+      if (buf.length > 6) buf.shift();
+    } else {
+      // Discard stale packets older than the oldest tracked in buffer
+      if (snap.tick < buf[0].tick) return;
+
+      // Discard duplicate ticks
+      for (let i = 0; i < len; i++) {
+        if (buf[i].tick === snap.tick) return;
+      }
+
+      // Out-of-order arrival: insert in sorted ascending order
+      let insertIdx = 0;
+      while (insertIdx < len && buf[insertIdx].tick < snap.tick) {
+        insertIdx++;
+      }
+      buf.splice(insertIdx, 0, snap);
+      while (buf.length > 6) buf.shift();
+    }
+
+    if (this.renderTick === null) {
       this.renderTick = snap.tick;
     }
   }

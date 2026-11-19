@@ -771,11 +771,11 @@ export class LightingSystem {
     const gridR = this.lightR;
     const gridG = this.lightG;
     const gridB = this.lightB;
-    const addR = gridR[i00];
-    const addG = gridG[i00];
-    const addB = gridB[i00];
 
-    if ((addR | addG | addB) === 0) {
+    // Early-out if none of the 4 contributing grid nodes have colored light (avoid float bitwise operations)
+    if (gridR[i00] === 0 && gridR[i10] === 0 && gridR[i01] === 0 && gridR[i11] === 0 &&
+        gridG[i00] === 0 && gridG[i10] === 0 && gridG[i01] === 0 && gridG[i11] === 0 &&
+        gridB[i00] === 0 && gridB[i10] === 0 && gridB[i01] === 0 && gridB[i11] === 0) {
       return baseU32;
     }
 
@@ -790,6 +790,10 @@ export class LightingSystem {
     const tb = gridB[i00] + (gridB[i10] - gridB[i00]) * fx;
     const bb = gridB[i01] + (gridB[i11] - gridB[i01]) * fx;
     const cb = (tb + (bb - tb) * fy) | 0;
+
+    if ((cr | cg | cb) === 0) {
+      return baseU32;
+    }
 
     const r0Col = baseU32 & 255;
     const g0Col = (baseU32 >> 8) & 255;
@@ -1002,11 +1006,11 @@ export class LightingSystem {
         }
 
         const baseU32 = SHADE_U32[band][basePalIdx];
-        const addR = gridR[i00];
-        const addG = gridG[i00];
-        const addB = gridB[i00];
 
-        if ((addR | addG | addB) === 0) {
+        // Early-out if none of the 4 contributing grid nodes have colored light (avoid float bitwise operations)
+        if (gridR[i00] === 0 && gridR[i10] === 0 && gridR[i01] === 0 && gridR[i11] === 0 &&
+            gridG[i00] === 0 && gridG[i10] === 0 && gridG[i01] === 0 && gridG[i11] === 0 &&
+            gridB[i00] === 0 && gridB[i10] === 0 && gridB[i01] === 0 && gridB[i11] === 0) {
           outU32[outRow + sx] = baseU32;
         } else {
           const tr = gridR[i00] + (gridR[i10] - gridR[i00]) * fx;
@@ -1021,11 +1025,15 @@ export class LightingSystem {
           const bb = gridB[i01] + (gridB[i11] - gridB[i01]) * fx;
           const cb = (tb + (bb - tb) * fy) | 0;
 
-          const r0Col = baseU32 & 255;
-          const g0Col = (baseU32 >> 8) & 255;
-          const b0Col = (baseU32 >> 16) & 255;
+          if ((cr | cg | cb) === 0) {
+            outU32[outRow + sx] = baseU32;
+          } else {
+            const r0Col = baseU32 & 255;
+            const g0Col = (baseU32 >> 8) & 255;
+            const b0Col = (baseU32 >> 16) & 255;
 
-          outU32[outRow + sx] = packABGR(r0Col + cr, g0Col + cg, b0Col + cb);
+            outU32[outRow + sx] = packABGR(r0Col + cr, g0Col + cg, b0Col + cb);
+          }
         }
       }
     }

@@ -79,19 +79,57 @@ class ModService {
     const existing = saveManager.getCharacter(id);
     if (!existing) return null;
 
-    const name = typeof patch.name === 'string' ? patch.name.trim().slice(0, 16) || existing.name : existing.name;
-    const level = Number.isFinite(Number(patch.level)) ? Math.max(1, Math.floor(Number(patch.level))) : existing.level;
+    const name = typeof patch.name === 'string'
+      ? patch.name.trim().replace(/[<>]/g, '').slice(0, 16) || existing.name
+      : existing.name;
+    const level = Number.isFinite(Number(patch.level)) ? Math.max(1, Math.min(999, Math.floor(Number(patch.level)))) : existing.level;
     const xp = Number.isFinite(Number(patch.xp)) ? Math.max(0, Math.floor(Number(patch.xp))) : existing.xp;
     const nextXp = Number.isFinite(Number(patch.nextXp)) ? Math.max(10, Math.floor(Number(patch.nextXp))) : existing.nextXp;
-    const statPoints = Number.isFinite(Number(patch.statPoints)) ? Math.max(0, Math.floor(Number(patch.statPoints))) : existing.statPoints;
-    const potions = Number.isFinite(Number(patch.potions)) ? Math.max(0, Math.floor(Number(patch.potions))) : existing.potions;
+    const statPoints = Number.isFinite(Number(patch.statPoints)) ? Math.max(0, Math.min(9999, Math.floor(Number(patch.statPoints)))) : existing.statPoints;
+    const potions = Number.isFinite(Number(patch.potions)) ? Math.max(0, Math.min(99, Math.floor(Number(patch.potions)))) : existing.potions;
     const isDead = typeof patch.isDead === 'boolean' ? (patch.isDead ? 1 : 0) : (existing.isDead ? 1 : 0);
-    const highestFloor = Number.isFinite(Number(patch.highestFloor)) ? Math.max(1, Math.floor(Number(patch.highestFloor))) : existing.highestFloor;
+    const highestFloor = Number.isFinite(Number(patch.highestFloor)) ? Math.max(1, Math.min(999, Math.floor(Number(patch.highestFloor)))) : existing.highestFloor;
+
+    // Sanitize stats to prevent malformed or prototype-injected fields
+    const safeStats = { ...existing.stats };
+    if (patch.stats && typeof patch.stats === 'object' && !Array.isArray(patch.stats)) {
+      for (const key of ['might', 'focus', 'agility', 'vitality']) {
+        if (Number.isFinite(Number(patch.stats[key]))) {
+          safeStats[key] = Math.max(1, Math.min(999, Math.floor(Number(patch.stats[key]))));
+        }
+      }
+    }
+
+    // Sanitize equipment to valid gear slots
+    const safeEquipment = { ...existing.equipment };
+    if (patch.equipment && typeof patch.equipment === 'object' && !Array.isArray(patch.equipment)) {
+      for (const slot of ['weapon', 'armor', 'gloves', 'ring']) {
+        if (patch.equipment[slot] === null) {
+          safeEquipment[slot] = null;
+        } else if (patch.equipment[slot] && typeof patch.equipment[slot] === 'object') {
+          const item = patch.equipment[slot];
+          safeEquipment[slot] = {
+            id: item.id || `eq_${slot}`,
+            name: String(item.name || slot).slice(0, 32),
+            slot,
+            weight: Number.isFinite(Number(item.weight)) ? Math.max(0, Number(item.weight)) : 1,
+            rarity: Number.isFinite(Number(item.rarity)) ? Math.max(0, Math.min(4, Math.floor(Number(item.rarity)))) : 0,
+            stats: (item.stats && typeof item.stats === 'object') ? item.stats : {}
+          };
+        }
+      }
+    }
+
+    // Sanitize inventory (cap length at 40 items)
+    let safeInventory = existing.inventory;
+    if (Array.isArray(patch.inventory)) {
+      safeInventory = patch.inventory.slice(0, 40).filter(it => it && typeof it === 'object');
+    }
 
     const dataJson = JSON.stringify({
-      stats: patch.stats && typeof patch.stats === 'object' ? patch.stats : existing.stats,
-      equipment: patch.equipment && typeof patch.equipment === 'object' ? patch.equipment : existing.equipment,
-      inventory: Array.isArray(patch.inventory) ? patch.inventory : existing.inventory
+      stats: safeStats,
+      equipment: safeEquipment,
+      inventory: safeInventory
     });
 
     db.prepare(`
