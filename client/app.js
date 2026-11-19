@@ -230,6 +230,8 @@ function render(now) {
 
       if (input.lockedMonsterId !== null || closeMob) {
         lastCombatAt = now;
+      } else if (sensingMob) {
+        music.prewarmSections(['combat', 'tension']);
       }
 
       if (now - lastCombatAt < 3500) {

@@ -249,6 +249,44 @@ export class MusicPlayer {
 
     this.currentSuiteName = suiteName;
     this.playSection('explore', { immediate, fadeSec });
+    // Eagerly pre-warm combat and tension patterns in idle frames to eliminate first-engagement hitch
+    this.prewarmSections(['combat', 'tension', 'explore']);
+  }
+
+  prewarmSections(sectionNames) {
+    const suiteData = this.getCurrentSuiteData();
+    if (!suiteData) return;
+    const sections = this.suiteSections[this.currentSuiteName] || this.suiteSections.crypts;
+
+    const patternsToWarm = new Set();
+    for (const s of sectionNames) {
+      const list = sections[s] || [];
+      for (const pid of list) {
+        if (!suiteData.patternBuffers.has(pid)) {
+          patternsToWarm.add(pid);
+        }
+      }
+    }
+
+    const queue = Array.from(patternsToWarm);
+    const processQueue = () => {
+      if (queue.length === 0) return;
+      const pid = queue.shift();
+      this.ensurePatternBuffer(suiteData, pid).catch(() => {});
+      if (queue.length > 0) {
+        if (typeof requestIdleCallback !== 'undefined') {
+          requestIdleCallback(processQueue, { timeout: 1000 });
+        } else {
+          setTimeout(processQueue, 100);
+        }
+      }
+    };
+
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(processQueue, { timeout: 1000 });
+    } else {
+      setTimeout(processQueue, 50);
+    }
   }
 
   getCurrentSuiteData() {
