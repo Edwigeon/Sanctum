@@ -212,7 +212,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   const ext = path.extname(filePath);
-  const mimeTypes = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
+  const mimeTypes = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.csv': 'text/plain'
+  };
 
   fs.readFile(filePath, (err, content) => {
     if (err) {

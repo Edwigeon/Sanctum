@@ -6,6 +6,7 @@ import { HUDController } from './systems/HUDController.js';
 import { InputController } from './systems/InputController.js';
 import { MenuController } from './systems/MenuController.js';
 import { AudioPSG } from './systems/AudioPSG.js';
+import { MusicPlayer } from './systems/MusicPlayer.js';
 import { SpriteRegistry } from './systems/SpriteRegistry.js';
 
 let ws = null;
@@ -22,6 +23,8 @@ const sprites = new SpriteRegistry();
 const renderer = new Renderer({ sprites });
 const audio = new AudioPSG();
 audio.loadManifest('/data/sfx.json');
+const music = new MusicPlayer({ audio });
+music.loadProject('/data/music/sanctum_cathedral.csv');
 sprites.load('/data/sprites.json').then((ok) => {
   if (ok && dungeon) renderer.bakeDungeonBuffer(dungeon);
 });
@@ -62,6 +65,7 @@ function exitToMainMenu() {
     ws.close();
     ws = null;
   }
+  music.stop();
   myPlayerId = null;
   dungeon = null;
   latestSnapshot = null;
@@ -128,6 +132,7 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       if (packet.data.floor) {
         hud.setFloorStatus(packet.data.floor);
       }
+      music.playSection('explore');
     } else if (packet.type === PACKET_TYPES.WORLD_SNAPSHOT) {
       const snap = packet.data;
       latestSnapshot = snap;
@@ -180,6 +185,7 @@ function processEvents(events) {
     } else if (ev.type === 'FLOOR_DESCENT') {
       hud.setFloorStatus(ev.floor);
       audio.play('floor_descent', { pitchJitter: 0 });
+      music.playSection('descent', { immediate: true });
     }
   }
 }
@@ -195,6 +201,19 @@ function render(now) {
   const myP = interp.players.find(p => p.id === myPlayerId);
   if (myP) {
     audio.setListener(myP.rx ?? myP.x, myP.ry ?? myP.y);
+
+    // Real-Time Macro FX: Low-Health Muffle (< 25% HP) and Cavern/Cathedral Environment Echo
+    const isLowHp = (myP.maxHp > 0) && ((myP.hp / myP.maxHp) <= 0.25);
+    const env = (latestSnapshot?.floor ?? 1) >= 4 ? 'cavern' : 'cathedral';
+    audio.setMacroState({ lowHealth: isLowHp, environment: env });
+
+    // Adaptive Music State: Switch between Combat and Exploration sections
+    const hasNearbyMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 95);
+    if (input.lockedMonsterId !== null || hasNearbyMob) {
+      music.playSection('combat');
+    } else {
+      music.playSection('explore');
+    }
   }
 
   input.updateHoldMove(now);

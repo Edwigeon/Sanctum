@@ -496,6 +496,19 @@
                 class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
             </div>
 
+            <!-- Audio Engine Quality (Sample Rate Switching) -->
+            <div class="space-y-1 pt-1 border-t border-slate-800/60">
+              <div class="flex justify-between text-[10px] font-mono text-slate-300">
+                <span>DSP Quality</span>
+                <span id="label-audio-quality" class="text-amber-400 font-bold">Standard (22 kHz)</span>
+              </div>
+              <div class="grid grid-cols-3 gap-1 text-[10px] font-mono">
+                <button type="button" data-quality="lofi" class="btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer" title="11,025 Hz (Authentic retro crunch / 75% CPU saving)">Lo-Fi</button>
+                <button type="button" data-quality="standard" class="btn-audio-quality py-1 rounded bg-indigo-950/80 border border-indigo-700 text-indigo-300 font-bold transition cursor-pointer" title="22,050 Hz (Default balanced audio)">Standard</button>
+                <button type="button" data-quality="hifi" class="btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer" title="44,100 Hz (Studio high fidelity)">Hi-Fi</button>
+              </div>
+            </div>
+
             <!-- Proximity SFX & Spatial Stereo Panning -->
             <label class="flex items-center justify-between text-[10px] font-mono text-slate-300 cursor-pointer pt-1 border-t border-slate-800/60">
               <div class="pr-2">

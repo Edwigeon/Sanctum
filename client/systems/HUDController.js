@@ -70,6 +70,24 @@ export class HUDController {
 
     const chkSpatial = document.getElementById('chk-spatial-audio');
     if (chkSpatial) chkSpatial.checked = !!settings.spatial;
+
+    const curQuality = settings.quality || 'standard';
+    const qualityLabels = {
+      lofi: 'Lo-Fi (11 kHz)',
+      standard: 'Standard (22 kHz)',
+      hifi: 'Hi-Fi (44 kHz)'
+    };
+    const labelQuality = document.getElementById('label-audio-quality');
+    if (labelQuality) labelQuality.textContent = qualityLabels[curQuality] || 'Standard (22 kHz)';
+
+    document.querySelectorAll('.btn-audio-quality').forEach(btn => {
+      const q = btn.dataset.quality;
+      if (q === curQuality) {
+        btn.className = 'btn-audio-quality py-1 rounded bg-indigo-950/80 border border-indigo-700 text-indigo-300 font-bold transition cursor-pointer';
+      } else {
+        btn.className = 'btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer';
+      }
+    });
   }
 
   bindEvents() {
@@ -141,6 +159,12 @@ export class HUDController {
 
     document.getElementById('chk-spatial-audio')?.addEventListener('change', (e) => {
       if (this.audio) this.audio.setSpatialEnabled(e.target.checked);
+    });
+
+    document.querySelectorAll('.btn-audio-quality').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (this.audio) this.audio.setQuality(btn.dataset.quality);
+      });
     });
   }
 

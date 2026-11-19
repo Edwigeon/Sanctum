@@ -17,6 +17,24 @@ export function midiToFreq(midi) {
   return PSG_CONSTANTS.ROOT_A4_FREQ * Math.pow(2, (midi - 69) / 12);
 }
 
+export const NOTE_OFFSETS = {
+  'C': 0, 'C#': 1, 'DB': 1,
+  'D': 2, 'D#': 3, 'EB': 3,
+  'E': 4,
+  'F': 5, 'F#': 6, 'GB': 6,
+  'G': 7, 'G#': 8, 'AB': 8,
+  'A': 9, 'A#': 10, 'BB': 10,
+  'B': 11
+};
+
+export function noteToMidi(noteStr) {
+  if (!noteStr || typeof noteStr !== 'string') return 60;
+  const clean = noteStr.trim().toUpperCase().replace('-', '');
+  const match = clean.match(/^([A-G][#B]?)(-?\d+)$/);
+  if (!match) return 60;
+  return (parseInt(match[2], 10) + 1) * 12 + (NOTE_OFFSETS[match[1]] ?? 0);
+}
+
 // --- OSCILLATOR (ported from Lanthorn-PSG engine/oscillator.py) ---
 
 export class Oscillator {
@@ -272,18 +290,37 @@ export class Modifiers {
 // --- AUDIO PSG ENGINE & PRESET PLAYER ---
 
 export class AudioPSG {
-  constructor(sampleRate = PSG_CONSTANTS.DEFAULT_SAMPLE_RATE) {
-    this.sampleRate = sampleRate;
-    this.osc = new Oscillator(sampleRate);
-    this.mod = new Modifiers(sampleRate);
+  constructor(sampleRateOverride = null) {
+    // Load persisted settings first to know quality preference
+    this.settings = this.loadSettings();
+
+    const qualityRates = {
+      hifi: PSG_CONSTANTS.HIFI_SAMPLE_RATE,
+      lofi: PSG_CONSTANTS.LOFI_SAMPLE_RATE,
+      standard: PSG_CONSTANTS.DEFAULT_SAMPLE_RATE
+    };
+
+    this.sampleRate = sampleRateOverride ?? qualityRates[this.settings.quality] ?? PSG_CONSTANTS.DEFAULT_SAMPLE_RATE;
+    this.osc = new Oscillator(this.sampleRate);
+    this.mod = new Modifiers(this.sampleRate);
 
     this.ctx = null;
     this.masterGain = null;
     this.sfxGain = null;
     this.musicGain = null;
 
-    // Load persisted settings
-    this.settings = this.loadSettings();
+    // Macro FX Nodes
+    this.lowHealthFilter = null;
+    this.submixBus = null;
+    this.envDelay = null;
+    this.envFeedback = null;
+    this.envDelayGain = null;
+
+    this.macroState = {
+      lowHealth: false,
+      environment: 'normal',
+      poisoned: false
+    };
 
     // Listener coordinates for 2D spatial audio
     this.listenerX = 0;
@@ -293,6 +330,27 @@ export class AudioPSG {
     this.bufferCache = new Map(); // name -> AudioBuffer
     this.lastPlayedAt = new Map(); // name -> ms timestamp (anti-spam throttle)
     this.listeners = new Set(); // Change event listeners
+
+    this.initWorker();
+  }
+
+  initWorker() {
+    this.worker = null;
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./AudioWorker.js', import.meta.url), { type: 'module' });
+        this.worker.onmessage = (e) => {
+          const { id, type, name, samples } = e.data || {};
+          if (type === 'SFX_READY' && samples && this.ctx) {
+            const buf = this.float32ToAudioBuffer(this.ctx, samples);
+            this.bufferCache.set(name, buf);
+          }
+        };
+      } catch (_) {
+        // Fall back gracefully to inline DSP if worker is not permitted
+        this.worker = null;
+      }
+    }
   }
 
   loadSettings() {
@@ -301,7 +359,8 @@ export class AudioPSG {
       sfx: 0.8,
       music: 0.6,
       muted: false,
-      spatial: true
+      spatial: true,
+      quality: 'standard' // 'hifi' (44.1k), 'standard' (22k), 'lofi' (11k)
     };
     try {
       const raw = localStorage.getItem('sanctum_audio_settings');
@@ -312,7 +371,8 @@ export class AudioPSG {
           sfx: typeof parsed.sfx === 'number' ? Math.max(0, Math.min(1, parsed.sfx)) : defaults.sfx,
           music: typeof parsed.music === 'number' ? Math.max(0, Math.min(1, parsed.music)) : defaults.music,
           muted: typeof parsed.muted === 'boolean' ? parsed.muted : defaults.muted,
-          spatial: typeof parsed.spatial === 'boolean' ? parsed.spatial : defaults.spatial
+          spatial: typeof parsed.spatial === 'boolean' ? parsed.spatial : defaults.spatial,
+          quality: ['hifi', 'standard', 'lofi'].includes(parsed.quality) ? parsed.quality : defaults.quality
         };
       }
     } catch (_) {}
@@ -353,29 +413,109 @@ export class AudioPSG {
     this.setMuted(m);
   }
 
+  setQuality(quality) {
+    if (!['hifi', 'standard', 'lofi'].includes(quality)) quality = 'standard';
+    if (this.settings.quality === quality) return;
+    this.settings.quality = quality;
+
+    const rates = {
+      hifi: PSG_CONSTANTS.HIFI_SAMPLE_RATE,
+      lofi: PSG_CONSTANTS.LOFI_SAMPLE_RATE,
+      standard: PSG_CONSTANTS.DEFAULT_SAMPLE_RATE
+    };
+    this.sampleRate = rates[quality] ?? PSG_CONSTANTS.DEFAULT_SAMPLE_RATE;
+    this.osc = new Oscillator(this.sampleRate);
+    this.mod = new Modifiers(this.sampleRate);
+
+    // Discard old sample-rate buffers
+    this.bufferCache.clear();
+    this.saveSettings();
+
+    if (this.worker) {
+      this.worker.postMessage({ type: 'SET_SAMPLE_RATE', sampleRate: this.sampleRate });
+    }
+  }
+
   ensureContext() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return null;
       this.ctx = new AudioCtx();
 
-      // Audio Graph: SFX Gain & Music Gain -> Master Gain -> Destination
+      // Master Gain -> Destination
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.value = this.settings.muted ? 0 : this.settings.master;
       this.masterGain.connect(this.ctx.destination);
 
+      // Low-Health / Tense Muffle Filter (BiquadFilter lowpass)
+      this.lowHealthFilter = this.ctx.createBiquadFilter();
+      this.lowHealthFilter.type = 'lowpass';
+      this.lowHealthFilter.frequency.value = 22000;
+      this.lowHealthFilter.Q.value = 0.7;
+      this.lowHealthFilter.connect(this.masterGain);
+
+      // Submix Bus (Dry signal path -> Low Health Filter)
+      this.submixBus = this.ctx.createGain();
+      this.submixBus.gain.value = 1.0;
+      this.submixBus.connect(this.lowHealthFilter);
+
+      // Environmental Delay / Echo (Wet send path for Cathedrals / Caverns)
+      this.envDelay = this.ctx.createDelay();
+      this.envDelay.delayTime.value = 0.22; // 220ms slapback echo
+
+      this.envFeedback = this.ctx.createGain();
+      this.envFeedback.gain.value = 0.35; // 35% feedback loop
+
+      this.envDelayGain = this.ctx.createGain();
+      this.envDelayGain.gain.value = 0.0; // Dry by default
+
+      this.envDelay.connect(this.envFeedback);
+      this.envFeedback.connect(this.envDelay);
+      this.envDelay.connect(this.envDelayGain);
+      this.envDelayGain.connect(this.lowHealthFilter);
+
+      // SFX Bus
       this.sfxGain = this.ctx.createGain();
       this.sfxGain.gain.value = this.settings.sfx;
-      this.sfxGain.connect(this.masterGain);
+      this.sfxGain.connect(this.submixBus);
+      this.sfxGain.connect(this.envDelay);
 
+      // Music Bus
       this.musicGain = this.ctx.createGain();
       this.musicGain.gain.value = this.settings.music;
-      this.musicGain.connect(this.masterGain);
+      this.musicGain.connect(this.submixBus);
+      this.musicGain.connect(this.envDelay);
     }
     if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
+  }
+
+  setMacroState({ lowHealth = null, environment = null, poisoned = null } = {}) {
+    if (lowHealth !== null) this.macroState.lowHealth = !!lowHealth;
+    if (environment !== null) this.macroState.environment = environment;
+    if (poisoned !== null) this.macroState.poisoned = !!poisoned;
+
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 1. Low Health Tension Macro (muffled heartbeat filter)
+    if (this.lowHealthFilter) {
+      if (this.macroState.lowHealth) {
+        this.lowHealthFilter.frequency.setTargetAtTime(450, now, 0.08);
+        this.lowHealthFilter.Q.setTargetAtTime(2.2, now, 0.08);
+      } else {
+        this.lowHealthFilter.frequency.setTargetAtTime(22000, now, 0.12);
+        this.lowHealthFilter.Q.setTargetAtTime(0.7, now, 0.12);
+      }
+    }
+
+    // 2. Environmental Echo / Reverb Macro (Cavern / Cathedral)
+    if (this.envDelayGain) {
+      const isWetEnv = this.macroState.environment === 'cathedral' || this.macroState.environment === 'cavern';
+      this.envDelayGain.gain.setTargetAtTime(isWetEnv ? 0.35 : 0.0, now, 0.1);
+    }
   }
 
   setMuted(muted) {
@@ -471,8 +611,9 @@ export class AudioPSG {
 
   /**
    * Renders a single note or event using a Lanthorn-PSG compatible JSON patch into a Float32Array.
+   * Supports both legacy patch fields and modern sequential `fx_chain` with `!CMD XX` macro overrides.
    */
-  renderSingleVoice(patch, freqOverride = null, durationOverride = null) {
+  renderSingleVoice(patch, freqOverride = null, durationOverride = null, macroOverrides = []) {
     const duration = durationOverride ?? patch.duration ?? 0.2;
     const baseFreq = freqOverride ?? patch.freq ?? (patch.midi ? midiToFreq(patch.midi) : 220);
 
@@ -517,28 +658,63 @@ export class AudioPSG {
       }
     }
 
-    // 4. Signal Processing Chain (Modifiers)
-    if (patch.ring_mod && patch.ring_mod.mix > 0) {
-      wave = this.mod.applyRingMod(wave, patch.ring_mod.freq || 500, patch.ring_mod.mix);
-    }
-    if (patch.retrigger && patch.retrigger.rate_hz > 0) {
-      wave = this.mod.applyRetrigger(wave, patch.retrigger.rate_hz);
-    }
+    // 4. Envelope (applied before non-linear FX like saturation or echo)
     if (patch.envelope) {
       const e = patch.envelope;
       wave = this.mod.applyADSR(wave, e.attack ?? 0.005, e.decay ?? 0.08, e.sustain_level ?? 0.5, e.release ?? 0.05);
     }
-    if (patch.lfo && patch.lfo.tremolo_depth > 0 && patch.lfo.tremolo_speed > 0) {
-      wave = this.mod.applyTremolo(wave, patch.lfo.tremolo_speed, patch.lfo.tremolo_depth);
-    }
-    if (patch.saturation && patch.saturation > 1.0) {
-      wave = this.mod.applySaturation(wave, patch.saturation);
-    }
-    if (patch.bit_depth && patch.bit_depth < 16) {
-      wave = this.mod.applyBitcrush(wave, patch.bit_depth);
-    }
-    if (patch.echo && patch.echo.feedback > 0 && patch.echo.delay_time > 0) {
-      wave = this.mod.applyEcho(wave, patch.echo.delay_time, patch.echo.feedback, patch.echo.num_taps || 3);
+
+    // 5. Signal Processing Chain (sequential fx_chain or legacy modifier fields)
+    if (Array.isArray(patch.fx_chain) && patch.fx_chain.length > 0) {
+      const chain = [...patch.fx_chain];
+      if (Array.isArray(macroOverrides)) {
+        for (const ov of macroOverrides) {
+          if (!ov || typeof ov !== 'string') continue;
+          const clean = ov.trim();
+          const cmd = clean.startsWith('!') ? clean.slice(1).split(/\s+/)[0] : clean.split(/\s+/)[0];
+          const rep = clean.startsWith('!') ? clean.slice(1) : clean;
+          const idx = chain.findIndex(c => c.trim().split(/\s+/)[0] === cmd);
+          if (idx !== -1) chain[idx] = rep;
+          else chain.push(rep);
+        }
+      }
+
+      for (const entry of chain) {
+        const parts = entry.trim().split(/\s+/);
+        const cmd = parts[0]?.toUpperCase();
+        if (cmd === 'SAT') {
+          wave = this.mod.applySaturation(wave, parseFloat(parts[1]) || 1.2);
+        } else if (cmd === 'BIT') {
+          wave = this.mod.applyBitcrush(wave, parseInt(parts[1], 10) || 12);
+        } else if (cmd === 'ECH') {
+          wave = this.mod.applyEcho(wave, parseFloat(parts[1]) || 0.25, parseFloat(parts[2]) || 0.3, 3);
+        } else if (cmd === 'RNG') {
+          wave = this.mod.applyRingMod(wave, parseFloat(parts[1]) || 400, parseFloat(parts[2]) || 0.2);
+        } else if (cmd === 'RET') {
+          wave = this.mod.applyRetrigger(wave, parseFloat(parts[1]) || 10);
+        } else if (cmd === 'TRM') {
+          wave = this.mod.applyTremolo(wave, parseFloat(parts[1]) || 4.0, parseFloat(parts[2]) || 0.3);
+        }
+      }
+    } else {
+      if (patch.ring_mod && patch.ring_mod.mix > 0) {
+        wave = this.mod.applyRingMod(wave, patch.ring_mod.freq || 500, patch.ring_mod.mix);
+      }
+      if (patch.retrigger && patch.retrigger.rate_hz > 0) {
+        wave = this.mod.applyRetrigger(wave, patch.retrigger.rate_hz);
+      }
+      if (patch.lfo && patch.lfo.tremolo_depth > 0 && patch.lfo.tremolo_speed > 0) {
+        wave = this.mod.applyTremolo(wave, patch.lfo.tremolo_speed, patch.lfo.tremolo_depth);
+      }
+      if (patch.saturation && patch.saturation > 1.0) {
+        wave = this.mod.applySaturation(wave, patch.saturation);
+      }
+      if (patch.bit_depth && patch.bit_depth < 16) {
+        wave = this.mod.applyBitcrush(wave, patch.bit_depth);
+      }
+      if (patch.echo && patch.echo.feedback > 0 && patch.echo.delay_time > 0) {
+        wave = this.mod.applyEcho(wave, patch.echo.delay_time, patch.echo.feedback, patch.echo.num_taps || 3);
+      }
     }
 
     return wave;
