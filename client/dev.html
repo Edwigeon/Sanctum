@@ -3,20 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>SANCTUM — Dev Studio (/dev)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    canvas.pixelated { image-rendering: pixelated; image-rendering: crisp-edges; }
-    .checker-bg {
-      background-image:
-        linear-gradient(45deg, #1e293b 25%, transparent 25%),
-        linear-gradient(-45deg, #1e293b 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #1e293b 75%),
-        linear-gradient(-45deg, transparent 75%, #1e293b 75%);
-      background-size: 16px 16px;
-      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
-      background-color: #0f172a;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased flex flex-col">
 
@@ -83,6 +70,46 @@
     </div>
   </div>
 
+  <!-- MOVE / RENAME / FOLDER MODAL -->
+  <div id="dev-move-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 w-96 space-y-3 text-xs font-mono shadow-2xl dev-modal">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <span class="font-bold text-amber-300">MOVE / RENAME SPRITE</span>
+        <button id="btn-move-close" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <p class="text-[11px] text-slate-400">Move <code id="move-target-name" class="text-amber-300">sprite</code> to a folder/biome or rename its ID.</p>
+      
+      <div class="space-y-2.5 bg-slate-950 p-3 rounded border border-slate-800">
+        <div>
+          <label class="text-slate-400 block text-[10px] mb-1">Target Category</label>
+          <select id="move-category" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-slate-100">
+            <option value="tiles">tiles</option>
+            <option value="entities">entities</option>
+            <option value="objects">objects</option>
+            <option value="items">items</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-slate-400 block text-[10px] mb-1">Target Folder / Biome</label>
+          <div class="flex gap-1.5">
+            <select id="move-folder-select" class="flex-1 bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-slate-100 font-medium">
+            </select>
+            <input id="move-folder-custom" type="text" placeholder="Or new folder" class="w-1/2 bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-slate-100">
+          </div>
+        </div>
+        <div>
+          <label class="text-slate-400 block text-[10px] mb-1">Sprite ID (without folder prefix)</label>
+          <input id="move-new-id" type="text" placeholder="e.g. floor_stone" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-slate-100">
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button id="btn-move-cancel" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded">Cancel</button>
+        <button id="btn-move-apply" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 font-bold text-slate-950 rounded">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TAB 1: SPRITE & TILE DIGITIZER -->
   <main id="view-sprites" class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 max-w-[1600px] w-full mx-auto min-h-0">
 
@@ -93,38 +120,57 @@
         <button id="btn-sp-save-disk" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px]">Save to Disk</button>
       </div>
 
-      <!-- FOLDER / BIOME FILTER -->
-      <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded border border-slate-800">
-        <span class="text-[10px] text-slate-500 uppercase px-1">Folder:</span>
-        <select id="sp-folder-filter" class="flex-1 bg-transparent text-[11px] text-amber-300 font-bold focus:outline-none">
-          <option value="ALL">All Folders</option>
-          <option value="common">📁 common</option>
-          <option value="crypt">📁 crypt</option>
-          <option value="cavern">📁 cavern</option>
-          <option value="overworld">📁 overworld</option>
-        </select>
+      <!-- FOLDER / BIOME FILTER & VIEW MODE -->
+      <div class="flex flex-col gap-1.5 bg-slate-950 p-2 rounded border border-slate-800">
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] text-slate-400 uppercase font-bold px-0.5">Folder:</span>
+          <select id="sp-folder-filter" class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-amber-300 font-bold focus:outline-none">
+            <option value="ALL">📁 All Folders</option>
+          </select>
+          <button id="btn-sp-add-folder" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 text-[10px] font-bold rounded" title="Create a new folder / biome">+ Folder</button>
+        </div>
+        <div class="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-800 text-slate-400">
+          <span>View Mode:</span>
+          <div class="flex gap-1">
+            <button id="btn-view-by-category" class="px-2 py-0.5 rounded bg-amber-600 text-slate-950 font-bold">Category</button>
+            <button id="btn-view-by-folder" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Folder</button>
+          </div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-1.5">
-        <select id="sp-new-cat" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-[11px]">
-          <option value="tiles">tiles</option>
-          <option value="entities">entities</option>
-          <option value="objects">objects</option>
-          <option value="items">items</option>
-        </select>
-        <input id="sp-new-id" type="text" placeholder="id or folder/id" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-[11px]">
-      </div>
-      <div class="grid grid-cols-2 gap-1.5">
-        <select id="sp-new-size" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-[11px]">
-          <option value="12">12×12 (Tile/Pawn)</option>
-          <option value="8">8×8 (Micro/Item)</option>
-          <option value="16">16×16 (Elite)</option>
-          <option value="24">24×24 (Boss)</option>
-        </select>
-        <button id="btn-sp-new" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded py-1 text-[11px]">+ Create</button>
+      <!-- CREATE NEW SPRITE -->
+      <div class="bg-slate-950 p-2 rounded border border-slate-800 space-y-1.5">
+        <div class="text-[10px] text-slate-400 uppercase font-bold flex justify-between">
+          <span>New Sprite</span>
+          <span id="lbl-create-dest" class="text-amber-400 font-normal">in active folder</span>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <select id="sp-new-cat" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-100 font-medium">
+            <option value="tiles">tiles</option>
+            <option value="entities">entities</option>
+            <option value="objects">objects</option>
+            <option value="items">items</option>
+          </select>
+          <select id="sp-new-folder" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-100 font-medium">
+            <option value="common">📁 common</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <input id="sp-new-id" type="text" placeholder="sprite_id" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-100">
+          <select id="sp-new-size" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-100 font-medium">
+            <option value="12">12×12 (Tile/Pawn)</option>
+            <option value="8">8×8 (Micro/Item)</option>
+            <option value="16">16×16 (Elite)</option>
+            <option value="24">24×24 (Boss)</option>
+            <option value="32">32×32 (High-Res Entity)</option>
+            <option value="32x64">32×64 (High-Res Tall Entity)</option>
+            <option value="64">64×64 (High-Res Massive)</option>
+          </select>
+        </div>
+        <button id="btn-sp-new" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded py-1.5 text-[11px] transition">+ Create Sprite</button>
       </div>
 
-      <div id="sp-bank-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1 max-h-[380px]"></div>
+      <div id="sp-bank-list" class="flex-1 min-h-[300px] overflow-y-auto space-y-1.5 pr-1"></div>
 
       <div class="pt-2 border-t border-slate-800 grid grid-cols-2 gap-1.5">
         <button id="btn-sp-recolor" class="bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-800 text-cyan-200 py-1.5 rounded text-[10px]" title="Batch swap colors across this sprite">🎨 Recolor...</button>
@@ -150,9 +196,28 @@
         </div>
       </div>
 
-      <!-- EDITOR CANVAS -->
-      <div class="flex flex-col items-center gap-2.5">
-        <canvas id="sp-editor-canvas" width="384" height="384" class="pixelated checker-bg border-2 border-slate-700 rounded-lg cursor-crosshair shadow-inner"></canvas>
+      <!-- EDITOR CANVAS & VIEWPORT -->
+      <div class="flex flex-col items-center gap-2 w-full">
+        <!-- ZOOM & PAN TOOLBAR -->
+        <div class="w-full flex flex-wrap items-center justify-between gap-1 text-[11px] px-1 text-slate-400">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] uppercase font-bold text-slate-500">Zoom:</span>
+            <button id="btn-zoom-out" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center font-bold text-slate-200" title="Zoom Out (Scroll Down)">−</button>
+            <span id="lbl-zoom-level" class="font-mono text-[11px] text-amber-300 w-12 text-center select-none">100%</span>
+            <button id="btn-zoom-in" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center font-bold text-slate-200" title="Zoom In (Scroll Up)">+</button>
+            <button id="btn-zoom-reset" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[10px] text-slate-300" title="Reset Zoom (100%)">1:1</button>
+            <button id="btn-zoom-fit" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[10px] text-slate-300" title="Fit to Viewport">Fit</button>
+          </div>
+          <div class="flex items-center gap-2 text-[10px] text-slate-500">
+            <span id="lbl-editor-coords" class="font-mono text-cyan-300">x: -, y: -</span>
+            <span class="hidden md:inline text-slate-500">• Wheel to Zoom • Middle/Space Drag to Pan</span>
+          </div>
+        </div>
+
+        <!-- VIEWPORT CONTAINER -->
+        <div id="sp-viewport" class="relative w-full h-[384px] bg-slate-950 border-2 border-slate-700 rounded-lg overflow-hidden select-none flex items-center justify-center checker-bg cursor-crosshair">
+          <canvas id="sp-editor-canvas" width="384" height="384" class="pixelated shadow-2xl origin-center will-change-transform"></canvas>
+        </div>
 
         <!-- TRANSFORM & FRAME CONTROLS -->
         <div class="w-full flex flex-wrap items-center justify-between gap-2 bg-slate-950/70 border border-slate-800 rounded-lg p-2">
@@ -350,7 +415,7 @@
           <div class="flex flex-wrap items-center gap-3 text-[10px]">
             <label class="flex items-center gap-1.5">
               <span class="text-slate-400">Wave</span>
-              <select id="pt-wave" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px]">
+              <select id="pt-wave" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-100">
                 <option value="square">square</option>
                 <option value="sawtooth">sawtooth</option>
                 <option value="triangle">triangle</option>
@@ -395,7 +460,7 @@
           <div class="grid grid-cols-2 gap-2">
             <label class="space-y-0.5">
               <span class="text-[10px] text-slate-400">Wave 1</span>
-              <select id="sfx-wave1" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1">
+              <select id="sfx-wave1" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-100">
                 <option value="square">square</option>
                 <option value="sawtooth">sawtooth</option>
                 <option value="triangle">triangle</option>
@@ -405,7 +470,7 @@
             </label>
             <label class="space-y-0.5">
               <span class="text-[10px] text-slate-400">Wave 2</span>
-              <select id="sfx-wave2" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1">
+              <select id="sfx-wave2" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-100">
                 <option value="">(none)</option>
                 <option value="noise">noise</option>
                 <option value="square">square</option>

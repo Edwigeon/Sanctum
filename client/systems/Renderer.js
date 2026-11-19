@@ -1,5 +1,6 @@
 import { ENGINE, PALETTE, PALETTE_INDEX, RARITY_COLORS } from '../../shared/Constants.js';
 import { LightingSystem } from './LightingSystem.js';
+import { CanvasHUD } from './CanvasHUD.js';
 
 // Pre-allocated entity geometry templates (zero per-frame array allocations)
 const LOOT_RECTS = [
@@ -58,9 +59,16 @@ export class Renderer {
     this.entityAnim = new Map(); // id -> { x, y, facingLeft, moveHold, actionState, actionTimer }
     this.floatingTexts = [];
     this.clickMarker = null;
+    this.canvasHud = new CanvasHUD();
 
     window.addEventListener('resize', () => this.resizeStage());
     this.resizeStage();
+  }
+
+  updateHUD(partial) {
+    if (this.canvasHud) {
+      this.canvasHud.updateState(partial);
+    }
   }
 
   resizeStage() {
@@ -311,7 +319,7 @@ export class Renderer {
       if ((hoveredMob && hoveredMob.id === m.id) || lockedMonsterId === m.id) {
         strokeUIRect(m.rx, m.ry, -4, -5, 8, 10, PALETTE[PALETTE_INDEX.YELLOW]);
       }
-      if (band >= 3 || m.hp < m.maxHp) {
+      if (band >= 2 || m.hp < m.maxHp) {
         drawUIRect(m.rx, m.ry, -4, -7, 8, 2, PALETTE[PALETTE_INDEX.BLACK]);
         drawUIRect(m.rx, m.ry, -4, -7, 8 * Math.max(0, m.hp / m.maxHp), 2, PALETTE[PALETTE_INDEX.RED]);
       }
@@ -413,5 +421,10 @@ export class Renderer {
       hCtx.fillText(hoveredLoot.name, hx, hy);
     }
     hCtx.textAlign = 'start';
+
+    // 3. Canvas-Native Action Bar & Vitals HUD (Life/Mana Globes, Belt, XP Bar)
+    if (this.canvasHud) {
+      this.canvasHud.render(hCtx, this.stageW, this.stageH, dt, this.animTime);
+    }
   }
 }

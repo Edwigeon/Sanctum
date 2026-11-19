@@ -7,11 +7,11 @@ Microscopic Footprint, Zero Bloat:
 No multi-megabyte game engines, no heavy client frameworks, no sprawling asset packs.
 The entire web client loads in milliseconds (< 100 KB) and runs smoothly on any browser, low-power laptop, or desktop.
 1984 Spirit, Modern Feel:
-Inspired by the pacing, loot addiction, and dark-fantasy loop of Diablo II, distilled through the blocky, 16-color charm of a PICO-8 / 1984 fantasy console.
+Inspired by the pacing, loot addiction, and dark-fantasy loop of classic dark-fantasy ARPGs, distilled through the blocky, 16-color charm of a PICO-8 / 1984 fantasy console.
 Mouse-First ARPG Controls: Left-click to move, target, and loot; right-click for active skills; 1–4 for belt potions.
 Dual-Resolution Clarity:
 World Tile Layer (Low-Res Pixel Canvas): 240×144 internal viewport (242×146 canvas with a 2px subpixel scroll margin) upscaled with nearest-neighbor (image-rendering: pixelated) for chunky, evocative retro dungeon tiles, combined with integer tile snapping and fractional GPU CSS translation (translate3d) for silky subpixel camera scrolling.
-Entity & UI Overlay Layer (High-DPI Vector Canvas): Native screen resolution (devicePixelRatio-scaled) overlaid cleanly on top for subpixel-interpolated pawn sprites (players, monsters, projectiles, ground loot), health bars, target highlights, razor-sharp floating damage numbers, and legible item tooltips. Crisp HUD orbs, character sheet, and inventory panels are rendered as HTML/CSS overlays.
+Entity & UI Overlay Layer (High-DPI Vector Canvas & Bespoke HTML/CSS): Native screen resolution (devicePixelRatio-scaled) overlaid cleanly on top for subpixel-interpolated pawn sprites (players, monsters, projectiles, ground loot), visible held weapons, gear palette tints, health bars, target highlights, razor-sharp floating damage numbers, and legible item tooltips. Crisp HUD orbs, character sheet, and inventory panels are rendered through a zero-dependency, handcrafted retro dark-fantasy CSS stylesheet (purging external CDN frameworks).
 Data-Driven & Moddable:
 Engine mechanics (/shared/, /server/, /client/) are strictly decoupled from content (/data/ JSON tables).
 Stories, acts, monster stats, skill curves, and item affixes can be expanded or modded without rewriting core simulation code.
@@ -19,7 +19,7 @@ Deterministic 32-Bit Simulation:
 All procedural dungeon seeds and RNG use 32-bit integer arithmetic (PRNG), ensuring identical map generation across server and clients with minimal network bandwidth (sending a 32-bit seed instead of map data).
 2. Gameplay Loop, World Structure & Progression
 Campaign Scale & Interconnected World:
-Overworld & Dungeons (Diablo-Inspired World Graph): An interconnected overworld of distinct biomes (Camp/Town Hub, Highlands, Ruined Courtyard, Graveyard, etc.) with a dynamic Day/Night cycle that transitions seamlessly into multi-floor subterranean dungeons (Crypts, Caverns, Sanctum Depths).
+Overworld & Dungeons (Interconnected World Graph): An interconnected overworld of distinct biomes (Camp/Town Hub, Highlands, Ruined Courtyard, Graveyard, etc.) with a dynamic Day/Night cycle that transitions seamlessly into multi-floor subterranean dungeons (Crypts, Caverns, Sanctum Depths).
 Cell / Chunk Streaming Architecture: Large areas and the interconnected overworld are divided into deterministic spatial cells/chunks (e.g., 32×32 or 40×30 tile cells) streamed and activated on demand around players, giving a continuous, interconnected world feel without loading barriers.
 Constrained Biome & Location Generation: Rather than generic random rooms everywhere, each area uses constrained procedural generation tailored to its biome (e.g., road/river/clearing constraints in overworld cells, BSP rooms + doors in keeps/crypts, cellular automata in caverns, fixed set-piece landmarks for boss lairs and town hubs).
 Town Hub, Waypoints & Portals: Seamless walk-out transitions from the camp into the overworld, plus Town Portals (TILES.PORTAL_TOWN) and waypoints for quick returns to stash, identify, and restock.
@@ -69,7 +69,12 @@ Phase 2B: Real-Time 2D Lighting, Interactive World Objects, Developer Asset Stud
  [x] Real-time 2D shadowcast lighting / fog-of-war (client/systems/LightingSystem.js): greedy merged continuous wall segments (`buildMergedWallSegments`) + exact analytical ray-segment occlusion (zero 12×12 tile-seam notches or ray-step shimmer), 9-band warm `SHADE_U32` palette ramp + world-locked 1×1 Bayer dithering, and static object occluders (`setStaticOccluder`).
  [x] Additive 16-color palette lighting (`PALETTE`, `PALETTE_INDEX`, `PALETTE_RGB` in `shared/Constants.js`) & subpixel entity stamping (`drawLitEntityStamp`): overlapping lights add brightness and RGB photons cleanly (`ORANGE` torch, `BLUE` Spark projectiles, `YELLOW` stairs & unique drops, `PINK` rare loot, `RED` elite monsters), with entities shaded into a contiguous 24×24 offscreen stamp and blitted at exact subpixel screen coordinates (60+ FPS smooth motion, zero grid seams).
  [x] Toggleable personal torch (`T`), smooth ambient light transitions (`L` daylight preview), and visibility-based monster/loot hover culling.
- [ ] Interactive Static World Objects: Shrines (granting temporary buffs and toggling off their colored shrine light beacon when activated), Chests/Containers (casting shadows as static occluders until opened/broken), and Toggleable Braziers/Torches.
+ [ ] Interactive Static World Objects:
+     - Shrines: granting temporary buffs (Speed, Conduit, Frenzy) and toggling off their colored shrine light beacon when activated.
+     - Chests & Containers: casting shadows as static occluders until opened/unlocked.
+     - Breakable Props: urns, ceramic pots, and wooden crates (1 HP entities with collision that shatter on attacks or projectiles, dropping gold, potions, or rare items).
+     - Interactive Doors (`TILES.DOOR`): click/walk-to-open doors that act as analytical shadowcasters when closed (blocking line-of-sight and sound) and open smoothly.
+     - Toggleable Braziers & Wall Torches.
  [x] Developer Asset & PSG Studio (/dev -> client/dev.html, client/dev.js, client/dev/SpriteStudio.js, client/dev/SoundLab.js, backed by /api/dev/sprites & /api/dev/sfx):
      - Image-to-Sanctum Digitizer: drag/drop, upload, or Ctrl+V paste reference images (.png/.jpg/.webp), perceptual 16-color palette quantizer with contrast, alpha threshold, and optional 4×4 Bayer dither toggle.
      - Interactive Pixel, Rotation & Animation Editor: 16-color palette picker, pencil/fill/eyedropper/eraser/mirror/rotate/flip/undo tools, multi-frame animation preview, 3×3 tile & 0°–360° rotation preview, and all 8 DOOM shade bands preview.
@@ -87,15 +92,62 @@ Phase 2C: Interconnected Cell/Chunk World, Constrained Biomes & Day/Night Cycle
  [ ] Overworld Day/Night cycle: time-of-day ambient light curve & palette shifting on outdoor cells (daylight visibility vs. nightfall torch-only visibility and tougher nocturnal spawns) contrasted with permanent darkness underground.
  [ ] Seamless cell transitions, Dungeon Entrances / Stairs (Up & Down), Town Portals (TILES.PORTAL_TOWN), and New Game+ (ngCycle) transitions.
 
-Phase 3B: Class Skills, Elite Monsters, Bosses & Audio
- [ ] Class-distinct right-click and hotbar active skills (e.g., Vanguard Cleave/Leap, Arcanist Spark/Nova, Shadow Dash/Fan of Knives) defined in data/classes.json or data/skills.json.
- [ ] Elite monster affixes ([Vampiric], [Molten], [Fast], [Teleporter]) with distinct color palettes and nametag badges.
- [ ] 3 Act Boss encounters with multi-phase attack patterns and guaranteed Unique/Rare drops.
+Phase 2D: UI Refactor, Custom Dark-Fantasy CSS & Paperdoll Overhaul
+ [x] Zero-Dependency Custom Retro CSS Stylesheet (`client/style.css`):
+     - Completely purged external Tailwind CDN runtime across `index.html`, `dev.html`, and `mod.html` in favor of a handcrafted, high-performance static stylesheet with zero network dependencies (< 20 KB uncompressed).
+     - PICO-8 16-color CSS variable design tokens (`--p8-0` through `--p8-15`), subtle iron/stone bevels, custom scrollbars, and dark-fantasy parchment/iron aesthetics.
+ [ ] Inventory & Paperdoll Overhaul:
+     - Dedicated visual paperdoll layout with crisp equipment slots (Weapon, Off-hand/Shield, Armor, Gloves, Boots, Ring 1, Ring 2, Amulet).
+     - Modern ARPG ergonomics: 1-click equip/swap, right-click to drop, and click-to-unequip back to bag.
+     - Dynamic Carry Weight meter with visual overburden thresholds and warning tooltips.
+     - Comparative hover tooltips: side-by-side inspection comparing hovered gear with currently equipped slot, displaying clean colored stat deltas (+4 Armor, -2 Focus).
+ [ ] Character Sheet (`C`) Deepening:
+     - Revamped layout showing core attributes (Might, Focus, Agility, Vitality) with uncommitted +/- point allocation preview.
+     - Detailed derived combat stats panel: physical armor mitigation %, spell damage multiplier, critical strike chance & multiplier, effective movement speed, and health/mana regeneration rates.
+ [ ] Itemization Deepening (Consumables, Stacking & Socketing):
+     - Consumable stack architecture: Health/Mana potions, Town Portal scrolls, and Antidotes supporting `{ stackable: true, count: 5, maxStack: 20 }` in player bags.
+     - Socketable Gem/Rune System: Weapons and armor rolling 1–2 sockets accepting chipped gems (Ruby = flat HP, Sapphire = MP/Spell, Topaz = MF/Crit) for early crafting depth.
+
+Phase 2E: Visual Customization, Palette Swaps & Visible Weapons
+ [ ] Unique Playable Class Sprites:
+     - Unique 2-frame 12×12 animated micro-sprites in `/data/sprites.json` for each archetype: Vanguard (heavy ironclad plate & greathelm), Arcanist (flowing hooded robes & mystic trim), and Shadow (sleek masked cowl & leather tunic).
+ [ ] Visible Held Weapons:
+     - Layered weapon micro-sprite stamping composited directly onto entity stamps, oriented dynamically by player facing direction or combat aim angle.
+ [ ] Dynamic Gear Color Palette Swapping:
+     - Entity sprite shading pipeline supporting indexed color swaps: remap base armor/cloth palette indices dynamically based on equipped armor rarity (Normal, Magic, Rare, Unique) or material tier (iron, bronze, shadowsilk, voidplate) using the canonical 16-color PICO-8 palette.
+ [ ] Expanded Environment & Object Sprite Library:
+     - Interactive chests (closed, open, golden, trapped), breakable urns and wooden crates, heavy wooden/iron doors (closed & open states), shrines with glowing beacon gems, wall sconces, and bone piles.
+
+Phase 3B: Class Skills, Entity Collisions, Status Effects & Elite Monsters
+ [ ] Class-Distinct Active Skills (Beyond Spark):
+     - Data-driven skill pipeline in `data/skills.json` supporting varied targeting modes (directional projectile, cone slash, radial pulse, targeted dash/blink), resource costs, and cooldown timers.
+     - **Vanguard Kit**: Cleave (cone melee slash hitting multiple targets), Shield Bash (short stun + knockback), Whirlwind (spinning radial melee strike), Iron Will (temporary armor/resistance fortification).
+     - **Arcanist Kit**: Spark (homing/piercing electric dart), Frost Nova (radial chill & freeze slowing mob movement), Teleport (instant phase blink through obstacles/mobs), Arcane Beam (sustained directional channel).
+     - **Shadow Kit**: Shadow Step (swift dash through enemies), Fan of Knives (radial multi-dagger spread), Poison Blade (stacking poison damage over time), Smoke Screen (aggro drop + brief stealth).
+ [ ] Server-Authoritative Entity-to-Entity Collision & Separation Physics:
+     - **Monster-to-Monster Soft Separation**: Circle-circle repulsion vectors in `GameRoom.js` update loop, ensuring enemy packs organically swarm and surround players rather than collapsing into a single stacked pixel.
+     - **Player-to-Monster Body-Blocking**: Solid collision bounds preventing players and monsters from phasing through each other, creating tactical choke points in corridors and doorways.
+     - **Hit Knockback Impulses**: Heavy melee strikes, critical hits, and Shield Bash apply decaying velocity impulses pushing enemies backward along the impact vector.
+ [ ] Spatial Partitioning Broadphase Grid:
+     - Room/chunk bucketed spatial hash grid ($144\times144\text{ px}$ bins) inside `GameRoom`, reducing aggro scans, projectile raycasts, and soft-separation neighbor checks from $O(N \times M)$ brute force down to $O(1)$ constant-time neighborhood queries.
+ [ ] Standardized Audio/VFX World Event Bus:
+     - Decouple simulation logic from presentation via typed `WORLD_EVENTS` broadcast in snapshots (`SFX_TRIGGER` with spatial panning/rolloff, `PARTICLE_BURST` with palette index colors, `SCREEN_SHAKE`, `FLOAT_TEXT`).
+ [ ] Status Effect (Buff / Debuff) Pipeline:
+     - Standardized tick-based `statusEffects` array on player and monster entities (`bleed`, `poison`, `chill`, `freeze`, `ignite`, `stun`, `haste`).
+     - Tick damage calculation, movement/attack speed scaling, visual floating combat text tags, and dithered entity sprite tinting.
+ [ ] Elite Monster Affixes & Champion Packs:
+     - Affixes ([Vampiric], [Molten/Fire Enchanted], [Fast], [Vortex/Pull], [Stonehide]) with dynamic colored light auras (RED, INDIGO, ORANGE) and floating nametag badges.
+ [ ] 3 Act Boss Encounters with multi-phase attack patterns, arena telegraphs, and guaranteed Unique/Rare drops.
  [x] Lanthorn-PSG Audio Core (`client/systems/AudioPSG.js` + `/data/sfx.json`): ported dual-oscillator continuous-phase synth, ADSR, pitch sweeps, vibrato/tremolo/PWM LFOs, saturation, bitcrush, ring-mod, retrigger, echo, and 3-layer 32-step Visual SFX Painter playback with cached Web Audio buffers & stereo panning (`M` to mute).
- [ ] Lanthorn-PSG MusicPlayer (`client/systems/MusicPlayer.js` + `/data/music/`):
-     - Lightweight Music Transport: parses compact Lanthorn V1.1 tracker songs (`.csv` or JSON, ~5–15 KB per track) and pre-bakes seamless looping `AudioBuffer`s on track/zone load (zero per-frame synthesis CPU cost).
-     - Deck A / Deck B Horizontal Crossfades: dual-deck equal-power cosine crossfade (`2–4 s`) for smooth transitions between biomes, dungeon depths, Town Hub, and Boss arenas.
-     - Synchronized 8-Track → 2-Stem Vertical Crossfades: renders base exploration tracks (`Tracks 1–4`) and intensity/combat/nightfall tracks (`Tracks 5–8`) into two sample-locked stems sharing the same `AudioContext.currentTime` start, dynamically sweeping stem gains based on combat aggro or Day/Night state.
+ [x] Lanthorn-PSG Interactive MusicPlayer (`client/systems/MusicPlayer.js`, `MusicDatabase.js` + `/data/music/`):
+     - Interactive tracker transport with 16-bit packed IndexedDB PCM caching, instant user-gesture unlock, and background idle pre-warming.
+     - Natural beat-quantized tonal shifts on pattern loop boundaries (`explore`, `tension`, `combat`) without volume dips or mid-phrase cuts.
+     - 6 full music suites (`town`, `wilderness`, `crypts`, `caverns`, `cathedral`, `boss`) anchored to D Dorian / D Phrygian / D Harmonic Minor.
+
+Phase 3C: Latency Compensation & Movement Prediction
+ [ ] Client-Side Movement Prediction & Reconciliation:
+     - Predict local player movement instantly on `INPUT_MOVE` clicks using shared deterministic `isWalkable()` and speed constants, storing an unacknowledged input ring buffer.
+     - Reconcile predicted positions against authoritative `WORLD_SNAPSHOT` packets: smoothly decay minor positional errors (< 4 px) over 3 frames, or hard-snap on severe desyncs (e.g. wall collision or stun). Eliminates noticeable click latency across high-ping or cloud-hosted connections.
 
 Phase 4B: Hall of Fame UI, Stashes & Production Hosting
  [ ] Mode-partitioned Shared Stashes (Classic vs. Hardcore) persisted in SQLite.
@@ -106,7 +158,5 @@ Phase 4B: Hall of Fame UI, Stashes & Production Hosting
 Phase 5: Narrative Pass, Combat Juice, Binary Asset Packing & PWA Polish
  [ ] 3 Thematic Story Acts, NPC camp interactions, and readable lore tablets (/data/acts.json).
  [ ] Combat feel pass: hit-stop frames, directional screen shake, and enhanced crit/overkill typography on highResCanvas.
- [ ] Equipment paperdoll unequipping (click equipped slot to unequip to pack) and item comparison tooltips on hover.
  [ ] Production Asset Packing: compile finalized sprite sheets & synthesized sound patch data from authoring JSON into compact binary packfiles (or SQLite asset DB) for minimal single-fetch loading, while retaining JSON mod overrides.
- [ ] Replace Tailwind CDN with a minimal custom static CSS stylesheet for zero-external-dependency offline loads.
  [ ] PWA manifest.json, service worker caching, and offline solo-play fallback mode.

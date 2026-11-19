@@ -1,4 +1,5 @@
 import { GAME_MODES, PACKET_TYPES, RARITY_COLORS } from '../../shared/Constants.js';
+import { getBitSpriteDataUrl, getItemSpriteKey } from './BitSprites.js';
 
 function formatItemStats(stats) {
   if (!stats) return '';
@@ -9,7 +10,8 @@ function formatItemStats(stats) {
 }
 
 export class HUDController {
-  constructor({ audio, sendPacket, onExitToMenu }) {
+  constructor({ renderer, audio, sendPacket, onExitToMenu }) {
+    this.renderer = renderer;
     this.audio = audio;
     this.sendPacket = sendPacket;
     this.onExitToMenu = onExitToMenu;
@@ -24,9 +26,28 @@ export class HUDController {
     this.lastPrivRef = null;
     this.currentInviteCode = '';
     this.currentInviteToken = '';
+    this.isInviteCodeRevealed = false;
 
     this.bindEvents();
     this.initAudioSettings();
+    this.initBitSpriteIcons();
+  }
+
+  initBitSpriteIcons() {
+    const mightEl = document.getElementById('icon-stat-might');
+    if (mightEl) mightEl.src = getBitSpriteDataUrl('might', 2);
+    const focusEl = document.getElementById('icon-stat-focus');
+    if (focusEl) focusEl.src = getBitSpriteDataUrl('focus', 2);
+    const agiEl = document.getElementById('icon-stat-agility');
+    if (agiEl) agiEl.src = getBitSpriteDataUrl('agility', 2);
+    const vitEl = document.getElementById('icon-stat-vitality');
+    if (vitEl) vitEl.src = getBitSpriteDataUrl('vitality', 2);
+
+    for (const slot of ['weapon', 'armor', 'gloves', 'ring']) {
+      const el = document.getElementById(`slot-${slot}`);
+      const iconEl = el?.querySelector('.slot-icon');
+      if (iconEl) iconEl.src = getBitSpriteDataUrl('slot_' + slot, 2);
+    }
   }
 
   initAudioSettings() {
@@ -74,12 +95,12 @@ export class HUDController {
 
     const curQuality = settings.quality || 'standard';
     const qualityLabels = {
-      lofi: 'Lo-Fi (11 kHz)',
-      standard: 'Standard (22 kHz)',
-      hifi: 'Hi-Fi (44 kHz)'
+      lofi: 'Lo-Fi',
+      standard: 'Standard',
+      hifi: 'Hi-Fi'
     };
     const labelQuality = document.getElementById('label-audio-quality');
-    if (labelQuality) labelQuality.textContent = qualityLabels[curQuality] || 'Standard (22 kHz)';
+    if (labelQuality) labelQuality.textContent = qualityLabels[curQuality] || 'Standard';
 
     document.querySelectorAll('.btn-audio-quality').forEach(btn => {
       const q = btn.dataset.quality;
@@ -92,18 +113,27 @@ export class HUDController {
   }
 
   bindEvents() {
-    document.getElementById('btn-toggle-char').addEventListener('click', () => this.toggleChar());
-    document.getElementById('btn-close-char').addEventListener('click', () => this.panelChar.classList.add('hidden'));
-    document.getElementById('btn-toggle-inv').addEventListener('click', () => this.toggleInv());
-    document.getElementById('btn-close-inv').addEventListener('click', () => this.panelInv.classList.add('hidden'));
-    document.getElementById('btn-toggle-menu').addEventListener('click', () => this.togglePause());
-    document.getElementById('btn-pause-resume').addEventListener('click', () => this.panelPause.classList.add('hidden'));
-    document.getElementById('btn-pause-quit').addEventListener('click', () => this.onExitToMenu());
-    document.getElementById('btn-death-quit').addEventListener('click', () => this.onExitToMenu());
-    document.getElementById('btn-respawn').addEventListener('click', () => {
+    document.getElementById('btn-toggle-char')?.addEventListener('click', () => this.toggleChar());
+    document.getElementById('btn-close-char')?.addEventListener('click', () => {
+      this.panelChar.classList.add('hidden');
+      this.updateHUDButtonStates();
+    });
+    document.getElementById('btn-toggle-inv')?.addEventListener('click', () => this.toggleInv());
+    document.getElementById('btn-close-inv')?.addEventListener('click', () => {
+      this.panelInv.classList.add('hidden');
+      this.updateHUDButtonStates();
+    });
+    document.getElementById('btn-toggle-menu')?.addEventListener('click', () => this.togglePause());
+    document.getElementById('btn-pause-resume')?.addEventListener('click', () => {
+      this.panelPause.classList.add('hidden');
+      this.updateHUDButtonStates();
+    });
+    document.getElementById('btn-pause-quit')?.addEventListener('click', () => this.onExitToMenu());
+    document.getElementById('btn-death-quit')?.addEventListener('click', () => this.onExitToMenu());
+    document.getElementById('btn-respawn')?.addEventListener('click', () => {
       this.sendPacket({ type: PACKET_TYPES.INPUT_RESPAWN });
     });
-    document.getElementById('btn-pot').addEventListener('click', () => {
+    document.getElementById('btn-pot')?.addEventListener('click', () => {
       this.sendPacket({ type: PACKET_TYPES.INPUT_POTION });
     });
 
@@ -113,6 +143,26 @@ export class HUDController {
       });
     });
 
+    // Reveal / Hide Realm Invite Code on Pause Menu
+    const btnReveal = document.getElementById('btn-pause-reveal-code');
+    btnReveal?.addEventListener('click', () => {
+      this.isInviteCodeRevealed = !this.isInviteCodeRevealed;
+      this.updatePauseCodeDisplay();
+    });
+
+    // Copy Invite Code Only
+    const btnCopyCode = document.getElementById('btn-pause-copy-code');
+    btnCopyCode?.addEventListener('click', async () => {
+      const code = this.currentInviteCode || this.currentInviteToken;
+      if (!code) return;
+      await navigator.clipboard?.writeText(code).catch(() => {});
+      if (btnCopyCode) btnCopyCode.textContent = 'Copied!';
+      setTimeout(() => {
+        if (btnCopyCode) btnCopyCode.textContent = 'Copy Code';
+      }, 1500);
+    });
+
+    // Copy Full Invite Link (Top status bar & Pause menu)
     const copyInvite = async () => {
       const token = this.currentInviteToken;
       const code = this.currentInviteCode;
@@ -122,14 +172,14 @@ export class HUDController {
       const btnTop = document.getElementById('btn-copy-invite');
       const btnPause = document.getElementById('btn-pause-copy-invite');
       if (btnTop) btnTop.textContent = 'Copied Link!';
-      if (btnPause) btnPause.textContent = 'Copied Secure Link!';
+      if (btnPause) btnPause.textContent = 'Copied Link!';
       setTimeout(() => {
-        if (btnTop && this.currentInviteCode) btnTop.textContent = `Invite: ${this.currentInviteCode}`;
-        if (btnPause) btnPause.textContent = 'Copy Invite Link';
+        if (btnTop) btnTop.textContent = 'Invite Link';
+        if (btnPause) btnPause.textContent = 'Copy Link';
       }, 1500);
     };
 
-    document.getElementById('btn-copy-invite').addEventListener('click', copyInvite);
+    document.getElementById('btn-copy-invite')?.addEventListener('click', copyInvite);
     document.getElementById('btn-pause-copy-invite')?.addEventListener('click', copyInvite);
 
     // Audio Controls & Volume Sliders
@@ -175,16 +225,38 @@ export class HUDController {
     return !this.panelPause.classList.contains('hidden');
   }
 
+  updateHUDButtonStates() {
+    const isCharOpen = this.panelChar && !this.panelChar.classList.contains('hidden');
+    const isInvOpen = this.panelInv && !this.panelInv.classList.contains('hidden');
+    const isPauseOpen = this.panelPause && !this.panelPause.classList.contains('hidden');
+    document.getElementById('btn-toggle-char')?.classList.toggle('btn-locked-pressed', isCharOpen);
+    document.getElementById('btn-toggle-inv')?.classList.toggle('btn-locked-pressed', isInvOpen);
+    document.getElementById('btn-toggle-menu')?.classList.toggle('btn-locked-pressed', isPauseOpen);
+    this.renderer?.updateHUD({
+      isCharOpen,
+      isInvOpen,
+      isPauseOpen
+    });
+  }
+
   toggleChar() {
     this.panelChar.classList.toggle('hidden');
+    this.updateHUDButtonStates();
   }
 
   toggleInv() {
     this.panelInv.classList.toggle('hidden');
+    this.updateHUDButtonStates();
   }
 
   togglePause() {
+    const isOpening = this.panelPause.classList.contains('hidden');
+    if (isOpening) {
+      this.isInviteCodeRevealed = false;
+      this.updatePauseCodeDisplay();
+    }
     this.panelPause.classList.toggle('hidden');
+    this.updateHUDButtonStates();
   }
 
   handleEscape() {
@@ -192,23 +264,44 @@ export class HUDController {
       this.panelChar.classList.add('hidden');
       this.panelInv.classList.add('hidden');
     } else {
+      const isOpening = this.panelPause.classList.contains('hidden');
+      if (isOpening) {
+        this.isInviteCodeRevealed = false;
+        this.updatePauseCodeDisplay();
+      }
       this.panelPause.classList.toggle('hidden');
+    }
+    this.updateHUDButtonStates();
+  }
+
+  updatePauseCodeDisplay() {
+    const pauseCode = document.getElementById('pause-my-code');
+    const btnReveal = document.getElementById('btn-pause-reveal-code');
+    if (!pauseCode) return;
+    if (this.isInviteCodeRevealed) {
+      pauseCode.textContent = this.currentInviteCode || (this.currentInviteToken ? this.currentInviteToken.slice(0, 8) + '...' : '—');
+      if (btnReveal) btnReveal.textContent = 'Hide';
+    } else {
+      pauseCode.textContent = '••••••';
+      if (btnReveal) btnReveal.textContent = 'Reveal';
     }
   }
 
   setInvite(code, token = '') {
     this.currentInviteCode = code || '';
     this.currentInviteToken = token || '';
+    this.isInviteCodeRevealed = false;
     const invBtn = document.getElementById('btn-copy-invite');
     const pauseShare = document.getElementById('pause-share-box');
-    const pauseCode = document.getElementById('pause-my-code');
     if (this.currentInviteCode || this.currentInviteToken) {
-      invBtn.textContent = `Copy Invite: ${this.currentInviteCode || 'Link'}`;
-      invBtn.classList.remove('hidden');
+      if (invBtn) {
+        invBtn.textContent = 'Invite Link';
+        invBtn.classList.remove('hidden');
+      }
       pauseShare?.classList.remove('hidden');
-      if (pauseCode) pauseCode.textContent = this.currentInviteCode || (this.currentInviteToken.slice(0, 8) + '...');
+      this.updatePauseCodeDisplay();
     } else {
-      invBtn.classList.add('hidden');
+      invBtn?.classList.add('hidden');
       pauseShare?.classList.add('hidden');
     }
   }
@@ -219,35 +312,74 @@ export class HUDController {
 
   setFloorStatus(floor) {
     const el = document.getElementById('status-line');
-    el.textContent = `Floor ${floor} — Sanctum Depths`;
-    el.className = 'text-emerald-400 font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded border border-slate-700';
+    if (el) {
+      el.textContent = `Floor ${floor} — Sanctum Depths`;
+    }
   }
 
   reset() {
     this.lastInvKey = '';
     this.lastVitalsKey = '';
     this.lastPrivRef = null;
+    this.isInviteCodeRevealed = false;
     this.setInviteCode('');
     this.panelChar.classList.add('hidden');
     this.panelInv.classList.add('hidden');
     this.panelPause.classList.add('hidden');
     this.panelDeath.classList.add('hidden');
+    this.updateHUDButtonStates();
     this.audio?.resetMacroState?.();
+    this.renderer?.updateHUD({
+      hp: 100,
+      maxHp: 100,
+      mp: 50,
+      maxMp: 50,
+      isDead: false,
+      potions: 3,
+      xp: 0,
+      nextXp: 100,
+      level: 1,
+      statPoints: 0,
+      isCharOpen: false,
+      isInvOpen: false,
+      isPauseOpen: false
+    });
   }
 
   update({ myP, priv, activeRoomMode }) {
     if (!myP) return;
 
+    this.renderer?.updateHUD({
+      hp: myP.hp,
+      maxHp: myP.maxHp,
+      mp: myP.mp,
+      maxMp: myP.maxMp,
+      isDead: !!myP.isDead,
+      potions: priv?.potions ?? 3,
+      xp: priv?.xp || 0,
+      nextXp: priv?.nextXp || 100,
+      level: priv?.level || 1,
+      statPoints: priv?.statPoints || 0,
+      isCharOpen: this.panelChar && !this.panelChar.classList.contains('hidden'),
+      isInvOpen: this.panelInv && !this.panelInv.classList.contains('hidden'),
+      isPauseOpen: this.panelPause && !this.panelPause.classList.contains('hidden')
+    });
+
     const vitalsKey = `${myP.hp}|${myP.maxHp}|${myP.mp}|${myP.maxMp}|${myP.isDead}|${activeRoomMode}`;
     if (vitalsKey !== this.lastVitalsKey) {
       this.lastVitalsKey = vitalsKey;
-      document.getElementById('hud-hp').textContent = `${myP.hp} / ${myP.maxHp}`;
-      document.getElementById('hud-mp').textContent = `${myP.mp} / ${myP.maxMp}`;
+      const elHp = document.getElementById('hud-hp');
+      if (elHp) elHp.textContent = `${myP.hp} / ${myP.maxHp}`;
+      const elMp = document.getElementById('hud-mp');
+      if (elMp) elMp.textContent = `${myP.mp} / ${myP.maxMp}`;
 
       if (myP.isDead) {
         const isHC = activeRoomMode === GAME_MODES.HARDCORE;
-        document.getElementById('status-line').textContent = isHC ? 'YOU HAVE FALLEN (Permadeath)' : 'You were slain!';
-        document.getElementById('status-line').className = 'text-[10px] font-mono text-rose-400 bg-slate-900 px-2 py-0.5 rounded border border-rose-900';
+        const statusEl = document.getElementById('status-line');
+        if (statusEl) {
+          statusEl.textContent = isHC ? 'YOU HAVE FALLEN (Permadeath)' : 'You were slain!';
+          statusEl.className = 'text-[10px] font-mono text-rose-400 bg-slate-900 px-2 py-0.5 rounded border border-rose-900';
+        }
         document.getElementById('death-title').textContent = isHC ? 'YOU HAVE FALLEN' : 'YOU WERE SLAIN';
         document.getElementById('death-subtitle').textContent = isHC
           ? 'Permadeath — Your deeds are etched in the Hall of Fallen Heroes.'
@@ -264,9 +396,11 @@ export class HUDController {
     if (!priv || priv === this.lastPrivRef) return;
     this.lastPrivRef = priv;
 
-    document.getElementById('hud-pot').textContent = `x${priv.potions ?? 3}`;
+    const elPot = document.getElementById('hud-pot');
+    if (elPot) elPot.textContent = `x${priv.potions ?? 3}`;
     const xpPct = Math.min(100, Math.round(((priv.xp || 0) / (priv.nextXp || 100)) * 100));
-    document.getElementById('hud-xp-bar').style.width = `${xpPct}%`;
+    const elXpBar = document.getElementById('hud-xp-bar');
+    if (elXpBar) elXpBar.style.width = `${xpPct}%`;
 
     const statBadge = document.getElementById('badge-stat-pts');
     if (priv.statPoints > 0) statBadge.classList.remove('hidden');
@@ -306,17 +440,29 @@ export class HUDController {
     if (priv.equipment) {
       for (const slot of ['weapon', 'armor', 'gloves', 'ring']) {
         const el = document.getElementById(`slot-${slot}`);
+        if (!el) continue;
         const item = priv.equipment[slot];
         const nameEl = el.querySelector('.slot-name');
+        const iconEl = el.querySelector('.slot-icon');
         if (item) {
           const col = RARITY_COLORS[item.rarity] || '#FFFFFF';
           el.style.borderColor = col;
-          nameEl.textContent = item.name;
-          nameEl.style.color = col;
+          if (nameEl) {
+            nameEl.textContent = item.name;
+            nameEl.style.color = col;
+          }
+          if (iconEl) {
+            iconEl.src = getBitSpriteDataUrl(getItemSpriteKey(item), 2);
+          }
         } else {
           el.style.borderColor = '';
-          nameEl.textContent = '—';
-          nameEl.style.color = '';
+          if (nameEl) {
+            nameEl.textContent = '—';
+            nameEl.style.color = '';
+          }
+          if (iconEl) {
+            iconEl.src = getBitSpriteDataUrl('slot_' + slot, 2);
+          }
         }
       }
     }
@@ -341,19 +487,25 @@ export class HUDController {
     } else {
       for (const item of inv) {
         const col = RARITY_COLORS[item.rarity] || '#FFFFFF';
+        const sprKey = getItemSpriteKey(item);
+        const sprUrl = getBitSpriteDataUrl(sprKey, 2);
+
         const row = document.createElement('button');
         row.type = 'button';
-        row.className = 'w-full text-left rounded bg-slate-900/90 border border-slate-800 px-2 py-1.5 hover:bg-slate-800 transition space-y-0.5';
+        row.className = 'w-full text-left rounded bg-slate-900/90 border border-slate-800 p-1.5 hover:bg-slate-800 transition flex items-center gap-2';
         row.style.borderLeftWidth = '3px';
         row.style.borderLeftColor = col;
         row.innerHTML = `
-          <div class="flex items-center justify-between gap-1 text-[11px] font-mono">
-            <span class="font-bold truncate" style="color:${col}">${item.name}</span>
-            <span class="text-[9px] text-slate-400 shrink-0">${(item.weight || 1).toFixed(1)} lb</span>
-          </div>
-          <div class="flex items-center justify-between text-[9px] font-mono">
-            <span class="text-emerald-300 truncate">${formatItemStats(item.stats)}</span>
-            <span class="text-slate-500 uppercase ml-1 shrink-0">${item.slot}</span>
+          <img src="${sprUrl}" class="w-6 h-6 pixelated shrink-0 bg-slate-950/80 p-0.5 rounded border border-slate-800" alt="${item.name}">
+          <div class="min-w-0 flex-1 space-y-0.5">
+            <div class="flex items-center justify-between gap-1 text-[11px] font-mono">
+              <span class="font-bold truncate" style="color:${col}">${item.name}</span>
+              <span class="text-[9px] text-slate-400 shrink-0">${(item.weight || 1).toFixed(1)} lb</span>
+            </div>
+            <div class="flex items-center justify-between text-[9px] font-mono">
+              <span class="text-emerald-300 truncate">${formatItemStats(item.stats)}</span>
+              <span class="text-slate-500 uppercase ml-1 shrink-0">${item.slot}</span>
+            </div>
           </div>
         `;
         row.addEventListener('click', () => {

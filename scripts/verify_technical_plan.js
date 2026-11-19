@@ -235,7 +235,7 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   console.log('✔ P3.10 GameRoom lifecycle and interval cleanup verified.');
 }
 
-// 11. Diablo 2 Lobby & Cryptographic Invite Tokens
+// 11. Realm Lobby & Cryptographic Invite Tokens
 {
   const { parseInviteInput } = await import('../client/systems/MenuController.js');
   const room = new GameRoom('TEST_CRYPTO', GAME_MODES.CLASSIC, 0, {});
@@ -251,11 +251,11 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
 
   const summary = room.getSummary();
   console.assert(summary.inviteToken === room.inviteToken, '[P3.11] Summary must include inviteToken');
-  console.assert(Array.isArray(summary.playerList), '[P3.11] Summary must include playerList for D2 lobby');
+  console.assert(Array.isArray(summary.playerList), '[P3.11] Summary must include playerList for realm lobby');
   console.assert(typeof summary.biome === 'string', '[P3.11] Summary must include biome');
 
   room.destroy();
-  console.log('✔ P3.11 Diablo 2 lobby metadata & cryptographic invite links verified.');
+  console.log('✔ P3.11 Realm lobby metadata & cryptographic invite links verified.');
 }
 
 // 12. Low-health audio macro reset & lobby discovery validation

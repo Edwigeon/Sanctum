@@ -49,6 +49,7 @@ function sendPacket(payload) {
 }
 
 const hud = new HUDController({
+  renderer,
   audio,
   sendPacket,
   onExitToMenu: exitToMainMenu
@@ -89,8 +90,11 @@ function exitToMainMenu() {
   renderer.reset();
   input.reset();
   hud.reset();
-  document.getElementById('badge-net').textContent = 'Disconnected';
-  document.getElementById('badge-net').className = 'text-slate-400 font-mono text-[10px]';
+  const netBadge = document.getElementById('badge-net');
+  if (netBadge) {
+    netBadge.textContent = 'Disconnected';
+    netBadge.className = 'text-slate-400 font-mono text-[10px]';
+  }
   menus.showMainMenu();
 }
 
@@ -107,9 +111,15 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
   ws = new WebSocket(`${protocol}//${window.location.host || 'localhost:8080'}`);
 
   ws.onopen = () => {
-    document.getElementById('badge-net').textContent = joinType === 'solo' ? 'Connected (Private)' : 'Connected (Host)';
-    document.getElementById('badge-net').className = 'text-emerald-400 font-mono text-[10px]';
-    document.getElementById('badge-mode').textContent = `${mode} Mode`;
+    const netBadge = document.getElementById('badge-net');
+    if (netBadge) {
+      netBadge.textContent = joinType === 'solo' ? 'Connected (Private)' : 'Connected (Host)';
+      netBadge.className = 'text-emerald-400 font-mono text-[10px]';
+    }
+    const modeBadge = document.getElementById('badge-mode');
+    if (modeBadge) {
+      modeBadge.textContent = `${mode} Mode`;
+    }
     sendPacket({
       type: PACKET_TYPES.JOIN_LOBBY,
       data: {
@@ -166,8 +176,11 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
   };
 
   ws.onclose = () => {
-    document.getElementById('badge-net').textContent = 'Disconnected';
-    document.getElementById('badge-net').className = 'text-rose-400 font-mono text-[10px]';
+    const netBadge = document.getElementById('badge-net');
+    if (netBadge) {
+      netBadge.textContent = 'Disconnected';
+      netBadge.className = 'text-rose-400 font-mono text-[10px]';
+    }
   };
 }
 

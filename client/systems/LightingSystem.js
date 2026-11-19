@@ -31,8 +31,8 @@ for (let band = 0; band <= MAX_LIGHT_BAND; band++) {
       continue;
     }
     const [br, bg, bb] = PALETTE_RGB[idx];
-    const brightness = Math.pow(t, 1.15);
-    const warmGlow = Math.pow(t, 2.2);
+    const brightness = Math.pow(t, 0.92);
+    const warmGlow = Math.pow(t, 2.0);
     const twilightTint = Math.sin(t * Math.PI);
 
     let r = br * brightness + warmGlow * 22 + twilightTint * 16;
@@ -68,13 +68,15 @@ export class LightingSystem {
     this.imageData = new ImageData(viewWidth, viewHeight);
     this.pixelU32 = new Uint32Array(this.imageData.data.buffer);
 
-    // Scratch offscreen canvas (24x24 max entity size) for stamping dither-lit entities onto highResCanvas
+    // Scratch offscreen canvas (up to 64x64 high-resolution entity size) for stamping dither-lit entities onto highResCanvas
     // at exact subpixel screen coordinates with zero internal grid seams and zero low-res snapping jitter
+    this.maxStampW = 64;
+    this.maxStampH = 64;
     this.stampCanvas = document.createElement('canvas');
-    this.stampCanvas.width = 24;
-    this.stampCanvas.height = 24;
+    this.stampCanvas.width = this.maxStampW;
+    this.stampCanvas.height = this.maxStampH;
     this.stampCtx = this.stampCanvas.getContext('2d');
-    this.stampImageData = this.stampCtx.createImageData(24, 24);
+    this.stampImageData = this.stampCtx.createImageData(this.maxStampW, this.maxStampH);
     this.stampU32 = new Uint32Array(this.stampImageData.data.buffer);
 
     this.gridCols = 0;
@@ -104,6 +106,7 @@ export class LightingSystem {
     this.ambientLight = 0.0;
     this.targetAmbientLight = 0.0;
     this.playerTorchEnabled = true;
+    this.flickerTime = 0.0;
     this.staticLights = new Map();
   }
 
@@ -355,44 +358,80 @@ export class LightingSystem {
             const openE = isOpenTile(r, c + 1);
 
             let chosenSpr = wallFrontSpr;
+            let variant = 0;
             let rot = 0;
             let flip = false;
 
-            if (openN && openW) {
-              // Wall on SE corner of void -> facing NW into room
-              chosenSpr = wallCornerSpr;
-              rot = 2;
-            } else if (openN && openE) {
-              // Wall on SW corner of void -> facing NE into room
-              chosenSpr = wallCornerSpr;
-              rot = 3;
-            } else if (openS && openW) {
-              // Wall on NE corner of void -> facing SW into room
-              chosenSpr = wallCornerSpr;
-              rot = 1;
-            } else if (openS && openE) {
-              // Top-left interior room corner (wall on NW corner of room, facing SE)
-              chosenSpr = wallCornerSpr;
-              rot = 0;
-            } else if (openN) {
-              // Wall below a room (facing North into the floor)
-              chosenSpr = wallTopSpr;
-              flip = wallTopSpr.allowFlip && (((r * 19 + c * 43) & 1) !== 0);
+            // Smart Wall Selection & Zero-Rotation Corners:
+            // Masonry courses ALWAYS remain horizontal (rot = 0).
+            // Convex Corners: Left Pier (var 0), Right Pier (var 1), Bottom-Left Pier (var 2), Bottom-Right Pier (var 3).
+            // Concave Corners: Top-Left Interior (var 4), Top-Right Interior (var 5), Bottom-Left Interior (var 6), Bottom-Right Interior (var 7).
+            if (openS && openE && !openN && !openW) {
+              // Left Door Pier / Convex corner facing South and East
+              chosenSpr = wallCornerSpr || wallFrontSpr;
+              variant = 0;
+            } else if (openS && openW && !openN && !openE) {
+              // Right Door Pier / Convex corner facing South and West
+              chosenSpr = wallCornerSpr || wallFrontSpr;
+              variant = 1;
+            } else if (openN && openE && !openS && !openW) {
+              // Bottom-Left Door Pier / Convex corner facing North and East
+              chosenSpr = wallCornerSpr || wallTopSpr;
+              variant = 2;
+            } else if (openN && openW && !openS && !openE) {
+              // Bottom-Right Door Pier / Convex corner facing North and West
+              chosenSpr = wallCornerSpr || wallTopSpr;
+              variant = 3;
+            } else if (openN && openS) {
+              // Wall separating two rooms vertically (front wall with open floor on both sides)
+              chosenSpr = wallFrontSpr;
+              variant = (r * 13 + c * 29) % chosenSpr.frames.length;
             } else if (openS) {
               // Wall above a room (facing South into the floor - classic front face)
               chosenSpr = wallFrontSpr;
-              flip = wallFrontSpr.allowFlip && (((r * 19 + c * 43) & 1) !== 0);
-            } else if (openW) {
-              // Wall on right-hand side of floor -> faces West into room
-              chosenSpr = wallSideSpr;
-              flip = false; // Right rim 'dd' faces inward west toward room
+              variant = (r * 13 + c * 29) % chosenSpr.frames.length;
+            } else if (openN) {
+              // Wall below a room (facing North into the floor - horizontal top cap)
+              chosenSpr = wallTopSpr;
+              variant = (r * 13 + c * 29) % chosenSpr.frames.length;
             } else if (openE) {
               // Wall on left-hand side of floor -> faces East into room
               chosenSpr = wallSideSpr;
-              flip = true; // Flip so 'dd' rim faces east into room
+              variant = (r * 13 + c * 29) % chosenSpr.frames.length;
+              flip = false; // Shadow on left (x=0..3), stone face, bevel on right (x=10..11)
+            } else if (openW) {
+              // Wall on right-hand side of floor -> faces West into room
+              chosenSpr = wallSideSpr;
+              variant = (r * 13 + c * 29) % chosenSpr.frames.length;
+              flip = true; // Flipped: bevel on left (x=0..1), stone face, shadow on right (x=8..11)
             } else {
-              // Fully interior hidden wall or void border
-              chosenSpr = wallFrontSpr;
+              // Check Concave (Interior Room) Corners
+              const openSE = isOpenTile(r + 1, c + 1);
+              const openSW = isOpenTile(r + 1, c - 1);
+              const openNE = isOpenTile(r - 1, c + 1);
+              const openNW = isOpenTile(r - 1, c - 1);
+
+              if (openSE) {
+                // Top-Left inside corner of a room: front wall meets left side wall
+                chosenSpr = wallCornerSpr || wallFrontSpr;
+                variant = 4;
+              } else if (openSW) {
+                // Top-Right inside corner of a room: front wall meets right side wall
+                chosenSpr = wallCornerSpr || wallFrontSpr;
+                variant = 5;
+              } else if (openNE) {
+                // Bottom-Left inside corner of a room: bottom cap wall meets left side wall
+                chosenSpr = wallCornerSpr || wallTopSpr;
+                variant = 6;
+              } else if (openNW) {
+                // Bottom-Right inside corner of a room: bottom cap wall meets right side wall
+                chosenSpr = wallCornerSpr || wallTopSpr;
+                variant = 7;
+              } else {
+                // Fully interior hidden wall or void border
+                chosenSpr = wallFrontSpr;
+                variant = 0;
+              }
             }
 
             if (explicitRot >= 0) {
@@ -400,8 +439,9 @@ export class LightingSystem {
               flip = (explicitRot & 4) !== 0;
             }
 
-            const variant = (r * 13 + c * 29) % chosenSpr.frames.length;
-            stampTileSprite(tx, ty, chosenSpr, variant, rot, flip);
+            const frameCount = chosenSpr.frames?.length || chosenSpr.variants?.length || 1;
+            const finalVar = variant % frameCount;
+            stampTileSprite(tx, ty, chosenSpr, finalVar, rot, flip);
           } else {
             fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_GRAY);
             fillRectIdx(tx, ty, ts - 1, 2, PALETTE_INDEX.INDIGO);
@@ -427,14 +467,14 @@ export class LightingSystem {
             const variant = (r * 13 + c * 29) % floorSpr.frames.length;
             stampTileSprite(tx, ty, floorSpr, variant, rot, flip);
           } else {
-            fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_BLUE);
+            fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.INDIGO);
             const hash = (r * 37 + c * 73) & 7;
             if (hash === 0) {
               fillRectIdx(tx + 2, ty + 2, 3, 1, PALETTE_INDEX.DARK_GRAY);
             } else if (hash === 3) {
-              fillRectIdx(tx + 7, ty + 8, 2, 1, PALETTE_INDEX.DARK_GRAY);
+              fillRectIdx(tx + 7, ty + 8, 2, 1, PALETTE_INDEX.DARK_BLUE);
             } else if (hash === 5) {
-              fillRectIdx(tx + 4, ty + 6, 1, 1, PALETTE_INDEX.INDIGO);
+              fillRectIdx(tx + 4, ty + 6, 1, 1, PALETTE_INDEX.BLACK);
             }
           }
         }
@@ -595,6 +635,8 @@ export class LightingSystem {
     }
 
     const lights = [];
+    this.flickerTime = (this.flickerTime || 0) + (dt || 0.016);
+    const ft = this.flickerTime;
 
     // 1. Players & Co-op Allies (default warm ORANGE torchlight, or custom p.lightColor)
     for (let i = 0; i < interp.players.length; i++) {
@@ -607,11 +649,28 @@ export class LightingSystem {
         continue;
       }
       if (p.torchEnabled === false) continue;
+
+      // Subtle organic flame flicker (multi-harmonic non-repeating sine wander)
+      const pt = ft + i * 2.37;
+      const f1 = Math.sin(pt * 6.8);
+      const f2 = Math.sin(pt * 13.4 + 1.4);
+      const f3 = Math.sin(pt * 25.1 + 3.1);
+      const flicker = f1 * 0.52 + f2 * 0.32 + f3 * 0.16;
+
+      const baseRadius = p.lightRadius || (isMe ? 116 : 96);
+      const baseIntensity = p.lightIntensity || 8.8;
+      const radius = Math.max(20, baseRadius + flicker * 3.2);
+      const intensity = Math.max(2.0, baseIntensity + flicker * 0.35);
+
+      // Micro-sway of the torch flame position (< 0.55px) for authentic living shadows
+      const swayX = Math.cos(pt * 4.3) * 0.55;
+      const swayY = Math.sin(pt * 5.7) * 0.55;
+
       lights.push({
-        x: p.rx,
-        y: p.ry,
-        radius: p.lightRadius || (isMe ? 100 : 84),
-        intensity: p.lightIntensity || 8.6,
+        x: p.rx + swayX,
+        y: p.ry + swayY,
+        radius,
+        intensity,
         rgb,
         isColored: p.lightColor !== undefined && p.lightColor !== PALETTE_INDEX.ORANGE && p.lightColor !== 'ORANGE',
         los: true
@@ -652,11 +711,13 @@ export class LightingSystem {
     // 4. Static & Interactive World Objects (Stairs, Shrines, Braziers, Portals)
     for (const s of this.staticLights.values()) {
       if (!s.enabled) continue;
+      // Gentle subtle breathing on static light sources
+      const sFlicker = Math.sin(ft * 3.7 + s.x * 0.1 + s.y * 0.2) * 0.25;
       lights.push({
         x: s.x,
         y: s.y,
-        radius: s.radius,
-        intensity: s.intensity,
+        radius: s.radius + sFlicker * 1.5,
+        intensity: s.intensity + sFlicker * 0.15,
         rgb: s.rgb,
         isColored: s.isColored,
         los: s.los !== false
@@ -705,7 +766,7 @@ export class LightingSystem {
           if (distSq >= rSq) continue;
 
           const norm = 1.0 - Math.sqrt(distSq) / rad;
-          const rawContrib = L.intensity * Math.pow(norm, 1.55);
+          const rawContrib = L.intensity * Math.pow(norm, 1.32);
           const idx = rowOffset + c;
           if (rawContrib <= 0.05) continue;
 
@@ -795,10 +856,32 @@ export class LightingSystem {
       return baseU32;
     }
 
-    const r0Col = baseU32 & 255;
-    const g0Col = (baseU32 >> 8) & 255;
-    const b0Col = (baseU32 >> 16) & 255;
-    return packABGR(r0Col + cr, g0Col + cg, b0Col + cb);
+    let r0Col = baseU32 & 255;
+    let g0Col = (baseU32 >> 8) & 255;
+    let b0Col = (baseU32 >> 16) & 255;
+
+    // Retrieve unlit base palette color
+    const [br0, bg0, bb0] = PALETTE_RGB[basePalIdx];
+
+    // Dampen artificial warm torch glow when illuminated by cool colored light (e.g. blue Spark)
+    if (cb > cr + 15) {
+      const coolFactor = Math.min(1.0, (cb - cr) / 80.0);
+      r0Col = Math.max(br0 * 0.2, r0Col - coolFactor * 18) | 0;
+      g0Col = Math.max(bg0 * 0.2, g0Col - coolFactor * 6) | 0;
+    }
+
+    // Chromatic diffuse modulation: surface reflects light matching its own pigmentation,
+    // preserving rich saturation instead of washing out into flat pastel chalk
+    const effR = cr * (0.32 + 0.68 * (br0 / 255.0));
+    const effG = cg * (0.32 + 0.68 * (bg0 / 255.0));
+    const effB = cb * (0.32 + 0.68 * (bb0 / 255.0));
+
+    // Soft-add highlight compression prevents high-end clipping blowout to flat white
+    const r = Math.min(255, (r0Col + effR * Math.max(0.18, 1.0 - r0Col / 270.0)) | 0);
+    const g = Math.min(255, (g0Col + effG * Math.max(0.18, 1.0 - g0Col / 270.0)) | 0);
+    const b = Math.min(255, (b0Col + effB * Math.max(0.18, 1.0 - b0Col / 270.0)) | 0);
+
+    return packABGR(r, g, b);
   }
 
   /**
@@ -807,12 +890,13 @@ export class LightingSystem {
    */
   drawLitEntityStamp(hCtx, { wx, wy, ox, oy, w, h, rects, camX, camY, scale }) {
     if (!this.lightGrid) return;
-    const sw = Math.min(24, w);
-    const sh = Math.min(24, h);
+    const sw = Math.min(this.maxStampW, w);
+    const sh = Math.min(this.maxStampH, h);
     const buf = this.stampU32;
+    const stride = this.maxStampW;
 
     for (let py = 0; py < sh; py++) {
-      buf.fill(0, py * 24, py * 24 + sw);
+      buf.fill(0, py * stride, py * stride + sw);
     }
 
     for (let ri = 0; ri < rects.length; ri++) {
@@ -821,12 +905,12 @@ export class LightingSystem {
       const yEnd = Math.min(sh, r.ry + r.rh);
       for (let py = Math.max(0, r.ry); py < yEnd; py++) {
         const worldY = wy + oy + py;
-        const rowOff = py * 24;
+        const rowOff = py * stride;
         for (let px = Math.max(0, r.rx); px < xEnd; px++) {
           const worldX = wx + ox + px;
           const u32 = this.sampleLitPixelU32(worldX, worldY, r.palIdx);
           if (r.palIdx === PALETTE_INDEX.BLACK) {
-            if (this.sampleLightAtWorld(worldX, worldY) > 0.25) {
+            if (this.sampleLightAtWorld(worldX, worldY) > 0.12) {
               buf[rowOff + px] = SHADE_U32[0][0];
             }
           } else if (u32 !== SHADE_U32[0][0]) {
@@ -843,9 +927,9 @@ export class LightingSystem {
   }
 
   /**
-   * Stamps a palette-indexed SpriteRegistry frame (with optional flipX and rotation) into the 24x24
-   * scratch ImageData buffer using per-pixel Bayer-dithered + additive colored lighting, then blits
-   * onto hCtx at exact subpixel screen coordinates.
+   * Stamps a palette-indexed SpriteRegistry frame (with optional flipX and rotation) into the scratch
+   * ImageData buffer using per-pixel Bayer-dithered + additive colored lighting, then blits onto hCtx
+   * at exact subpixel screen coordinates. Supports scaled high-res sprites (32x32, 32x64) with 2x subpixel density.
    */
   drawLitSpriteStamp(hCtx, { sprite, state = 'idle', frameIdx = 0, wx, wy, camX, camY, scale, flipX = false, rot90 = 0, angleRad = 0 }) {
     if (!this.lightGrid || !sprite) return;
@@ -853,15 +937,25 @@ export class LightingSystem {
     const frames = st?.frames || sprite.frames;
     if (!frames || frames.length === 0) return;
     const frame = frames[frameIdx % frames.length];
-    const sw = Math.min(24, sprite.w);
-    const sh = Math.min(24, sprite.h);
-    const ox = -sprite.anchorX;
-    const oy = -sprite.anchorY;
+    const sw = Math.min(this.maxStampW, sprite.w);
+    const sh = Math.min(this.maxStampH, sprite.h);
+    const stride = this.maxStampW;
     const buf = this.stampU32;
     const blackU32 = SHADE_U32[0][0];
 
+    // Compute scaled destination size & offsets
+    // Sprites with 32x32 or 32x64 default to renderScale: 0.5 (scaled down to 16x16 or 16x32 world units)
+    // allowing double retro pixel density with crisp subpixel lighting & zero collision desync
+    const renderScale = sprite.renderScale ?? (sprite.targetW ? sprite.targetW / sw : ((sw >= 32 || sh >= 32) ? 0.5 : 1));
+    const destW = sw * renderScale;
+    const destH = sh * renderScale;
+    const anchorX = sprite.anchorX != null ? sprite.anchorX : Math.floor(sw / 2);
+    const anchorY = sprite.anchorY != null ? sprite.anchorY : Math.floor(sh * 0.75);
+    const ox = -anchorX * renderScale;
+    const oy = -anchorY * renderScale;
+
     for (let py = 0; py < sh; py++) {
-      buf.fill(0, py * 24, py * 24 + sw);
+      buf.fill(0, py * stride, py * stride + sw);
     }
 
     const r90 = rot90 & 3;
@@ -872,8 +966,8 @@ export class LightingSystem {
     const cy = (sh - 1) * 0.5;
 
     for (let py = 0; py < sh; py++) {
-      const worldY = wy + oy + py;
-      const rowOff = py * 24;
+      const worldY = wy + oy + (py * renderScale);
+      const rowOff = py * stride;
       for (let px = 0; px < sw; px++) {
         let sx = flipX ? (sw - 1 - px) : px;
         let sy = py;
@@ -899,9 +993,9 @@ export class LightingSystem {
         const palIdx = frame[sy * sprite.w + sx];
         if (palIdx === 255) continue;
 
-        const worldX = wx + ox + px;
+        const worldX = wx + ox + (px * renderScale);
         if (palIdx === PALETTE_INDEX.BLACK) {
-          if (this.sampleLightAtWorld(worldX, worldY) > 0.25) {
+          if (this.sampleLightAtWorld(worldX, worldY) > 0.12) {
             buf[rowOff + px] = blackU32;
           }
         } else {
@@ -916,7 +1010,7 @@ export class LightingSystem {
     this.stampCtx.putImageData(this.stampImageData, 0, 0, 0, 0, sw, sh);
     const screenX = (wx + ox - camX) * scale;
     const screenY = (wy + oy - camY) * scale;
-    hCtx.drawImage(this.stampCanvas, 0, 0, sw, sh, screenX, screenY, sw * scale, sh * scale);
+    hCtx.drawImage(this.stampCanvas, 0, 0, sw, sh, screenX, screenY, destW * scale, destH * scale);
   }
 
   /**
@@ -1032,7 +1126,11 @@ export class LightingSystem {
             const g0Col = (baseU32 >> 8) & 255;
             const b0Col = (baseU32 >> 16) & 255;
 
-            outU32[outRow + sx] = packABGR(r0Col + cr, g0Col + cg, b0Col + cb);
+            const r = Math.min(255, (r0Col + cr * Math.max(0.2, 1.0 - r0Col / 280.0)) | 0);
+            const g = Math.min(255, (g0Col + cg * Math.max(0.2, 1.0 - g0Col / 280.0)) | 0);
+            const b = Math.min(255, (b0Col + cb * Math.max(0.2, 1.0 - b0Col / 280.0)) | 0);
+
+            outU32[outRow + sx] = packABGR(r, g, b);
           }
         }
       }

@@ -89,7 +89,7 @@ export class MenuController {
       bar.classList.remove('hidden');
       document.getElementById('auth-user-label').textContent = this.currentAccount.username;
       const daysLeft = Math.max(0, Math.ceil((this.currentAccount.expiresAt - Date.now()) / (24 * 60 * 60 * 1000)));
-      document.getElementById('auth-ttl-label').textContent = this.currentAccount.role === 'moderator' ? 'Moderator (Exempt)' : `Retention: ${daysLeft}d`;
+      document.getElementById('auth-ttl-label').textContent = this.currentAccount.role === 'moderator' ? 'Realm Moderator' : 'Account Active';
       if (this.currentAccount.role === 'moderator') modBtn.classList.remove('hidden');
       else modBtn.classList.add('hidden');
     } else {
@@ -531,22 +531,24 @@ export class MenuController {
       card.addEventListener('click', () => {
         this.selectedClass = card.dataset.class;
         document.querySelectorAll('.class-card').forEach(c => {
+          c.classList.remove('btn-locked-pressed');
           c.className = 'class-card text-left p-2 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-slate-600 transition';
         });
-        card.className = 'class-card text-left p-2 rounded-lg border-2 border-amber-500 bg-amber-950/20 transition';
+        card.classList.add('btn-locked-pressed');
+        card.className = 'class-card btn-locked-pressed text-left p-2 rounded-lg border-2 border-amber-500 bg-amber-950/20 transition';
       });
     });
 
     this.btnClassic.addEventListener('click', () => {
       this.currentMode = GAME_MODES.CLASSIC;
-      this.btnClassic.className = 'border border-indigo-500 bg-indigo-950/40 text-indigo-200 py-1.5 rounded text-center font-bold';
+      this.btnClassic.className = 'btn-locked-pressed border border-amber-500 bg-amber-950/40 text-amber-200 py-1.5 rounded text-center font-bold';
       this.btnHardcore.className = 'border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded text-center font-bold hover:border-rose-900 transition';
     });
 
     this.btnHardcore.addEventListener('click', () => {
       this.currentMode = GAME_MODES.HARDCORE;
-      this.btnHardcore.className = 'border border-rose-600 bg-rose-950/40 text-rose-200 py-1.5 rounded text-center font-bold';
-      this.btnClassic.className = 'border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded text-center font-bold hover:border-indigo-900 transition';
+      this.btnHardcore.className = 'btn-locked-pressed border border-rose-600 bg-rose-950/40 text-rose-200 py-1.5 rounded text-center font-bold';
+      this.btnClassic.className = 'border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded text-center font-bold hover:border-amber-900 transition';
     });
 
     document.getElementById('btn-create-char').addEventListener('click', async () => {
@@ -601,7 +603,7 @@ export class MenuController {
       this.startLobbyPolling();
     });
 
-    // Diablo 2 Tab Switching
+    // Realm Lobby Tab Switching
     const tabJoin = document.getElementById('tab-btn-join');
     const tabCreate = document.getElementById('tab-btn-create');
     const contentJoin = document.getElementById('tab-join-content');

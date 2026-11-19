@@ -4,18 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>PROJECT: SANCTUM</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    * {
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    canvas.pixelated {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body
@@ -37,24 +26,24 @@
         <div
           class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-950/80 border border-indigo-800/60 text-[10px] font-mono text-indigo-300 mb-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          v0.2.0-WIP • 15 Hz Authoritative
+          Sanctum • Early Access
         </div>
         <h1
           class="font-black text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 drop-shadow">
           SANCTUM
         </h1>
-        <p class="text-xs text-slate-400 font-mono">Small. Fast. Efficient. Moddable.</p>
+        <p class="text-xs text-slate-400">Descend into the darkness of the forgotten cathedral.</p>
       </div>
 
       <div id="auth-status-bar"
         class="hidden bg-slate-950/80 border border-slate-800 rounded-lg px-3 py-2 text-[11px] font-mono flex items-center justify-between gap-2">
         <div class="text-left">
           <div class="text-emerald-300 font-bold" id="auth-user-label">User</div>
-          <div class="text-[10px] text-slate-400" id="auth-ttl-label">Retention: 180d</div>
+          <div class="text-[10px] text-slate-400" id="auth-ttl-label">Account Active</div>
         </div>
         <div class="flex items-center gap-2">
           <a id="btn-open-mod" href="/mod" target="_blank"
-            class="hidden px-2 py-1 rounded bg-amber-950/60 border border-amber-700/60 text-amber-300 hover:bg-amber-900/60 text-[10px]">Mod
+            class="hidden px-2 py-1 rounded bg-amber-950/60 border border-amber-700/60 text-amber-300 hover:bg-amber-900/60 text-[10px]">Realm
             Portal</a>
           <button id="btn-logout"
             class="px-2 py-1 rounded bg-slate-800 hover:bg-rose-950 border border-slate-700 text-slate-300 text-[10px]">Logout</button>
@@ -74,11 +63,13 @@
 
       <div id="main-menu-controls"
         class="hidden text-left bg-slate-950/90 border border-slate-800 rounded-lg p-3.5 text-[11px] font-mono text-slate-300 space-y-1.5">
-        <div><strong class="text-amber-400">LMB (Click/Hold):</strong> Move, Pursue &amp; Auto-Attack</div>
+        <div><strong class="text-amber-400">LMB (Click/Hold):</strong> Move, Pursue &amp; Attack</div>
         <div><strong class="text-cyan-400">RMB:</strong> Cast Spark Spell</div>
         <div><strong class="text-rose-400">1:</strong> Drink Health Potion</div>
-        <div><strong class="text-emerald-400">C / I / ESC:</strong> Character Sheet / Inventory / Menu</div>
-        <div><strong class="text-slate-300">M:</strong> Toggle Audio Mute</div>
+        <div><strong class="text-emerald-400">C:</strong> Character Sheet &amp; Attributes</div>
+        <div><strong class="text-indigo-400">I:</strong> Inventory &amp; Equipment</div>
+        <div><strong class="text-slate-300">ESC:</strong> Game Menu &amp; Audio</div>
+        <div><strong class="text-slate-300">M:</strong> Toggle Sound</div>
       </div>
     </div>
   </div>
@@ -90,7 +81,7 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
         <div>
           <h2 class="font-bold text-base tracking-wider text-amber-300">SANCTUM ACCOUNT</h2>
-          <p class="text-[10px] text-slate-400 font-mono">Saves retained 6 months per login</p>
+          <p class="text-[10px] text-slate-400 font-mono">Your heroes and progress are saved online</p>
         </div>
         <button id="btn-auth-back"
           class="text-xs font-mono text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-800">←
@@ -173,7 +164,7 @@
 
           <div class="grid grid-cols-3 gap-2" id="class-grid">
             <button type="button" data-class="VANGUARD"
-              class="class-card text-left p-2 rounded-lg border-2 border-amber-500 bg-amber-950/20 transition">
+              class="class-card btn-locked-pressed text-left p-2 rounded-lg border-2 border-amber-500 bg-amber-950/20 transition">
               <div class="font-bold text-amber-300">Vanguard</div>
               <div class="text-[9px] text-slate-400">Melee</div>
               <div class="text-[9px] font-mono text-slate-300 mt-0.5">MGT 16</div>
@@ -196,7 +187,7 @@
             <label class="block text-slate-400 mb-1">Game Mode</label>
             <div class="grid grid-cols-2 gap-2">
               <button id="btn-mode-classic" type="button"
-                class="border border-indigo-500 bg-indigo-950/40 text-indigo-200 py-1.5 rounded text-center font-bold">
+                class="btn-locked-pressed border border-amber-500 bg-amber-950/40 text-amber-200 py-1.5 rounded text-center font-bold">
                 Classic<span class="block text-[9px] font-normal text-slate-400">Normal Respawn</span>
               </button>
               <button id="btn-mode-hardcore" type="button"
@@ -215,15 +206,15 @@
     </div>
   </div>
 
-  <!-- MULTIPLAYER LOBBY BROWSER (DIABLO 2 BATTLE.NET REALM STYLE) -->
+  <!-- MULTIPLAYER LOBBY BROWSER (REALM LOBBY STYLE) -->
   <div id="screen-lobby"
     class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-3">
     <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-4xl w-full shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
-      <!-- TOP D2 LOBBY HEADER -->
+      <!-- TOP REALM LOBBY HEADER -->
       <div class="flex items-center justify-between border-b border-slate-800 px-5 py-3 bg-slate-950/80 shrink-0">
         <div class="flex items-center gap-3">
           <div class="font-bold text-sm tracking-widest text-amber-300 font-mono flex items-center gap-1.5">
-            <span>⚔</span> SANCTUM REALM • BATTLE LOBBY
+            <span>⚔</span> SANCTUM REALMS • MULTIPLAYER LOBBY
           </div>
           <span id="lobby-mode-badge" class="px-2 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50 bg-indigo-950/60 text-indigo-300">Classic</span>
         </div>
@@ -236,7 +227,7 @@
         </div>
       </div>
 
-      <!-- D2 TABS: JOIN GAME / CREATE GAME -->
+      <!-- REALM TABS: JOIN GAME / CREATE GAME -->
       <div class="flex border-b border-slate-800 bg-slate-950/40 text-xs font-mono font-bold shrink-0">
         <button id="tab-btn-join" type="button"
           class="flex-1 py-2.5 border-b-2 border-amber-500 text-amber-300 bg-slate-900/90 transition text-center flex items-center justify-center gap-1.5">
@@ -253,7 +244,7 @@
 
       <!-- TAB CONTENT CONTAINER -->
       <div class="p-5 flex-1 overflow-y-auto">
-        <!-- TAB 1: JOIN GAME (DIABLO 2 DUAL PANE) -->
+        <!-- TAB 1: JOIN GAME (DUAL PANE) -->
         <div id="tab-join-content" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
             <!-- LEFT PANE: LIVE GAME LIST (7 COLS) -->
@@ -292,7 +283,7 @@
                   <span id="detail-game-lock" class="hidden text-amber-400 text-sm">🔒</span>
                 </div>
 
-                <!-- PLAYERS IN GAME (DIABLO 2 STYLE) -->
+                <!-- PLAYERS IN GAME -->
                 <div>
                   <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
                     <span>Heroes in Realm</span>
@@ -319,15 +310,15 @@
             </div>
           </div>
 
-          <!-- BOTTOM BAR: CRYPTOGRAPHIC INVITE LINK / TOKEN JOIN -->
+          <!-- BOTTOM BAR: REALM INVITE CODE / LINK JOIN -->
           <div class="pt-3 border-t border-slate-800 bg-slate-950/40 p-3 rounded-lg border border-slate-800 flex flex-col sm:flex-row items-center gap-2.5 text-xs font-mono">
             <div class="shrink-0 flex items-center gap-1.5 text-amber-300 font-bold">
-              <span>🗝</span> Invite Link or Token:
+              <span>🗝</span> Realm Invite Link or Code:
             </div>
-            <input id="inp-invite-code" type="text" placeholder="Paste full invite URL or cryptographic token..."
+            <input id="inp-invite-code" type="text" placeholder="Paste realm invite link or code..."
               class="flex-1 w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 font-mono focus:outline-none focus:border-amber-500">
             <button id="btn-join-invite" type="button"
-              class="w-full sm:w-auto px-4 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold whitespace-nowrap transition">
+              class="w-full sm:w-auto px-4 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold whitespace-nowrap transition cursor-pointer">
               Accept & Enter
             </button>
           </div>
@@ -336,7 +327,7 @@
         <!-- TAB 2: CREATE GAME PANEL -->
         <div id="tab-create-content" class="hidden max-w-lg mx-auto bg-slate-950/70 border border-slate-800 rounded-lg p-5 space-y-3.5 text-xs font-mono">
           <div class="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold border-b border-slate-800 pb-2">
-            Create Sanctuary Realm
+            Create Sanctum Realm
           </div>
           <div>
             <label class="block text-slate-300 mb-1">Game Name</label>
@@ -367,46 +358,17 @@
               </div>
             </div>
             <div class="text-[10px] text-slate-400 col-span-2">
-              Listed realms appear in the Diablo 2 realm browser for this mode. Set a password above to protect with a key.
+              Public realms appear in the realm browser for anyone to join. Add a password to restrict access.
             </div>
           </div>
           <button id="btn-enter-multi" type="button"
-            class="w-full bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-lg shadow-xl transition mt-2 uppercase tracking-wider">
-            Forge & Enter Game
+            class="w-full bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-lg shadow-xl transition mt-2 uppercase tracking-wider cursor-pointer">
+            Create & Enter Realm
           </button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- TOP STATUS BAR -->
-  <header
-    class="w-full max-w-6xl flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800 text-xs shrink-0">
-    <div class="flex items-center gap-3">
-      <span class="font-bold tracking-wider text-amber-300">SANCTUM</span>
-      <span id="badge-mode"
-        class="bg-indigo-900/60 text-indigo-300 px-1.5 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50">Classic
-        Mode</span>
-      <span id="badge-net" class="text-slate-400 font-mono text-[10px]">Disconnected</span>
-      <span id="status-line"
-        class="text-emerald-400 font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded border border-slate-700">Floor
-        1</span>
-      <button id="btn-copy-invite" type="button"
-        class="hidden text-[10px] font-mono bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded border border-amber-700/60 transition"
-        title="Copy Invite Link">Invite: —</button>
-      <button id="btn-quick-mute" type="button"
-        class="text-[10px] font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 transition flex items-center gap-1"
-        title="Toggle Audio Mute (Key: M)"><span id="icon-quick-mute">🔊</span><span id="label-quick-mute">Sound</span></button>
-    </div>
-    <div class="text-slate-400 font-mono text-[11px] hidden sm:flex gap-3">
-      <span><strong class="text-amber-400">LMB:</strong> Move / Attack / Loot</span>
-      <span><strong class="text-cyan-400">RMB:</strong> Spark</span>
-      <span><strong class="text-rose-400">1:</strong> Potion</span>
-      <span><strong class="text-emerald-400">C:</strong> Char</span>
-      <span><strong class="text-indigo-400">I:</strong> Inv</span>
-      <span><strong class="text-slate-300">M:</strong> Mute</span>
-    </div>
-  </header>
 
   <!-- GAME VIEWPORT -->
   <main class="flex-1 w-full flex items-center justify-center min-h-0 overflow-hidden">
@@ -419,9 +381,15 @@
         class="pixelated absolute top-0 left-0 z-[8] origin-top-left pointer-events-none"></canvas>
       <canvas id="highResCanvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
 
+      <!-- IN-GAME FLOOR BADGE -->
+      <div class="absolute top-2.5 left-3 z-20 pointer-events-none">
+        <span id="status-line"
+          class="text-emerald-400 font-mono text-[10px] bg-slate-950/70 border border-slate-800/80 px-2 py-0.5 rounded backdrop-blur-sm shadow">Floor 1</span>
+      </div>
+
       <!-- CHARACTER SHEET PANEL (C) -->
       <aside id="panel-char"
-        class="hidden absolute top-3 left-3 bottom-20 w-64 z-30 bg-slate-950/92 border border-amber-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-between text-xs cursor-default">
+        class="hidden absolute top-3 left-3 w-72 max-h-[calc(100%-88px)] z-30 bg-slate-950/95 border border-amber-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-start text-xs cursor-default">
         <div class="space-y-2.5 overflow-y-auto pr-1">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <div>
@@ -449,25 +417,37 @@
             </div>
             <div class="space-y-1 font-mono text-[11px]" id="char-attrs">
               <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
-                <span class="text-rose-300">Might</span>
+                <div class="flex items-center gap-2">
+                  <img id="icon-stat-might" class="w-4 h-4 pixelated shrink-0" alt="Might">
+                  <span class="text-rose-300">Might</span>
+                </div>
                 <div class="flex items-center gap-2"><span id="stat-might">16</span><button data-stat="might"
                     class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button>
                 </div>
               </div>
               <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
-                <span class="text-cyan-300">Focus</span>
+                <div class="flex items-center gap-2">
+                  <img id="icon-stat-focus" class="w-4 h-4 pixelated shrink-0" alt="Focus">
+                  <span class="text-cyan-300">Focus</span>
+                </div>
                 <div class="flex items-center gap-2"><span id="stat-focus">8</span><button data-stat="focus"
                     class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button>
                 </div>
               </div>
               <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
-                <span class="text-emerald-300">Agility</span>
+                <div class="flex items-center gap-2">
+                  <img id="icon-stat-agility" class="w-4 h-4 pixelated shrink-0" alt="Agility">
+                  <span class="text-emerald-300">Agility</span>
+                </div>
                 <div class="flex items-center gap-2"><span id="stat-agility">10</span><button data-stat="agility"
                     class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button>
                 </div>
               </div>
               <div class="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded">
-                <span class="text-amber-300">Vitality</span>
+                <div class="flex items-center gap-2">
+                  <img id="icon-stat-vitality" class="w-4 h-4 pixelated shrink-0" alt="Vitality">
+                  <span class="text-amber-300">Vitality</span>
+                </div>
                 <div class="flex items-center gap-2"><span id="stat-vitality">16</span><button data-stat="vitality"
                     class="btn-alloc-stat hidden px-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded text-[10px] font-bold">+</button>
                 </div>
@@ -492,7 +472,7 @@
 
       <!-- INVENTORY & EQUIPMENT PANEL (I) -->
       <aside id="panel-inv"
-        class="hidden absolute top-3 right-3 bottom-20 w-72 z-30 bg-slate-950/92 border border-indigo-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-between text-xs cursor-default">
+        class="hidden absolute top-3 right-3 w-80 max-h-[calc(100%-88px)] z-30 bg-slate-950/92 border border-indigo-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-start text-xs cursor-default">
         <div class="space-y-3 overflow-y-auto pr-1">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <span class="font-bold text-indigo-300 text-sm tracking-wide">INVENTORY</span>
@@ -503,21 +483,33 @@
           <div>
             <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Equipped Gear</div>
             <div class="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
-              <div id="slot-weapon" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
-                <div class="text-[9px] text-slate-500 uppercase">Weapon</div>
-                <div class="slot-name text-slate-400 truncate">—</div>
+              <div id="slot-weapon" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Weapon">
+                <div class="min-w-0 flex-1">
+                  <div class="text-[9px] text-slate-500 uppercase">Weapon</div>
+                  <div class="slot-name text-slate-400 truncate">—</div>
+                </div>
               </div>
-              <div id="slot-armor" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
-                <div class="text-[9px] text-slate-500 uppercase">Armor</div>
-                <div class="slot-name text-slate-400 truncate">—</div>
+              <div id="slot-armor" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Armor">
+                <div class="min-w-0 flex-1">
+                  <div class="text-[9px] text-slate-500 uppercase">Armor</div>
+                  <div class="slot-name text-slate-400 truncate">—</div>
+                </div>
               </div>
-              <div id="slot-gloves" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
-                <div class="text-[9px] text-slate-500 uppercase">Gloves</div>
-                <div class="slot-name text-slate-400 truncate">—</div>
+              <div id="slot-gloves" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Gloves">
+                <div class="min-w-0 flex-1">
+                  <div class="text-[9px] text-slate-500 uppercase">Gloves</div>
+                  <div class="slot-name text-slate-400 truncate">—</div>
+                </div>
               </div>
-              <div id="slot-ring" class="bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[42px]">
-                <div class="text-[9px] text-slate-500 uppercase">Ring</div>
-                <div class="slot-name text-slate-400 truncate">—</div>
+              <div id="slot-ring" class="slot-box bg-slate-900/90 border border-slate-800 rounded p-1.5 min-h-[46px] flex items-center gap-2">
+                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Ring">
+                <div class="min-w-0 flex-1">
+                  <div class="text-[9px] text-slate-500 uppercase">Ring</div>
+                  <div class="slot-name text-slate-400 truncate">—</div>
+                </div>
               </div>
             </div>
           </div>
@@ -537,7 +529,7 @@
               <span>Pack Items</span>
               <span class="text-slate-500 normal-case">Click: Equip • RMB: Drop</span>
             </div>
-            <div id="inv-list" class="space-y-1 max-h-44 overflow-y-auto pr-1"></div>
+            <div id="inv-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1"></div>
           </div>
         </div>
       </aside>
@@ -588,52 +580,66 @@
                 class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
             </div>
 
-            <!-- Audio Engine Quality (Sample Rate Switching) -->
+            <!-- Audio Engine Quality -->
             <div class="space-y-1 pt-1 border-t border-slate-800/60">
               <div class="flex justify-between text-[10px] font-mono text-slate-300">
-                <span>DSP Quality</span>
-                <span id="label-audio-quality" class="text-amber-400 font-bold">Standard (22 kHz)</span>
+                <span>Audio Quality</span>
+                <span id="label-audio-quality" class="text-amber-400 font-bold">Standard</span>
               </div>
               <div class="grid grid-cols-3 gap-1 text-[10px] font-mono">
-                <button type="button" data-quality="lofi" class="btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer" title="11,025 Hz (Authentic retro crunch / 75% CPU saving)">Lo-Fi</button>
-                <button type="button" data-quality="standard" class="btn-audio-quality py-1 rounded bg-indigo-950/80 border border-indigo-700 text-indigo-300 font-bold transition cursor-pointer" title="22,050 Hz (Default balanced audio)">Standard</button>
-                <button type="button" data-quality="hifi" class="btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer" title="44,100 Hz (Studio high fidelity)">Hi-Fi</button>
+                <button type="button" data-quality="lofi" class="btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer" title="Retro chiptune tone">Lo-Fi</button>
+                <button type="button" data-quality="standard" class="btn-audio-quality py-1 rounded bg-indigo-950/80 border border-indigo-700 text-indigo-300 font-bold transition cursor-pointer" title="Balanced audio">Standard</button>
+                <button type="button" data-quality="hifi" class="btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer" title="High fidelity audio">Hi-Fi</button>
               </div>
             </div>
 
-            <!-- Proximity SFX & Spatial Stereo Panning -->
+            <!-- Spatial Audio -->
             <label class="flex items-center justify-between text-[10px] font-mono text-slate-300 cursor-pointer pt-1 border-t border-slate-800/60">
               <div class="pr-2">
-                <div class="text-slate-200 font-semibold">Proximity SFX Volume</div>
-                <div class="text-[9px] text-slate-400 leading-tight">Player distance attenuation &amp; stereo panning</div>
+                <div class="text-slate-200 font-semibold">Spatial Audio</div>
+                <div class="text-[9px] text-slate-400 leading-tight">Directional sound and distance fading</div>
               </div>
               <input id="chk-spatial-audio" type="checkbox" checked
                 class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-indigo-500 focus:ring-0 cursor-pointer">
             </label>
           </div>
 
-          <div id="pause-share-box" class="hidden pt-2 border-t border-slate-800 space-y-1.5 text-left">
-            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase">
-              <span>Invite Friends to This Game</span>
-              <span id="pause-my-code" class="text-amber-300 font-bold">—</span>
+          <!-- REALM SHARING / INVITE CODES (HIDDEN / REVEALABLE) -->
+          <div id="pause-share-box" class="hidden pt-2 border-t border-slate-800 space-y-2 text-left">
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+              <span>Realm Invite</span>
+              <div class="flex items-center gap-1.5">
+                <span id="pause-my-code" class="text-amber-300 font-bold font-mono tracking-widest">••••••</span>
+                <button id="btn-pause-reveal-code" type="button"
+                  class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+                  Reveal
+                </button>
+              </div>
             </div>
-            <button id="btn-pause-copy-invite" type="button"
-              class="w-full bg-amber-950/70 hover:bg-amber-900/70 border border-amber-700/70 text-amber-200 font-mono font-bold py-1.5 rounded text-xs transition">
-              Copy Invite Link
-            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-pause-copy-code" type="button"
+                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-mono font-medium py-1.5 rounded text-xs transition cursor-pointer">
+                Copy Code
+              </button>
+              <button id="btn-pause-copy-invite" type="button"
+                class="bg-amber-950/70 hover:bg-amber-900/70 border border-amber-700/70 text-amber-200 font-mono font-bold py-1.5 rounded text-xs transition cursor-pointer">
+                Copy Link
+              </button>
+            </div>
           </div>
+
           <div class="pt-2 border-t border-slate-800 space-y-1.5 text-left">
-            <div class="text-[10px] font-mono text-slate-400 uppercase">Join Friend's Invite</div>
+            <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Join Another Realm</div>
             <div class="flex gap-1.5 text-xs font-mono">
-              <input id="inp-pause-invite" type="text" placeholder="Code or ?join=... link"
-                class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-100 focus:outline-none focus:border-amber-500">
+              <input id="inp-pause-invite" type="text" placeholder="Invite link or code..."
+                class="flex-1 bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-slate-100 focus:outline-none focus:border-amber-500">
               <button id="btn-pause-invite" type="button"
-                class="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold">Go</button>
+                class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold cursor-pointer">Join</button>
             </div>
             <div id="pause-invite-err" class="hidden text-[10px] font-mono text-rose-400"></div>
           </div>
           <button id="btn-pause-quit"
-            class="w-full bg-slate-800 hover:bg-rose-900/70 border border-slate-700 hover:border-rose-700 text-slate-200 font-semibold py-2 rounded text-xs transition">Exit
+            class="w-full bg-slate-800 hover:bg-rose-900/70 border border-slate-700 hover:border-rose-700 text-slate-200 font-semibold py-2 rounded text-xs transition cursor-pointer mt-1">Exit
             to Main Menu</button>
         </div>
       </div>
@@ -656,8 +662,8 @@
         </div>
       </div>
 
-      <!-- BOTTOM ACTION HUD -->
-      <div class="absolute bottom-2 left-3 right-3 z-20 flex items-end justify-between pointer-events-none">
+      <!-- BOTTOM ACTION HUD (Replaced by Canvas-native HUD) -->
+      <div id="bottom-hud" class="hidden absolute bottom-2 left-3 right-3 z-20 flex items-end justify-between pointer-events-none">
         <div
           class="flex items-center gap-2 bg-slate-900/90 border border-red-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm pointer-events-auto">
           <div

@@ -63,10 +63,27 @@ export class InputController {
 
     stage.addEventListener('mousemove', (e) => {
       const rect = stage.getBoundingClientRect();
-      this.mouse.screenX = (e.clientX - rect.left) / this.renderer.stageScale;
-      this.mouse.screenY = (e.clientY - rect.top) / this.renderer.stageScale;
+      const pxX = e.clientX - rect.left;
+      const pxY = e.clientY - rect.top;
+
+      // Update Canvas HUD mouse position & cursor
+      this.renderer.canvasHud?.setMousePos(pxX, pxY);
+      const hudHit = this.renderer.canvasHud?.hitTest(pxX, pxY);
+      if (hudHit && hudHit.id !== 'belt_bg') {
+        stage.style.cursor = 'pointer';
+      } else {
+        stage.style.cursor = 'crosshair';
+      }
+
+      this.mouse.screenX = pxX / this.renderer.stageScale;
+      this.mouse.screenY = pxY / this.renderer.stageScale;
       this.mouse.worldX = this.mouse.screenX + this.renderer.camera.x;
       this.mouse.worldY = this.mouse.screenY + this.renderer.camera.y;
+    });
+
+    stage.addEventListener('mouseleave', () => {
+      this.renderer.canvasHud?.setMousePos(-1, -1);
+      stage.style.cursor = 'crosshair';
     });
 
     stage.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -77,8 +94,27 @@ export class InputController {
       if (!latestSnapshot || this.hud.isPaused()) return;
 
       const rect = stage.getBoundingClientRect();
-      const screenX = (e.clientX - rect.left) / this.renderer.stageScale;
-      const screenY = (e.clientY - rect.top) / this.renderer.stageScale;
+      const pxX = e.clientX - rect.left;
+      const pxY = e.clientY - rect.top;
+
+      // Canvas HUD Click Interception
+      const hudHit = this.renderer.canvasHud?.hitTest(pxX, pxY);
+      if (hudHit && e.button === 0) {
+        this.renderer.canvasHud?.setMouseDown(true);
+        if (hudHit.id === 'potion' || hudHit.id === 'hp') {
+          this.sendPacket({ type: PACKET_TYPES.INPUT_POTION });
+        } else if (hudHit.id === 'char') {
+          this.hud.toggleChar();
+        } else if (hudHit.id === 'inv') {
+          this.hud.toggleInv();
+        } else if (hudHit.id === 'menu') {
+          this.hud.togglePause();
+        }
+        return; // Consumed by Canvas HUD
+      }
+
+      const screenX = pxX / this.renderer.stageScale;
+      const screenY = pxY / this.renderer.stageScale;
       const wx = screenX + this.renderer.camera.x;
       const wy = screenY + this.renderer.camera.y;
 
@@ -119,6 +155,7 @@ export class InputController {
     });
 
     window.addEventListener('mouseup', (e) => {
+      this.renderer.canvasHud?.setMouseDown(false);
       if (e.button !== 0 || !this.lmbDown) return;
       this.lmbDown = false;
       if (this.holdMode === 'attack' && this.lockedMonsterId !== null) {
