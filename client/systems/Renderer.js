@@ -38,7 +38,8 @@ const PLAYER_ALLY_RECTS = [
 ];
 
 export class Renderer {
-  constructor() {
+  constructor({ sprites = null } = {}) {
+    this.sprites = sprites;
     this.pCanvas = document.getElementById('pixelCanvas');
     this.pCtx = this.pCanvas.getContext('2d', { alpha: false });
     this.hCanvas = document.getElementById('highResCanvas');
@@ -53,6 +54,8 @@ export class Renderer {
     this.stageH = 432;
 
     this.camera = { x: 0, y: 0 };
+    this.animTime = 0;
+    this.entityAnim = new Map(); // id -> { x, y, facingLeft, moveHold, actionState, actionTimer }
     this.floatingTexts = [];
     this.clickMarker = null;
 
@@ -101,7 +104,7 @@ export class Renderer {
   }
 
   bakeDungeonBuffer(d) {
-    this.lighting.bakeFloorIndices(d);
+    this.lighting.bakeFloorIndices(d, this.sprites);
   }
 
   snapCameraToSpawn(dungeon) {
@@ -128,11 +131,77 @@ export class Renderer {
 
   reset() {
     this.lighting.bakeFloorIndices(null);
+    this.entityAnim.clear();
     this.floatingTexts = [];
     this.clickMarker = null;
   }
 
+  /**
+   * Triggers a timed animation state (e.g. 'attack', 'cast', 'hurt') on a player or monster entity.
+   */
+  triggerEntityAnim(id, state, durationSec = 0.28) {
+    if (!id) return;
+    let rec = this.entityAnim.get(id);
+    if (!rec) {
+      rec = { x: null, y: null, facingLeft: false, moveHold: 0, actionState: null, actionTimer: 0 };
+      this.entityAnim.set(id, rec);
+    }
+    rec.actionState = state;
+    rec.actionTimer = durationSec;
+  }
+
+  /**
+   * Updates per-entity motion/facing and resolves the active animation state & frame index.
+   */
+  resolveEntityAnim(id, rx, ry, dt, sprite, isDead = false) {
+    let rec = this.entityAnim.get(id);
+    if (!rec) {
+      rec = { x: rx, y: ry, facingLeft: false, moveHold: 0, actionState: null, actionTimer: 0 };
+      this.entityAnim.set(id, rec);
+    }
+    if (rec.x !== null && rec.y !== null) {
+      const dx = rx - rec.x;
+      const dy = ry - rec.y;
+      if (Math.hypot(dx, dy) > 0.08) {
+        rec.moveHold = 0.14;
+        if (dx < -0.05) rec.facingLeft = true;
+        else if (dx > 0.05) rec.facingLeft = false;
+      } else if (rec.moveHold > 0) {
+        rec.moveHold = Math.max(0, rec.moveHold - dt);
+      }
+    }
+    rec.x = rx;
+    rec.y = ry;
+
+    if (rec.actionTimer > 0) {
+      rec.actionTimer = Math.max(0, rec.actionTimer - dt);
+      if (rec.actionTimer === 0) rec.actionState = null;
+    }
+
+    let state = 'idle';
+    if (isDead) state = 'death';
+    else if (rec.actionState) state = rec.actionState;
+    else if (rec.moveHold > 0) state = 'move';
+
+    const stObj = sprite?.getState ? sprite.getState(state) : sprite;
+    const fps = stObj?.fps || sprite?.fps || 4;
+    const count = stObj?.frames?.length || 1;
+    let frameIdx = 0;
+    if (count > 1) {
+      if (stObj?.pingPong && count > 2) {
+        const span = count * 2 - 2;
+        const step = Math.floor(this.animTime * fps) % span;
+        frameIdx = step < count ? step : span - step;
+      } else {
+        frameIdx = Math.floor(this.animTime * fps) % count;
+      }
+    }
+    return { state, frameIdx, flipX: rec.facingLeft };
+  }
+
   drawFrame({ dt, dungeon, interp, myPlayerId, hoveredLoot, hoveredMob, lockedMonsterId }) {
+    this.animTime += dt;
+    const animFrame = Math.floor(this.animTime * 3.5);
     const myP = interp.players.find(p => p.id === myPlayerId);
     if (myP && dungeon) {
       const targetCamX = myP.rx - ENGINE.INTERNAL_WIDTH / 2;
@@ -218,13 +287,23 @@ export class Renderer {
       }
     }
 
+    const defaultMobSpr = this.sprites?.get('entities', 'monster_crawler');
     for (let i = 0; i < interp.monsters.length; i++) {
       const m = interp.monsters[i];
       if (this.lighting.sampleLightAtWorld(m.rx, m.ry) <= 0.12) continue;
-      this.lighting.drawLitEntityStamp(hCtx, {
-        wx: m.rx, wy: m.ry, ox: -3, oy: -4, w: 6, h: 8,
-        rects: MOB_RECTS, camX, camY, scale
-      });
+      const mobSpr = (m.type && this.sprites?.get('entities', `monster_${m.type}`)) || defaultMobSpr;
+      if (mobSpr?.frames?.length) {
+        const anim = this.resolveEntityAnim(m.id, m.rx, m.ry, dt, mobSpr, false);
+        this.lighting.drawLitSpriteStamp(hCtx, {
+          sprite: mobSpr, state: anim.state, frameIdx: anim.frameIdx, flipX: anim.flipX,
+          wx: m.rx, wy: m.ry, camX, camY, scale
+        });
+      } else {
+        this.lighting.drawLitEntityStamp(hCtx, {
+          wx: m.rx, wy: m.ry, ox: -3, oy: -4, w: 6, h: 8,
+          rects: MOB_RECTS, camX, camY, scale
+        });
+      }
 
       const band = this.lighting.getLightBandAtWorld(m.rx, m.ry);
       if (band <= 0) continue;
@@ -252,11 +331,20 @@ export class Renderer {
 
     for (let i = 0; i < interp.players.length; i++) {
       const p = interp.players[i];
+      const heroSpr = this.sprites?.get('entities', `hero_${(p.classId || 'vanguard').toLowerCase()}`) || this.sprites?.get('entities', 'hero_vanguard');
       if (p.isDead) {
-        this.lighting.drawLitEntityStamp(hCtx, {
-          wx: p.rx, wy: p.ry, ox: -3, oy: -4, w: 6, h: 8,
-          rects: DEAD_RECTS, camX, camY, scale
-        });
+        if (heroSpr?.states?.death?.frames?.length) {
+          const anim = this.resolveEntityAnim(p.id, p.rx, p.ry, dt, heroSpr, true);
+          this.lighting.drawLitSpriteStamp(hCtx, {
+            sprite: heroSpr, state: 'death', frameIdx: anim.frameIdx, flipX: anim.flipX,
+            wx: p.rx, wy: p.ry, camX, camY, scale
+          });
+        } else {
+          this.lighting.drawLitEntityStamp(hCtx, {
+            wx: p.rx, wy: p.ry, ox: -3, oy: -4, w: 6, h: 8,
+            rects: DEAD_RECTS, camX, camY, scale
+          });
+        }
         continue;
       }
       const isMe = p.id === myPlayerId;
@@ -266,10 +354,18 @@ export class Renderer {
         strokeUIRect(p.rx, p.ry, -4, 2, 8, 3, PALETTE[PALETTE_INDEX.YELLOW]);
       }
 
-      this.lighting.drawLitEntityStamp(hCtx, {
-        wx: p.rx, wy: p.ry, ox: -3, oy: -6, w: 6, h: 11,
-        rects: isMe ? PLAYER_SELF_RECTS : PLAYER_ALLY_RECTS, camX, camY, scale
-      });
+      if (heroSpr?.frames?.length) {
+        const anim = this.resolveEntityAnim(p.id, p.rx, p.ry, dt, heroSpr, false);
+        this.lighting.drawLitSpriteStamp(hCtx, {
+          sprite: heroSpr, state: anim.state, frameIdx: anim.frameIdx, flipX: anim.flipX,
+          wx: p.rx, wy: p.ry, camX, camY, scale
+        });
+      } else {
+        this.lighting.drawLitEntityStamp(hCtx, {
+          wx: p.rx, wy: p.ry, ox: -3, oy: -6, w: 6, h: 11,
+          rects: isMe ? PLAYER_SELF_RECTS : PLAYER_ALLY_RECTS, camX, camY, scale
+        });
+      }
 
       const hx = (p.rx - camX) * scale;
       const hy = (p.ry - camY) * scale - 24;

@@ -283,7 +283,7 @@ export class GameRoom {
       });
       m.hp -= hit.damage;
       p.attackCooldown = 8;
-      this.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, x: m.x, y: m.y, damage: hit.damage, isCrit: hit.isCrit });
+      this.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: p.id, x: m.x, y: m.y, damage: hit.damage, isCrit: hit.isCrit });
       if (m.hp <= 0) this.killMonster(m);
       return true;
     }
@@ -469,7 +469,7 @@ export class GameRoom {
       for (const m of this.monsters.values()) {
         if (dist(proj.x, proj.y, m.x, m.y) < 10) {
           m.hp -= proj.damage;
-          this.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, x: m.x, y: m.y, damage: proj.damage, isCrit: true });
+          this.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: proj.ownerId, x: m.x, y: m.y, damage: proj.damage, isCrit: true });
           if (m.hp <= 0) this.killMonster(m);
           proj.life = 0;
           break;
@@ -508,7 +508,7 @@ export class GameRoom {
           });
           closestP.hp = Math.max(0, closestP.hp - hit.damage);
           m.attackCooldown = 18;
-          this.events.push({ type: 'DAMAGE', targetType: 'player', id: closestP.id, x: closestP.x, y: closestP.y, damage: hit.damage, isCrit: false });
+          this.events.push({ type: 'DAMAGE', targetType: 'player', id: closestP.id, attackerId: m.id, x: closestP.x, y: closestP.y, damage: hit.damage, isCrit: false });
           if (closestP.hp <= 0) this.handlePlayerDeath(closestP);
         }
       }

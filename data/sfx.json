@@ -1,0 +1,251 @@
+{
+  "hit": {
+    "name": "Melee Strike",
+    "wave_type": "square",
+    "duty_cycle": 0.25,
+    "duration": 0.11,
+    "gain": 0.75,
+    "wave_type_2": "noise",
+    "mix": 0.35,
+    "pitch_sweep": {
+      "start_freq": 240,
+      "end_freq": 68
+    },
+    "envelope": {
+      "attack": 0.002,
+      "decay": 0.08,
+      "sustain_level": 0.1,
+      "release": 0.03
+    },
+    "saturation": 2.2,
+    "bit_depth": 10
+  },
+  "crit": {
+    "name": "Critical Cleave",
+    "wave_type": "sawtooth",
+    "duty_cycle": 0.5,
+    "duration": 0.18,
+    "gain": 0.9,
+    "wave_type_2": "noise",
+    "mix": 0.3,
+    "pitch_sweep": {
+      "start_freq": 520,
+      "end_freq": 95
+    },
+    "envelope": {
+      "attack": 0.002,
+      "decay": 0.12,
+      "sustain_level": 0.15,
+      "release": 0.05
+    },
+    "saturation": 2.8,
+    "bit_depth": 10,
+    "ring_mod": {
+      "freq": 680,
+      "mix": 0.35
+    }
+  },
+  "player_hurt": {
+    "name": "Player Hurt",
+    "wave_type": "triangle",
+    "duty_cycle": 0.5,
+    "duration": 0.16,
+    "gain": 0.85,
+    "wave_type_2": "noise",
+    "mix": 0.3,
+    "pitch_sweep": {
+      "start_freq": 145,
+      "end_freq": 46
+    },
+    "envelope": {
+      "attack": 0.003,
+      "decay": 0.11,
+      "sustain_level": 0.1,
+      "release": 0.04
+    },
+    "saturation": 2.5,
+    "bit_depth": 8
+  },
+  "spark": {
+    "name": "Arcane Spark",
+    "wave_type": "square",
+    "duty_cycle": 0.25,
+    "duration": 0.16,
+    "gain": 0.65,
+    "wave_type_2": "noise",
+    "mix": 0.2,
+    "pitch_sweep": {
+      "start_freq": 880,
+      "end_freq": 290
+    },
+    "envelope": {
+      "attack": 0.002,
+      "decay": 0.1,
+      "sustain_level": 0.2,
+      "release": 0.05
+    },
+    "lfo": {
+      "vibrato_speed": 28,
+      "vibrato_depth": 1.2
+    },
+    "bit_depth": 10,
+    "echo": {
+      "delay_time": 0.06,
+      "feedback": 0.25,
+      "num_taps": 3
+    }
+  },
+  "potion": {
+    "name": "Health Potion",
+    "wave_type": "sine",
+    "duty_cycle": 0.5,
+    "duration": 0.26,
+    "gain": 1,
+    "wave_type_2": "triangle",
+    "mix": 0.35,
+    "pitch_sweep": {
+      "start_freq": 260,
+      "end_freq": 680
+    },
+    "envelope": {
+      "attack": 0.01,
+      "decay": 0.14,
+      "sustain_level": 0.4,
+      "release": 0.1
+    },
+    "lfo": {
+      "tremolo_speed": 22,
+      "tremolo_depth": 0.45
+    },
+    "saturation": 1.7
+  },
+  "level_up": {
+    "name": "Level Up Fanfare",
+    "wave_type": "square",
+    "duty_cycle": 0.5,
+    "duration": 0.2,
+    "gain": 0.75,
+    "freq": 220,
+    "notes": [
+      60,
+      64,
+      67,
+      72
+    ],
+    "step_duration": 0.09,
+    "note_duration": 0.2,
+    "envelope": {
+      "attack": 0.005,
+      "decay": 0.06,
+      "sustain_level": 0.6,
+      "release": 0.1
+    },
+    "lfo": {
+      "vibrato_speed": 6,
+      "vibrato_depth": 0.25
+    },
+    "bit_depth": 12,
+    "echo": {
+      "delay_time": 0.11,
+      "feedback": 0.3,
+      "num_taps": 3
+    }
+  },
+  "overburdened": {
+    "name": "Overburdened Buzz",
+    "wave_type": "sawtooth",
+    "duty_cycle": 0.5,
+    "duration": 0.2,
+    "gain": 0.65,
+    "freq": 220,
+    "notes": [
+      45,
+      42
+    ],
+    "step_duration": 0.09,
+    "note_duration": 0.2,
+    "envelope": {
+      "attack": 0.002,
+      "decay": 0.05,
+      "sustain_level": 0.3,
+      "release": 0.03
+    },
+    "bit_depth": 8
+  },
+  "player_death": {
+    "name": "Hero Fallen",
+    "wave_type": "sawtooth",
+    "duty_cycle": 0.5,
+    "duration": 0.2,
+    "gain": 0.85,
+    "wave_type_2": "triangle",
+    "mix": 0.4,
+    "freq": 220,
+    "notes": [
+      52,
+      48,
+      45,
+      40
+    ],
+    "step_duration": 0.09,
+    "note_duration": 0.2,
+    "envelope": {
+      "attack": 0.01,
+      "decay": 0.12,
+      "sustain_level": 0.4,
+      "release": 0.14
+    },
+    "saturation": 1.6,
+    "bit_depth": 9,
+    "echo": {
+      "delay_time": 0.14,
+      "feedback": 0.35,
+      "num_taps": 3
+    }
+  },
+  "floor_descent": {
+    "name": "Stairs Descent",
+    "wave_type": "triangle",
+    "duty_cycle": 0.5,
+    "duration": 0.35,
+    "gain": 0.8,
+    "wave_type_2": "noise",
+    "mix": 0.25,
+    "pitch_sweep": {
+      "start_freq": 190,
+      "end_freq": 52
+    },
+    "envelope": {
+      "attack": 0.02,
+      "decay": 0.2,
+      "sustain_level": 0.2,
+      "release": 0.12
+    },
+    "bit_depth": 9,
+    "echo": {
+      "delay_time": 0.12,
+      "feedback": 0.35,
+      "num_taps": 3
+    }
+  },
+  "torch_toggle": {
+    "name": "Torch Flick",
+    "wave_type": "noise",
+    "duty_cycle": 0.5,
+    "duration": 0.09,
+    "gain": 0.55,
+    "wave_type_2": "triangle",
+    "mix": 0.3,
+    "pitch_sweep": {
+      "start_freq": 320,
+      "end_freq": 110
+    },
+    "envelope": {
+      "attack": 0.002,
+      "decay": 0.06,
+      "sustain_level": 0,
+      "release": 0.02
+    },
+    "bit_depth": 8
+  }
+}

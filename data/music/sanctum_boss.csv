@@ -1,0 +1,482 @@
+LANTHORN_V1.1,8,7,112,4,D,Harmonic Minor,16
+PATCH,BossBass,"{""name"": ""BossBass"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""square"", ""mix"": 0.45, ""duty_cycle"": 0.25, ""envelope"": {""attack"": 0.003, ""decay"": 0.14, ""sustain_level"": 0.35, ""release"": 0.08}, ""saturation"": 2.1}"
+PATCH,BossDrum,"{""name"": ""BossDrum"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.18, ""envelope"": {""attack"": 0.001, ""decay"": 0.24, ""sustain_level"": 0.0, ""release"": 0.1}, ""saturation"": 2.4, ""portamento"": {""slide_time"": 0.025}}"
+PATCH,BossHarp,"{""name"": ""BossHarp"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""square"", ""mix"": 0.45, ""duty_cycle"": 0.18, ""envelope"": {""attack"": 0.001, ""decay"": 0.2, ""sustain_level"": 0.06, ""release"": 0.16}, ""saturation"": 1.25, ""echo"": {""delay_time"": 0.134, ""feedback"": 0.22}}"
+PATCH,BossBrass,"{""name"": ""BossBrass"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""triangle"", ""mix"": 0.35, ""envelope"": {""attack"": 0.04, ""decay"": 0.18, ""sustain_level"": 0.8, ""release"": 0.26}, ""lfo"": {""vibrato_speed"": 5.2, ""vibrato_depth"": 0.18}, ""saturation"": 1.7}"
+PATCH,EnrageLead,"{""name"": ""EnrageLead"", ""wave_type"": ""square"", ""wave_type_2"": ""sawtooth"", ""mix"": 0.5, ""duty_cycle"": 0.22, ""envelope"": {""attack"": 0.01, ""decay"": 0.15, ""sustain_level"": 0.78, ""release"": 0.22}, ""lfo"": {""vibrato_speed"": 6.0, ""vibrato_depth"": 0.22}, ""saturation"": 2.0, ""echo"": {""delay_time"": 0.268, ""feedback"": 0.28}}"
+PATCH,EnragePerc,"{""name"": ""EnragePerc"", ""wave_type"": ""noise"", ""wave_type_2"": ""triangle"", ""mix"": 0.25, ""bit_depth"": 9, ""envelope"": {""attack"": 0.001, ""decay"": 0.07, ""sustain_level"": 0.0, ""release"": 0.04}}"
+PATCH,DoomChoir,"{""name"": ""DoomChoir"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""sine"", ""mix"": 0.55, ""envelope"": {""attack"": 0.28, ""decay"": 0.25, ""sustain_level"": 0.85, ""release"": 0.45}, ""lfo"": {""vibrato_speed"": 3.2, ""vibrato_depth"": 0.16}, ""saturation"": 1.5}"
+PATCH,DoomBell,"{""name"": ""DoomBell"", ""wave_type"": ""sine"", ""wave_type_2"": ""square"", ""mix"": 0.28, ""duty_cycle"": 0.25, ""envelope"": {""attack"": 0.002, ""decay"": 0.75, ""sustain_level"": 0.05, ""release"": 0.65}, ""ring_mod"": {""carrier_freq"": 440.0, ""mix"": 0.26}, ""echo"": {""delay_time"": 0.268, ""feedback"": 0.36}}"
+--- ORDER LIST ---,SeqIndex,PatternID
+SEQ,0,A
+SEQ,1,B
+SEQ,2,C
+SEQ,3,D
+--- PATTERNS ---,Type,ID,Length
+PATTERN,A,64,112,4,16,D,Harmonic Minor,Throne of Ash
+EVENT,0,0,D-2,BossBass,188,2,--,PAN 128
+EVENT,0,1,D-2,BossDrum,225,3,SDN 12,PAN 128
+EVENT,0,2,"D-4,F-4,A-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,0,3,D-4,BossBrass,192,6,VIB 52,PAN 148
+EVENT,0,4,A-4,EnrageLead,178,4,VIB 60,PAN 184
+EVENT,0,6,"D-3,A-3",DoomChoir,145,16,--,PAN 128
+EVENT,0,7,D-5,DoomBell,155,10,--,PAN 196
+EVENT,2,0,D-2,BossBass,150,2,--,--
+EVENT,2,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,4,0,D-2,BossBass,150,2,--,--
+EVENT,4,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,4,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,4,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,6,0,D-2,BossBass,150,2,--,--
+EVENT,6,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,6,3,F-4,BossBrass,192,4,VIB 52,--
+EVENT,6,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,8,0,D-2,BossBass,188,2,--,--
+EVENT,8,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,8,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,10,0,D-2,BossBass,150,2,--,--
+EVENT,10,3,A-4,BossBrass,192,6,VIB 52,--
+EVENT,10,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,12,0,D-2,BossBass,150,2,--,--
+EVENT,12,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,12,4,F-4,EnrageLead,178,4,VIB 60,--
+EVENT,12,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,14,0,D-2,BossBass,150,2,--,--
+EVENT,14,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,14,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,16,0,D#2,BossBass,188,2,--,--
+EVENT,16,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,16,2,"D#4,G-4,A#4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,16,3,A#4,BossBrass,192,6,VIB 52,--
+EVENT,16,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,16,6,"D#3,A#3",DoomChoir,145,16,--,PAN 128
+EVENT,18,0,D#2,BossBass,150,2,--,--
+EVENT,18,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,20,0,D#2,BossBass,150,2,--,--
+EVENT,20,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,20,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,20,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,22,0,D#2,BossBass,150,2,--,--
+EVENT,22,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,22,3,G-4,BossBrass,192,4,VIB 52,--
+EVENT,22,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,24,0,D#2,BossBass,188,2,--,--
+EVENT,24,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,24,4,D-5,EnrageLead,178,4,VIB 60,--
+EVENT,26,0,D#2,BossBass,150,2,--,--
+EVENT,26,3,D#4,BossBrass,192,6,VIB 52,--
+EVENT,26,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,28,0,D#2,BossBass,150,2,--,--
+EVENT,28,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,28,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,28,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,30,0,D#2,BossBass,150,2,--,--
+EVENT,30,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,30,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,32,0,D-2,BossBass,188,2,--,--
+EVENT,32,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,32,2,"D-4,F-4,A-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,32,3,D-4,BossBrass,192,6,VIB 52,--
+EVENT,32,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,32,6,"D-3,F-3",DoomChoir,145,16,--,PAN 128
+EVENT,32,7,G#4,DoomBell,155,10,--,PAN 60
+EVENT,34,0,D-2,BossBass,150,2,--,--
+EVENT,34,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,36,0,D-2,BossBass,150,2,--,--
+EVENT,36,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,36,4,G#4,EnrageLead,178,4,VIB 60,--
+EVENT,36,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,38,0,D-2,BossBass,150,2,--,--
+EVENT,38,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,38,3,F-4,BossBrass,192,4,VIB 52,--
+EVENT,38,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,40,0,D-2,BossBass,188,2,--,--
+EVENT,40,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,40,4,F-4,EnrageLead,178,4,VIB 60,--
+EVENT,42,0,D-2,BossBass,150,2,--,--
+EVENT,42,3,G#4,BossBrass,192,6,VIB 52,--
+EVENT,42,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,44,0,D-2,BossBass,150,2,--,--
+EVENT,44,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,44,4,D-4,EnrageLead,178,4,VIB 60,--
+EVENT,44,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,46,0,D-2,BossBass,150,2,--,--
+EVENT,46,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,46,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,48,0,A-1,BossBass,188,2,--,--
+EVENT,48,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,48,2,"A-3,C#4,E-4,G-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,48,3,A-4,BossBrass,192,10,VIB 52,--
+EVENT,48,4,E-4,EnrageLead,178,4,VIB 60,--
+EVENT,48,6,"A-2,C#3,E-3",DoomChoir,145,16,--,PAN 128
+EVENT,48,7,A-4,DoomBell,155,10,--,PAN 196
+EVENT,50,0,A-1,BossBass,150,2,--,--
+EVENT,50,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,52,0,A-1,BossBass,150,2,--,--
+EVENT,52,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,52,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,52,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,54,0,A-1,BossBass,150,2,--,--
+EVENT,54,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,54,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,56,0,A-1,BossBass,188,2,--,--
+EVENT,56,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,56,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,58,0,A-1,BossBass,150,2,--,--
+EVENT,58,3,C#4,BossBrass,192,6,VIB 52,--
+EVENT,58,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,60,0,A-1,BossBass,150,2,--,--
+EVENT,60,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,60,4,C#5,EnrageLead,178,4,VIB 60,--
+EVENT,60,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,62,0,A-1,BossBass,150,2,--,--
+EVENT,62,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,62,5,D-5,EnragePerc,86,2,--,PAN 84
+PATTERN,B,64,112,4,16,D,Harmonic Minor,Blood Decree
+EVENT,0,0,A#1,BossBass,188,2,--,PAN 128
+EVENT,0,1,D-2,BossDrum,225,3,SDN 12,PAN 128
+EVENT,0,2,"A#3,D-4,F-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,0,3,A#4,BossBrass,192,8,VIB 52,PAN 148
+EVENT,0,4,D-5,EnrageLead,178,6,VIB 60,PAN 184
+EVENT,0,6,"A#2,F-3",DoomChoir,145,16,--,PAN 128
+EVENT,0,7,A#4,DoomBell,155,10,--,PAN 64
+EVENT,2,0,A#1,BossBass,150,2,--,--
+EVENT,2,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,4,0,A#1,BossBass,150,2,--,--
+EVENT,4,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,4,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,6,0,A#1,BossBass,150,2,--,--
+EVENT,6,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,6,4,C-5,EnrageLead,178,4,VIB 60,--
+EVENT,6,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,8,0,A#1,BossBass,188,2,--,--
+EVENT,8,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,8,3,A-4,BossBrass,192,4,VIB 52,--
+EVENT,10,0,A#1,BossBass,150,2,--,--
+EVENT,10,4,A#4,EnrageLead,178,6,VIB 60,--
+EVENT,10,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,12,0,A#1,BossBass,150,2,--,--
+EVENT,12,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,12,3,F-4,BossBrass,192,4,VIB 52,--
+EVENT,12,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,14,0,A#1,BossBass,150,2,--,--
+EVENT,14,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,14,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,16,0,G-1,BossBass,188,2,--,--
+EVENT,16,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,16,2,"G-3,A#3,D-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,16,3,G-4,BossBrass,192,8,VIB 52,--
+EVENT,16,4,A#4,EnrageLead,178,6,VIB 60,--
+EVENT,16,6,"G-2,D-3",DoomChoir,145,16,--,PAN 128
+EVENT,18,0,G-1,BossBass,150,2,--,--
+EVENT,18,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,20,0,G-1,BossBass,150,2,--,--
+EVENT,20,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,20,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,22,0,G-1,BossBass,150,2,--,--
+EVENT,22,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,22,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,22,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,24,0,G-1,BossBass,188,2,--,--
+EVENT,24,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,24,3,A#4,BossBrass,192,8,VIB 52,--
+EVENT,26,0,G-1,BossBass,150,2,--,--
+EVENT,26,4,G-4,EnrageLead,178,6,VIB 60,--
+EVENT,26,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,28,0,G-1,BossBass,150,2,--,--
+EVENT,28,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,28,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,30,0,G-1,BossBass,150,2,--,--
+EVENT,30,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,30,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,32,0,D#2,BossBass,188,2,--,--
+EVENT,32,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,32,2,"D#3,G-3,A#3",BossHarp,142,16,ARP 4,PAN 76
+EVENT,32,3,G-4,BossBrass,192,6,VIB 52,--
+EVENT,32,4,A#4,EnrageLead,178,6,VIB 60,--
+EVENT,32,6,"D#2,A#2",DoomChoir,145,16,--,PAN 128
+EVENT,32,7,D#5,DoomBell,155,10,--,PAN 196
+EVENT,34,0,D#2,BossBass,150,2,--,--
+EVENT,34,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,36,0,D#2,BossBass,150,2,--,--
+EVENT,36,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,36,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,38,0,D#2,BossBass,150,2,--,--
+EVENT,38,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,38,3,F-4,BossBrass,192,4,VIB 52,--
+EVENT,38,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,38,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,40,0,D#2,BossBass,188,2,--,--
+EVENT,40,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,42,0,D#2,BossBass,150,2,--,--
+EVENT,42,3,D#4,BossBrass,192,6,VIB 52,--
+EVENT,42,4,D#4,EnrageLead,178,6,VIB 60,--
+EVENT,42,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,44,0,D#2,BossBass,150,2,--,--
+EVENT,44,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,44,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,46,0,D#2,BossBass,150,2,--,--
+EVENT,46,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,46,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,48,0,A-1,BossBass,188,2,--,--
+EVENT,48,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,48,2,"A-3,C#4,E-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,48,3,E-4,BossBrass,192,8,VIB 52,--
+EVENT,48,4,E-4,EnrageLead,178,4,VIB 60,--
+EVENT,48,6,"A-2,E-3",DoomChoir,145,16,--,PAN 128
+EVENT,48,7,C#5,DoomBell,155,10,--,PAN 64
+EVENT,50,0,A-1,BossBass,150,2,--,--
+EVENT,50,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,52,0,A-1,BossBass,150,2,--,--
+EVENT,52,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,52,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,52,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,54,0,A-1,BossBass,150,2,--,--
+EVENT,54,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,54,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,56,0,A-1,BossBass,188,2,--,--
+EVENT,56,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,56,3,C#4,BossBrass,192,8,VIB 52,--
+EVENT,56,4,C#5,EnrageLead,178,4,VIB 60,--
+EVENT,58,0,A-1,BossBass,150,2,--,--
+EVENT,58,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,60,0,A-1,BossBass,150,2,--,--
+EVENT,60,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,60,4,E-5,EnrageLead,178,4,VIB 60,--
+EVENT,60,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,62,0,A-1,BossBass,150,2,--,--
+EVENT,62,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,62,5,D-5,EnragePerc,86,2,--,PAN 84
+PATTERN,C,64,112,4,16,D,Phrygian,Diminished Wrath
+EVENT,0,0,D-2,BossBass,188,2,--,PAN 128
+EVENT,0,1,D-2,BossDrum,225,3,SDN 12,PAN 128
+EVENT,0,2,"D-4,F-4,A-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,0,3,D-4,BossBrass,192,8,VIB 52,PAN 148
+EVENT,0,4,D-5,EnrageLead,178,4,VIB 60,PAN 184
+EVENT,0,6,"D-3,A-3",DoomChoir,145,16,--,PAN 128
+EVENT,0,7,D-5,DoomBell,155,10,--,PAN 196
+EVENT,2,0,D-2,BossBass,150,2,--,--
+EVENT,2,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,4,0,D-2,BossBass,150,2,--,--
+EVENT,4,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,4,4,F-5,EnrageLead,178,4,VIB 60,--
+EVENT,4,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,6,0,D-2,BossBass,150,2,--,--
+EVENT,6,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,6,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,8,0,D-2,BossBass,188,2,--,--
+EVENT,8,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,8,3,E-4,BossBrass,192,8,VIB 52,--
+EVENT,8,4,E-5,EnrageLead,178,4,VIB 60,--
+EVENT,10,0,D-2,BossBass,150,2,--,--
+EVENT,10,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,12,0,D-2,BossBass,150,2,--,--
+EVENT,12,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,12,4,D-5,EnrageLead,178,4,VIB 60,--
+EVENT,12,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,14,0,D-2,BossBass,150,2,--,--
+EVENT,14,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,14,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,16,0,F-2,BossBass,188,2,--,--
+EVENT,16,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,16,2,"F-4,A-4,C-5",BossHarp,142,16,ARP 4,PAN 76
+EVENT,16,3,F-4,BossBrass,192,8,VIB 52,--
+EVENT,16,4,C-5,EnrageLead,178,4,VIB 60,--
+EVENT,16,6,"F-3,C-4",DoomChoir,145,16,--,PAN 128
+EVENT,18,0,F-2,BossBass,150,2,--,--
+EVENT,18,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,20,0,F-2,BossBass,150,2,--,--
+EVENT,20,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,20,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,20,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,22,0,F-2,BossBass,150,2,--,--
+EVENT,22,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,22,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,24,0,F-2,BossBass,188,2,--,--
+EVENT,24,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,24,3,A-4,BossBrass,192,8,VIB 52,--
+EVENT,24,4,F-4,EnrageLead,178,4,VIB 60,--
+EVENT,26,0,F-2,BossBass,150,2,--,--
+EVENT,26,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,28,0,F-2,BossBass,150,2,--,--
+EVENT,28,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,28,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,28,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,30,0,F-2,BossBass,150,2,--,--
+EVENT,30,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,30,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,32,0,G#2,BossBass,188,2,--,--
+EVENT,32,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,32,2,"G#3,B-3,D-4,F-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,32,3,G#4,BossBrass,192,8,VIB 52,--
+EVENT,32,4,B-4,EnrageLead,178,4,VIB 60,--
+EVENT,32,6,"G#3,D-4",DoomChoir,145,16,--,PAN 128
+EVENT,32,7,G#4,DoomBell,155,10,--,PAN 60
+EVENT,34,0,G#2,BossBass,150,2,--,--
+EVENT,34,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,36,0,G#2,BossBass,150,2,--,--
+EVENT,36,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,36,4,D-5,EnrageLead,178,4,VIB 60,--
+EVENT,36,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,38,0,G#2,BossBass,150,2,--,--
+EVENT,38,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,38,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,40,0,G#2,BossBass,188,2,--,--
+EVENT,40,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,40,3,B-4,BossBrass,192,8,VIB 52,--
+EVENT,40,4,F-5,EnrageLead,178,4,VIB 60,--
+EVENT,42,0,G#2,BossBass,150,2,--,--
+EVENT,42,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,44,0,G#2,BossBass,150,2,--,--
+EVENT,44,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,44,4,G#5,EnrageLead,178,4,VIB 60,--
+EVENT,44,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,46,0,G#2,BossBass,150,2,--,--
+EVENT,46,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,46,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,48,0,A-1,BossBass,188,2,--,--
+EVENT,48,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,48,2,"A-3,C#4,E-4,G-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,48,3,A-4,BossBrass,192,12,VIB 52,--
+EVENT,48,4,A-5,EnrageLead,178,8,VIB 60,--
+EVENT,48,6,"A-2,C#3,E-3",DoomChoir,145,16,--,PAN 128
+EVENT,48,7,A-4,DoomBell,155,10,--,PAN 128
+EVENT,50,0,A-1,BossBass,150,2,--,--
+EVENT,50,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,52,0,A-1,BossBass,150,2,--,--
+EVENT,52,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,52,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,54,0,A-1,BossBass,150,2,--,--
+EVENT,54,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,54,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,56,0,A-1,BossBass,188,2,--,--
+EVENT,56,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,56,4,G-5,EnrageLead,178,4,VIB 60,--
+EVENT,58,0,A-1,BossBass,150,2,--,--
+EVENT,58,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,60,0,A-1,BossBass,150,2,--,--
+EVENT,60,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,60,3,G-4,BossBrass,192,4,VIB 52,--
+EVENT,60,4,E-5,EnrageLead,178,4,VIB 60,--
+EVENT,60,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,62,0,A-1,BossBass,150,2,--,--
+EVENT,62,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,62,5,D-5,EnragePerc,86,2,--,PAN 84
+PATTERN,D,64,112,4,16,D,Harmonic Minor,Final Turnaround
+EVENT,0,0,G-1,BossBass,188,2,--,PAN 128
+EVENT,0,1,D-2,BossDrum,225,3,SDN 12,PAN 128
+EVENT,0,2,"G-3,A#3,D-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,0,3,A#4,BossBrass,192,8,VIB 52,PAN 148
+EVENT,0,4,D-5,EnrageLead,178,4,VIB 60,PAN 184
+EVENT,0,6,"G-2,D-3",DoomChoir,145,16,--,PAN 128
+EVENT,0,7,G-4,DoomBell,155,10,--,PAN 64
+EVENT,2,0,G-1,BossBass,150,2,--,--
+EVENT,2,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,4,0,G-1,BossBass,150,2,--,--
+EVENT,4,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,4,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,4,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,6,0,G-1,BossBass,150,2,--,--
+EVENT,6,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,6,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,8,0,G-1,BossBass,188,2,--,--
+EVENT,8,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,8,3,G-4,BossBrass,192,8,VIB 52,--
+EVENT,8,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,10,0,G-1,BossBass,150,2,--,--
+EVENT,10,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,12,0,G-1,BossBass,150,2,--,--
+EVENT,12,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,12,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,12,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,14,0,G-1,BossBass,150,2,--,--
+EVENT,14,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,14,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,16,0,F-1,BossBass,188,2,--,--
+EVENT,16,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,16,2,"F-3,A-3,C-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,16,3,A-4,BossBrass,192,8,VIB 52,--
+EVENT,16,4,C-5,EnrageLead,178,4,VIB 60,--
+EVENT,16,6,"F-2,C-3",DoomChoir,145,16,--,PAN 128
+EVENT,16,7,F-4,DoomBell,155,10,--,PAN 196
+EVENT,18,0,F-1,BossBass,150,2,--,--
+EVENT,18,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,20,0,F-1,BossBass,150,2,--,--
+EVENT,20,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,20,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,20,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,22,0,F-1,BossBass,150,2,--,--
+EVENT,22,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,22,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,24,0,F-1,BossBass,188,2,--,--
+EVENT,24,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,24,3,F-4,BossBrass,192,8,VIB 52,--
+EVENT,24,4,F-4,EnrageLead,178,4,VIB 60,--
+EVENT,26,0,F-1,BossBass,150,2,--,--
+EVENT,26,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,28,0,F-1,BossBass,150,2,--,--
+EVENT,28,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,28,4,A-4,EnrageLead,178,4,VIB 60,--
+EVENT,28,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,30,0,F-1,BossBass,150,2,--,--
+EVENT,30,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,30,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,32,0,D#1,BossBass,188,2,--,--
+EVENT,32,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,32,2,"D#3,G-3,A#3",BossHarp,142,16,ARP 4,PAN 76
+EVENT,32,3,G-4,BossBrass,192,8,VIB 52,--
+EVENT,32,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,32,6,"D#2,A#2",DoomChoir,145,16,--,PAN 128
+EVENT,32,7,D#4,DoomBell,155,10,--,PAN 64
+EVENT,34,0,D#1,BossBass,150,2,--,--
+EVENT,34,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,36,0,D#1,BossBass,150,2,--,--
+EVENT,36,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,36,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,36,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,38,0,D#1,BossBass,150,2,--,--
+EVENT,38,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,38,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,40,0,D#1,BossBass,188,2,--,--
+EVENT,40,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,40,3,D#4,BossBrass,192,8,VIB 52,--
+EVENT,40,4,D#4,EnrageLead,178,4,VIB 60,--
+EVENT,42,0,D#1,BossBass,150,2,--,--
+EVENT,42,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,44,0,D#1,BossBass,150,2,--,--
+EVENT,44,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,44,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,44,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,46,0,D#1,BossBass,150,2,--,--
+EVENT,46,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,46,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,48,0,A-1,BossBass,188,2,--,--
+EVENT,48,1,D-2,BossDrum,225,3,SDN 12,--
+EVENT,48,2,"A-3,C#4,E-4,G-4",BossHarp,142,16,ARP 4,PAN 76
+EVENT,48,3,E-4,BossBrass,192,6,VIB 52,--
+EVENT,48,4,E-4,EnrageLead,178,4,VIB 60,--
+EVENT,48,6,"A-2,C#3,E-3",DoomChoir,145,16,--,PAN 128
+EVENT,48,7,C#5,DoomBell,155,10,--,PAN 196
+EVENT,50,0,A-1,BossBass,150,2,--,--
+EVENT,50,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,52,0,A-1,BossBass,150,2,--,--
+EVENT,52,1,A-1,BossDrum,170,3,SDN 12,--
+EVENT,52,4,G-4,EnrageLead,178,4,VIB 60,--
+EVENT,52,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,54,0,A-1,BossBass,150,2,--,--
+EVENT,54,1,D-2,BossDrum,185,3,SDN 12,--
+EVENT,54,3,C#4,BossBrass,192,6,VIB 52,--
+EVENT,54,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,56,0,A-1,BossBass,188,2,--,--
+EVENT,56,1,D-2,BossDrum,215,3,SDN 12,--
+EVENT,56,4,A#4,EnrageLead,178,4,VIB 60,--
+EVENT,58,0,A-1,BossBass,150,2,--,--
+EVENT,58,5,D-5,EnragePerc,86,2,--,PAN 84
+EVENT,60,0,A-1,BossBass,150,2,--,--
+EVENT,60,1,A-1,BossDrum,180,3,SDN 12,--
+EVENT,60,3,A-3,BossBrass,192,4,VIB 52,--
+EVENT,60,4,C#5,EnrageLead,178,4,VIB 60,--
+EVENT,60,5,D-5,EnragePerc,135,2,--,PAN 172
+EVENT,62,0,A-1,BossBass,150,2,--,--
+EVENT,62,1,D-2,BossDrum,200,3,SDN 12,--
+EVENT,62,5,D-5,EnragePerc,86,2,--,PAN 84

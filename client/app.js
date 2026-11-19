@@ -5,6 +5,8 @@ import { Renderer } from './systems/Renderer.js';
 import { HUDController } from './systems/HUDController.js';
 import { InputController } from './systems/InputController.js';
 import { MenuController } from './systems/MenuController.js';
+import { AudioPSG } from './systems/AudioPSG.js';
+import { SpriteRegistry } from './systems/SpriteRegistry.js';
 
 let ws = null;
 let myPlayerId = null;
@@ -16,7 +18,13 @@ let lastInterp = { players: [], monsters: [], projectiles: [], loot: [] };
 let lastFrameTime = performance.now();
 
 const interpolator = new Interpolator();
-const renderer = new Renderer();
+const sprites = new SpriteRegistry();
+const renderer = new Renderer({ sprites });
+const audio = new AudioPSG();
+audio.loadManifest('/data/sfx.json');
+sprites.load('/data/sprites.json').then((ok) => {
+  if (ok && dungeon) renderer.bakeDungeonBuffer(dungeon);
+});
 
 function sendPacket(payload) {
   if (ws && ws.readyState === 1) {
@@ -32,6 +40,7 @@ const hud = new HUDController({
 const input = new InputController({
   renderer,
   hud,
+  audio,
   sendPacket,
   getState: () => ({ latestSnapshot, lastInterp, myPlayerId })
 });
@@ -136,16 +145,43 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
   };
 }
 
+function getStereoPan(worldX) {
+  if (typeof worldX !== 'number') return 0;
+  const centerX = renderer.camera.x + 120;
+  return Math.max(-0.85, Math.min(0.85, (worldX - centerX) / 140));
+}
+
 function processEvents(events) {
   if (!events) return;
   for (const ev of events) {
-    if (ev.type === 'DAMAGE') renderer.addFloatingText(ev.isCrit ? `${ev.damage}! CRIT` : `${ev.damage}`, ev.x, ev.y, ev.isCrit ? '#FACC15' : '#FFFFFF', ev.isCrit);
-    else if (ev.type === 'HEAL') renderer.addFloatingText(`+${ev.amount} HP`, ev.x, ev.y, '#34D399');
-    else if (ev.type === 'LEVEL_UP') renderer.addFloatingText(`LEVEL ${ev.level}!`, ev.x, ev.y - 6, '#FACC15', true);
-    else if (ev.type === 'OVERBURDENED' && ev.id === myPlayerId) renderer.addFloatingText('Too Heavy!', ev.x, ev.y - 6, '#F87171', false);
-    else if (ev.type === 'PLAYER_DEATH' && ev.hardcore) renderer.addFloatingText(`${ev.name} HAS FALLEN!`, ev.x || 120, ev.y || 72, '#EF4444', true);
-    else if (ev.type === 'PLAYER_RESPAWN') renderer.addFloatingText('RESPAWNED', ev.x, ev.y - 6, '#38BDF8', true);
-    else if (ev.type === 'FLOOR_DESCENT') hud.setFloorStatus(ev.floor);
+    if (ev.type === 'DAMAGE') {
+      renderer.addFloatingText(ev.isCrit ? `${ev.damage}! CRIT` : `${ev.damage}`, ev.x, ev.y, ev.isCrit ? '#FACC15' : '#FFFFFF', ev.isCrit);
+      const pan = getStereoPan(ev.x);
+      if (ev.attackerId) renderer.triggerEntityAnim(ev.attackerId, 'attack', 0.28);
+      if (ev.id) renderer.triggerEntityAnim(ev.id, 'hurt', 0.2);
+      if (ev.targetType === 'player' && ev.id === myPlayerId) {
+        audio.play('player_hurt', { pan: 0, pitchJitter: 0.06 });
+      } else {
+        audio.play(ev.isCrit ? 'crit' : 'hit', { pan, pitchJitter: 0.06 });
+      }
+    } else if (ev.type === 'HEAL') {
+      renderer.addFloatingText(`+${ev.amount} HP`, ev.x, ev.y, '#34D399');
+      audio.play('potion', { pan: getStereoPan(ev.x), pitchJitter: 0.03 });
+    } else if (ev.type === 'LEVEL_UP') {
+      renderer.addFloatingText(`LEVEL ${ev.level}!`, ev.x, ev.y - 6, '#FACC15', true);
+      audio.play('level_up', { pitchJitter: 0 });
+    } else if (ev.type === 'OVERBURDENED' && ev.id === myPlayerId) {
+      renderer.addFloatingText('Too Heavy!', ev.x, ev.y - 6, '#F87171', false);
+      audio.play('overburdened', { pitchJitter: 0 });
+    } else if (ev.type === 'PLAYER_DEATH') {
+      if (ev.hardcore) renderer.addFloatingText(`${ev.name} HAS FALLEN!`, ev.x || 120, ev.y || 72, '#EF4444', true);
+      if (ev.id === myPlayerId || ev.hardcore) audio.play('player_death', { pitchJitter: 0 });
+    } else if (ev.type === 'PLAYER_RESPAWN') {
+      renderer.addFloatingText('RESPAWNED', ev.x, ev.y - 6, '#38BDF8', true);
+    } else if (ev.type === 'FLOOR_DESCENT') {
+      hud.setFloorStatus(ev.floor);
+      audio.play('floor_descent', { pitchJitter: 0 });
+    }
   }
 }
 

@@ -1,0 +1,271 @@
+LANTHORN_V1.1,8,7,68,4,C#,Phrygian,16
+PATCH,AbyssSub,"{""name"": ""AbyssSub"", ""wave_type"": ""sine"", ""wave_type_2"": ""triangle"", ""mix"": 0.3, ""envelope"": {""attack"": 0.5, ""decay"": 0.3, ""sustain_level"": 0.88, ""release"": 0.8}, ""saturation"": 1.4}"
+PATCH,CrystalRes,"{""name"": ""CrystalRes"", ""wave_type"": ""sine"", ""wave_type_2"": ""triangle"", ""mix"": 0.35, ""envelope"": {""attack"": 0.01, ""decay"": 0.75, ""sustain_level"": 0.06, ""release"": 0.85}, ""ring_mod"": {""carrier_freq"": 587.0, ""mix"": 0.25}, ""echo"": {""delay_time"": 0.44, ""feedback"": 0.46}}"
+PATCH,CavernDraft,"{""name"": ""CavernDraft"", ""wave_type"": ""noise"", ""wave_type_2"": ""sine"", ""mix"": 0.3, ""envelope"": {""attack"": 0.75, ""decay"": 0.35, ""sustain_level"": 0.6, ""release"": 0.9}, ""lfo"": {""tremolo_speed"": 0.9, ""tremolo_depth"": 0.32}}"
+PATCH,DepthPad,"{""name"": ""DepthPad"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""sine"", ""mix"": 0.5, ""envelope"": {""attack"": 0.6, ""decay"": 0.3, ""sustain_level"": 0.78, ""release"": 0.8}, ""lfo"": {""vibrato_speed"": 1.6, ""vibrato_depth"": 0.14}, ""saturation"": 1.35}"
+PATCH,AbyssPulse,"{""name"": ""AbyssPulse"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""square"", ""mix"": 0.45, ""duty_cycle"": 0.25, ""envelope"": {""attack"": 0.005, ""decay"": 0.16, ""sustain_level"": 0.25, ""release"": 0.08}, ""saturation"": 2.0}"
+PATCH,DepthDrum,"{""name"": ""DepthDrum"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.18, ""envelope"": {""attack"": 0.002, ""decay"": 0.38, ""sustain_level"": 0.0, ""release"": 0.2}, ""saturation"": 2.4, ""portamento"": {""slide_time"": 0.035}}"
+PATCH,ObsidianTick,"{""name"": ""ObsidianTick"", ""wave_type"": ""square"", ""wave_type_2"": ""noise"", ""mix"": 0.5, ""bit_depth"": 7, ""envelope"": {""attack"": 0.001, ""decay"": 0.05, ""sustain_level"": 0.0, ""release"": 0.03}}"
+PATCH,AbyssLead,"{""name"": ""AbyssLead"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""square"", ""mix"": 0.35, ""duty_cycle"": 0.2, ""envelope"": {""attack"": 0.08, ""decay"": 0.24, ""sustain_level"": 0.72, ""release"": 0.4}, ""lfo"": {""vibrato_speed"": 5.5, ""vibrato_depth"": 0.25}, ""saturation"": 1.8, ""echo"": {""delay_time"": 0.32, ""feedback"": 0.34}}"
+--- ORDER LIST ---,SeqIndex,PatternID
+SEQ,0,A
+SEQ,1,B
+SEQ,2,C
+SEQ,3,D
+--- PATTERNS ---,Type,ID,Length
+PATTERN,A,64,68,4,16,C#,Phrygian,Obsidian Fault
+EVENT,0,0,C#2,AbyssSub,148,32,--,PAN 128
+EVENT,0,1,G#4,CrystalRes,104,14,--,PAN 192
+EVENT,0,2,G#3,CavernDraft,82,32,--,PAN 44
+EVENT,0,3,"C#3,G#3",DepthPad,122,32,--,PAN 128
+EVENT,0,4,C#2,AbyssPulse,156,3,--,PAN 100
+EVENT,0,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,0,7,G#3,AbyssLead,164,10,VIB 56,PAN 160
+EVENT,2,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,4,4,C#2,AbyssPulse,128,3,--,--
+EVENT,6,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,8,4,C#2,AbyssPulse,156,3,--,--
+EVENT,8,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,10,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,12,4,C#2,AbyssPulse,128,3,--,--
+EVENT,12,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,12,7,A-3,AbyssLead,164,6,VIB 56,--
+EVENT,14,4,C#2,AbyssPulse,128,3,--,--
+EVENT,14,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,16,4,C#2,AbyssPulse,156,3,--,--
+EVENT,16,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,16,7,G#3,AbyssLead,164,10,VIB 56,--
+EVENT,18,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,20,4,C#2,AbyssPulse,128,3,--,--
+EVENT,22,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,24,1,D-5,CrystalRes,104,14,--,PAN 64
+EVENT,24,4,C#2,AbyssPulse,156,3,--,--
+EVENT,24,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,26,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,28,4,C#2,AbyssPulse,128,3,--,--
+EVENT,28,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,30,4,C#2,AbyssPulse,128,3,--,--
+EVENT,30,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,32,0,D-2,AbyssSub,148,32,--,PAN 128
+EVENT,32,2,D-4,CavernDraft,86,32,--,PAN 212
+EVENT,32,3,"D-3,A-3",DepthPad,122,32,--,PAN 128
+EVENT,32,4,D-2,AbyssPulse,156,3,--,--
+EVENT,32,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,32,7,A-3,AbyssLead,164,10,VIB 56,--
+EVENT,34,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,36,4,D-2,AbyssPulse,128,3,--,--
+EVENT,38,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,40,4,D-2,AbyssPulse,156,3,--,--
+EVENT,40,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,42,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,44,4,D-2,AbyssPulse,128,3,--,--
+EVENT,44,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,44,7,F#3,AbyssLead,164,6,VIB 56,--
+EVENT,46,4,D-2,AbyssPulse,128,3,--,--
+EVENT,46,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,48,1,C#5,CrystalRes,104,14,--,PAN 184
+EVENT,48,4,D-2,AbyssPulse,156,3,--,--
+EVENT,48,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,50,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,52,4,D-2,AbyssPulse,128,3,--,--
+EVENT,52,7,E-3,AbyssLead,164,10,VIB 56,--
+EVENT,54,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,56,4,D-2,AbyssPulse,156,3,--,--
+EVENT,56,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,58,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,60,4,D-2,AbyssPulse,128,3,--,--
+EVENT,60,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,62,4,D-2,AbyssPulse,128,3,--,--
+EVENT,62,5,D-2,DepthDrum,162,4,SDN 12,--
+PATTERN,B,64,68,4,16,C#,Phrygian,Tritone Chasm
+EVENT,0,0,C#2,AbyssSub,148,32,--,PAN 128
+EVENT,0,2,G#3,CavernDraft,82,32,--,PAN 44
+EVENT,0,3,"C#3,E-3,G#3",DepthPad,122,32,--,PAN 128
+EVENT,0,4,C#2,AbyssPulse,156,3,--,PAN 100
+EVENT,0,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,0,7,C#4,AbyssLead,164,8,VIB 56,PAN 160
+EVENT,2,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,4,4,C#2,AbyssPulse,128,3,--,--
+EVENT,6,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,8,1,E-5,CrystalRes,104,14,--,PAN 60
+EVENT,8,4,C#2,AbyssPulse,156,3,--,--
+EVENT,8,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,8,7,D-4,AbyssLead,164,8,VIB 56,--
+EVENT,10,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,12,4,C#2,AbyssPulse,128,3,--,--
+EVENT,12,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,14,4,C#2,AbyssPulse,128,3,--,--
+EVENT,14,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,16,4,E-2,AbyssPulse,156,3,--,--
+EVENT,16,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,16,7,E-4,AbyssLead,164,10,VIB 56,--
+EVENT,18,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,20,4,E-2,AbyssPulse,128,3,--,--
+EVENT,22,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,24,4,E-2,AbyssPulse,156,3,--,--
+EVENT,24,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,26,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,28,4,E-2,AbyssPulse,128,3,--,--
+EVENT,28,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,30,4,E-2,AbyssPulse,128,3,--,--
+EVENT,30,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,32,0,G-1,AbyssSub,148,32,--,PAN 128
+EVENT,32,1,G-4,CrystalRes,104,14,--,PAN 200
+EVENT,32,2,D-4,CavernDraft,86,32,--,PAN 212
+EVENT,32,3,"G-2,C#3,D-3",DepthPad,122,32,--,PAN 128
+EVENT,32,4,G-2,AbyssPulse,156,3,--,--
+EVENT,32,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,32,7,G-4,AbyssLead,164,10,VIB 56,--
+EVENT,34,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,36,4,G-2,AbyssPulse,128,3,--,--
+EVENT,38,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,40,4,G-2,AbyssPulse,156,3,--,--
+EVENT,40,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,42,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,44,4,G-2,AbyssPulse,128,3,--,--
+EVENT,44,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,44,7,F#4,AbyssLead,164,8,VIB 56,--
+EVENT,46,4,G-2,AbyssPulse,128,3,--,--
+EVENT,46,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,48,4,F#2,AbyssPulse,156,3,--,--
+EVENT,48,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,50,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,52,4,F#2,AbyssPulse,128,3,--,--
+EVENT,52,7,E-4,AbyssLead,164,10,VIB 56,--
+EVENT,54,1,D-5,CrystalRes,104,14,--,PAN 68
+EVENT,54,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,56,4,F#2,AbyssPulse,156,3,--,--
+EVENT,56,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,58,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,60,4,F#2,AbyssPulse,128,3,--,--
+EVENT,60,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,62,4,F#2,AbyssPulse,128,3,--,--
+EVENT,62,5,D-2,DepthDrum,162,4,SDN 12,--
+PATTERN,C,64,68,4,16,C#,Phrygian,Hollow Maw
+EVENT,0,0,A-1,AbyssSub,148,32,--,PAN 128
+EVENT,0,1,A-4,CrystalRes,104,14,--,PAN 196
+EVENT,0,2,G#3,CavernDraft,82,32,--,PAN 44
+EVENT,0,3,"A-2,E-3",DepthPad,122,32,--,PAN 128
+EVENT,0,4,A-1,AbyssPulse,156,3,--,PAN 100
+EVENT,0,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,0,7,E-4,AbyssLead,164,10,VIB 56,PAN 160
+EVENT,2,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,4,4,A-1,AbyssPulse,128,3,--,--
+EVENT,6,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,8,4,A-1,AbyssPulse,156,3,--,--
+EVENT,8,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,10,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,12,4,A-1,AbyssPulse,128,3,--,--
+EVENT,12,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,12,7,C#4,AbyssLead,164,6,VIB 56,--
+EVENT,14,4,A-1,AbyssPulse,128,3,--,--
+EVENT,14,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,16,4,A-1,AbyssPulse,156,3,--,--
+EVENT,16,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,16,7,A-3,AbyssLead,164,12,VIB 56,--
+EVENT,18,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,20,1,E-5,CrystalRes,104,14,--,PAN 60
+EVENT,20,4,A-1,AbyssPulse,128,3,--,--
+EVENT,22,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,24,4,A-1,AbyssPulse,156,3,--,--
+EVENT,24,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,26,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,28,4,A-1,AbyssPulse,128,3,--,--
+EVENT,28,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,30,4,A-1,AbyssPulse,128,3,--,--
+EVENT,30,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,32,0,G#1,AbyssSub,148,32,--,PAN 128
+EVENT,32,2,D-4,CavernDraft,86,32,--,PAN 212
+EVENT,32,3,"G#2,D-3",DepthPad,122,32,--,PAN 128
+EVENT,32,4,G#1,AbyssPulse,156,3,--,--
+EVENT,32,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,32,7,G#3,AbyssLead,164,10,VIB 56,--
+EVENT,34,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,36,4,G#1,AbyssPulse,128,3,--,--
+EVENT,38,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,40,1,G#4,CrystalRes,104,14,--,PAN 188
+EVENT,40,4,G#1,AbyssPulse,156,3,--,--
+EVENT,40,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,42,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,44,4,G#1,AbyssPulse,128,3,--,--
+EVENT,44,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,44,7,B-3,AbyssLead,164,6,VIB 56,--
+EVENT,46,4,G#1,AbyssPulse,128,3,--,--
+EVENT,46,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,48,4,G#1,AbyssPulse,156,3,--,--
+EVENT,48,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,50,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,52,4,G#1,AbyssPulse,128,3,--,--
+EVENT,52,7,D-4,AbyssLead,164,10,VIB 56,--
+EVENT,54,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,56,4,G#1,AbyssPulse,156,3,--,--
+EVENT,56,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,58,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,60,4,G#1,AbyssPulse,128,3,--,--
+EVENT,60,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,62,4,G#1,AbyssPulse,128,3,--,--
+EVENT,62,5,D-2,DepthDrum,162,4,SDN 12,--
+PATTERN,D,64,68,4,16,C#,Phrygian,Abyss Turnaround
+EVENT,0,0,D-2,AbyssSub,148,32,--,PAN 128
+EVENT,0,2,G#3,CavernDraft,82,32,--,PAN 44
+EVENT,0,3,"D-3,F#3,A-3",DepthPad,122,32,--,PAN 128
+EVENT,0,4,D-2,AbyssPulse,156,3,--,PAN 100
+EVENT,0,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,0,7,D-4,AbyssLead,164,10,VIB 56,PAN 160
+EVENT,2,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,4,4,D-2,AbyssPulse,128,3,--,--
+EVENT,6,1,D-5,CrystalRes,104,14,--,PAN 64
+EVENT,6,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,8,4,D-2,AbyssPulse,156,3,--,--
+EVENT,8,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,10,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,12,4,D-2,AbyssPulse,128,3,--,--
+EVENT,12,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,12,7,A-3,AbyssLead,164,8,VIB 56,--
+EVENT,14,4,D-2,AbyssPulse,128,3,--,--
+EVENT,14,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,16,4,D-2,AbyssPulse,156,3,--,--
+EVENT,16,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,18,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,20,4,D-2,AbyssPulse,128,3,--,--
+EVENT,22,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,24,4,D-2,AbyssPulse,156,3,--,--
+EVENT,24,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,24,7,F#3,AbyssLead,164,8,VIB 56,--
+EVENT,26,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,28,4,D-2,AbyssPulse,128,3,--,--
+EVENT,28,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,30,4,D-2,AbyssPulse,128,3,--,--
+EVENT,30,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,32,0,G#1,AbyssSub,148,32,--,PAN 128
+EVENT,32,1,C#5,CrystalRes,104,14,--,PAN 196
+EVENT,32,2,D-4,CavernDraft,86,32,--,PAN 212
+EVENT,32,3,"G#2,C-3,D#3",DepthPad,122,32,--,PAN 128
+EVENT,32,4,G#1,AbyssPulse,156,3,--,--
+EVENT,32,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,32,7,G#3,AbyssLead,164,12,VIB 56,--
+EVENT,34,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,36,4,G#1,AbyssPulse,128,3,--,--
+EVENT,38,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,40,4,G#1,AbyssPulse,156,3,--,--
+EVENT,40,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,42,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,44,4,G#1,AbyssPulse,128,3,--,--
+EVENT,44,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,46,4,G#1,AbyssPulse,128,3,--,--
+EVENT,46,5,D-2,DepthDrum,162,4,SDN 12,--
+EVENT,48,4,G#1,AbyssPulse,156,3,--,--
+EVENT,48,5,C#2,DepthDrum,205,6,SDN 16,PAN 128
+EVENT,48,7,B-3,AbyssLead,164,8,VIB 56,--
+EVENT,50,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,52,1,G#4,CrystalRes,104,14,--,PAN 128
+EVENT,52,4,G#1,AbyssPulse,128,3,--,--
+EVENT,54,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,56,4,G#1,AbyssPulse,156,3,--,--
+EVENT,56,5,G#1,DepthDrum,172,5,SDN 12,--
+EVENT,56,7,C-4,AbyssLead,164,8,VIB 56,--
+EVENT,58,6,G#5,ObsidianTick,74,2,--,PAN 184
+EVENT,60,4,G#1,AbyssPulse,128,3,--,--
+EVENT,60,6,G#5,ObsidianTick,74,2,--,PAN 72
+EVENT,62,4,G#1,AbyssPulse,128,3,--,--
+EVENT,62,5,D-2,DepthDrum,162,4,SDN 12,--

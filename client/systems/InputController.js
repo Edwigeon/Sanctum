@@ -1,9 +1,10 @@
 import { PACKET_TYPES } from '../../shared/Constants.js';
 
 export class InputController {
-  constructor({ renderer, hud, sendPacket, getState }) {
+  constructor({ renderer, hud, audio, sendPacket, getState }) {
     this.renderer = renderer;
     this.hud = hud;
+    this.audio = audio;
     this.sendPacket = sendPacket;
     this.getState = getState;
 
@@ -86,6 +87,7 @@ export class InputController {
         if (myP) {
           const px = myP.rx !== undefined ? myP.rx : myP.x;
           const py = myP.ry !== undefined ? myP.ry : myP.y;
+          if ((myP.mp ?? 0) >= 10) this.audio?.play('spark', { pitchJitter: 0.05 });
           this.sendPacket({ type: PACKET_TYPES.INPUT_SKILL, angle: Math.atan2(wy - py, wx - px) });
         }
         return;
@@ -135,7 +137,11 @@ export class InputController {
         this.sendPacket({ type: PACKET_TYPES.INPUT_POTION });
       } else if (k === 't') {
         const on = this.renderer.lighting.togglePlayerTorch();
+        this.audio?.play('torch_toggle', { pitchJitter: 0.08 });
         this.renderer.addFloatingText(on ? 'Torch Lit' : 'Torch Snuffed', this.mouse.worldX, this.mouse.worldY - 8, on ? '#FACC15' : '#94A3B8');
+      } else if (k === 'm') {
+        const muted = this.audio?.toggleMute();
+        this.renderer.addFloatingText(muted ? 'Audio Muted' : 'Audio On', this.mouse.worldX, this.mouse.worldY - 8, muted ? '#94A3B8' : '#34D399');
       } else if (k === 'l') {
         const nextAmb = this.renderer.lighting.targetAmbientLight > 0 ? 0.0 : 5.5;
         this.renderer.lighting.setAmbientLight(nextAmb);

@@ -51,7 +51,7 @@ JavaScript (ES Modules) across both Node.js server and browser client.
 Shared /shared/ modules (Constants.js, MathUtils.js, DungeonGen.js, CombatMath.js) guarantee identical physics, RNG, and damage math on both sides.
 Modular Client & Server Systems:
 Server systems (/server/systems/): GameRoom, DataRegistry, LootGenerator, Database, AuthService, SaveManager, ModService, DemoSeeder.
-Client systems (/client/systems/): LightingSystem (merged-wall analytical shadowcasting + 9-band Bayer dither + additive 16-color lights + subpixel entity stamping), Renderer, Interpolator, HUDController, InputController, MenuController.
+Client systems (/client/systems/): LightingSystem (merged-wall analytical shadowcasting + 9-band Bayer dither + additive 16-color lights + subpixel sprite/entity stamping), SpriteRegistry (/data/sprites.json hex-grid loader), AudioPSG (Lanthorn-PSG core + Visual SFX Painter engine), Renderer, Interpolator, HUDController, InputController, MenuController.
 Detailed documentation of implemented systems lives in SYSTEMS.md.
 Server-Authoritative Simulation (15 Hz):
 Clients send lightweight input intents (MOVE, ATTACK, SKILL, POTION, PICKUP).
@@ -70,11 +70,12 @@ Phase 2B: Real-Time 2D Lighting, Interactive World Objects, Developer Asset Stud
  [x] Additive 16-color palette lighting (`PALETTE`, `PALETTE_INDEX`, `PALETTE_RGB` in `shared/Constants.js`) & subpixel entity stamping (`drawLitEntityStamp`): overlapping lights add brightness and RGB photons cleanly (`ORANGE` torch, `BLUE` Spark projectiles, `YELLOW` stairs & unique drops, `PINK` rare loot, `RED` elite monsters), with entities shaded into a contiguous 24×24 offscreen stamp and blitted at exact subpixel screen coordinates (60+ FPS smooth motion, zero grid seams).
  [x] Toggleable personal torch (`T`), smooth ambient light transitions (`L` daylight preview), and visibility-based monster/loot hover culling.
  [ ] Interactive Static World Objects: Shrines (granting temporary buffs and toggling off their colored shrine light beacon when activated), Chests/Containers (casting shadows as static occluders until opened/broken), and Toggleable Braziers/Torches.
- [ ] Developer Sprite & Asset Digitizer Suite (/dev -> client/dev.html & client/dev.js, backed by /api/dev/sprites):
-     - Image-to-Sanctum Digitizer: drag/drop or paste reference images (.png/.jpg/.webp), interactive crop/resize (8×8, 12×12 tile/pawn/object, 16×16 elite, 24×24 boss), perceptual 16-color palette quantizer with alpha threshold, contrast, and optional Bayer dither toggle.
-     - Interactive Pixel, Rotation & Animation Editor: 16-color palette picker, pencil/eraser/fill/line/mirror tools, rotation preview (0°..360° & 90° steps), multi-frame animation preview (Idle/Walk/Active frames), and 3×3 tiled floor/wall preview under simulated torchlight across all brightness bands.
-     - Direct Export & Live Reload: one-click save directly to /data/sprites.json via local server API or JSON snippet copy.
- [ ] Data-driven Palette-Indexed Micro-Sprites (/data/sprites.json): compact 16-color hex-grid definitions baked at runtime into rotatable stamps for textured tiles, doors, shrines, chests, items, and 2-frame entity animations (zero external .png bloat).
+ [x] Developer Asset & PSG Studio (/dev -> client/dev.html, client/dev.js, client/dev/SpriteStudio.js, client/dev/SoundLab.js, backed by /api/dev/sprites & /api/dev/sfx):
+     - Image-to-Sanctum Digitizer: drag/drop, upload, or Ctrl+V paste reference images (.png/.jpg/.webp), perceptual 16-color palette quantizer with contrast, alpha threshold, and optional 4×4 Bayer dither toggle.
+     - Interactive Pixel, Rotation & Animation Editor: 16-color palette picker, pencil/fill/eyedropper/eraser/mirror/rotate/flip/undo tools, multi-frame animation preview, 3×3 tile & 0°–360° rotation preview, and all 8 DOOM shade bands preview.
+     - Lanthorn-PSG Sound Lab Tab: dual-mode workbench supporting both Parametric Synthesis (dual-oscillator/ADSR/LFO/FX/MIDI arpeggios) and a PICO-8 / Lanthorn-style Visual SFX Painter (3-layer 32-step Pitch & Volume piano-roll canvas with ghost overlays & smooth pitch slide), plus real-time oscilloscope preview for `/data/sfx.json`.
+     - Direct Export & Live Save: moderator-authenticated one-click save directly to /data/sprites.json and /data/sfx.json or JSON clipboard copy.
+ [x] Data-driven Palette-Indexed Micro-Sprites (`client/systems/SpriteRegistry.js` + `/data/sprites.json`): compact 16-color hex-grid definitions baked live into `LightingSystem.bakeFloorIndices()` (tiles) and `drawLitSpriteStamp()` (rotatable/animated 2-frame entities with unified Bayer-dithered lighting and zero external `.png` bloat).
 
 Phase 2C: Interconnected Cell/Chunk World, Constrained Biomes & Day/Night Cycle
  [ ] Spatial Cell / Chunk loading system: stitch adjacent deterministic cells into an interconnected world graph, streaming active cells around players on both server and client.
@@ -90,7 +91,11 @@ Phase 3B: Class Skills, Elite Monsters, Bosses & Audio
  [ ] Class-distinct right-click and hotbar active skills (e.g., Vanguard Cleave/Leap, Arcanist Spark/Nova, Shadow Dash/Fan of Knives) defined in data/classes.json or data/skills.json.
  [ ] Elite monster affixes ([Vampiric], [Molten], [Fast], [Teleporter]) with distinct color palettes and nametag badges.
  [ ] 3 Act Boss encounters with multi-phase attack patterns and guaranteed Unique/Rare drops.
- [ ] Synthesized Web Audio chiptune SFX engine (client/systems/AudioEngine.js) for hits, crits, spell casts, potion chugs, loot drops, and level-ups.
+ [x] Lanthorn-PSG Audio Core (`client/systems/AudioPSG.js` + `/data/sfx.json`): ported dual-oscillator continuous-phase synth, ADSR, pitch sweeps, vibrato/tremolo/PWM LFOs, saturation, bitcrush, ring-mod, retrigger, echo, and 3-layer 32-step Visual SFX Painter playback with cached Web Audio buffers & stereo panning (`M` to mute).
+ [ ] Lanthorn-PSG MusicPlayer (`client/systems/MusicPlayer.js` + `/data/music/`):
+     - Lightweight Music Transport: parses compact Lanthorn V1.1 tracker songs (`.csv` or JSON, ~5–15 KB per track) and pre-bakes seamless looping `AudioBuffer`s on track/zone load (zero per-frame synthesis CPU cost).
+     - Deck A / Deck B Horizontal Crossfades: dual-deck equal-power cosine crossfade (`2–4 s`) for smooth transitions between biomes, dungeon depths, Town Hub, and Boss arenas.
+     - Synchronized 8-Track → 2-Stem Vertical Crossfades: renders base exploration tracks (`Tracks 1–4`) and intensity/combat/nightfall tracks (`Tracks 5–8`) into two sample-locked stems sharing the same `AudioContext.currentTime` start, dynamically sweeping stem gains based on combat aggro or Day/Night state.
 
 Phase 4B: Hall of Fame UI, Stashes & Production Hosting
  [ ] Mode-partitioned Shared Stashes (Classic vs. Hardcore) persisted in SQLite.
@@ -98,8 +103,10 @@ Phase 4B: Hall of Fame UI, Stashes & Production Hosting
  [ ] Dockerfile & docker-compose.yml for single-command homelab deployment with persistent volume mounts for /data/saves.
  [ ] Node.js Cluster / Worker mode (server/cluster.js) for multi-core room distribution.
 
-Phase 5: Narrative Pass, Combat Juice & PWA Polish
+Phase 5: Narrative Pass, Combat Juice, Binary Asset Packing & PWA Polish
  [ ] 3 Thematic Story Acts, NPC camp interactions, and readable lore tablets (/data/acts.json).
  [ ] Combat feel pass: hit-stop frames, directional screen shake, and enhanced crit/overkill typography on highResCanvas.
  [ ] Equipment paperdoll unequipping (click equipped slot to unequip to pack) and item comparison tooltips on hover.
+ [ ] Production Asset Packing: compile finalized sprite sheets & synthesized sound patch data from authoring JSON into compact binary packfiles (or SQLite asset DB) for minimal single-fetch loading, while retaining JSON mod overrides.
+ [ ] Replace Tailwind CDN with a minimal custom static CSS stylesheet for zero-external-dependency offline loads.
  [ ] PWA manifest.json, service worker caching, and offline solo-play fallback mode.

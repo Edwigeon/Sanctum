@@ -30,9 +30,16 @@ Sanctum/
 │   ├── app.js                  # Client coordinator: WebSocket lifecycle, event routing, rAF loop
 │   ├── mod.html                # Moderator Portal UI (/mod)
 │   ├── mod.js                  # Moderator Portal controller
+│   ├── dev.html                # Developer Asset & PSG Studio UI (/dev)
+│   ├── dev.js                  # Dev Studio coordinator & moderator save auth
+│   ├── dev/
+│   │   ├── SpriteStudio.js     # Image-to-16-color digitizer, pixel/frame editor, 8-band torch preview
+│   │   └── SoundLab.js         # Lanthorn-PSG parametric workbench + PICO-8 3-layer Visual SFX Painter
 │   └── systems/
 │       ├── LightingSystem.js   # Merged-wall analytical 2D lighting, 9-band Bayer dither, additive 16-color RGB
-│       ├── Renderer.js         # Dual-canvas rendering pipeline, camera lock, subpixel entity stamping, UI overlay
+│       ├── SpriteRegistry.js   # Loads /data/sprites.json hex-grids into fast Uint8Array frames
+│       ├── AudioPSG.js         # Lanthorn-PSG core port: dual-oscillator synth, DSP modifiers, 3-layer painter, Web Audio
+│       ├── Renderer.js         # Dual-canvas rendering pipeline, camera lock, subpixel sprite/entity stamping, UI overlay
 │       ├── Interpolator.js     # 15 Hz snapshot buffer -> smooth 60+ FPS entity interpolation
 │       ├── HUDController.js    # In-game DOM HUD, Character Sheet (C), Inventory (I), Pause/Invite
 │       ├── InputController.js  # Mouse world projection, LMB move/attack lock, RMB skill, visibility culling, hotkeys
@@ -42,6 +49,8 @@ Sanctum/
     ├── monsters.json           # Monster definitions (crawler, brute)
     ├── items.json              # Base equipment definitions across 4 slots (weapon, armor, gloves, ring)
     ├── affixes.json            # Item prefixes and suffixes
+    ├── sprites.json            # Palette-indexed 16-color hex-grid micro-sprites (tiles, entities, objects)
+    ├── sfx.json                # Lanthorn-PSG compatible SFX patches (hit, crit, spark, potion, level_up, etc.)
     └── saves/
         └── sanctum.db          # SQLite database (WAL mode)
 ```
@@ -105,12 +114,20 @@ Sanctum uses a pure real-time 2D line-of-sight lighting engine (no explored/unex
 ### Dual-Canvas Pipeline & Subpixel Entity Stamping (`Renderer.js`)
 1. **Low-Res World Layer (`#pixelCanvas`, `242×146`)**:
    * Upscaled via CSS `image-rendering: pixelated` with a 2px margin shifted on the GPU via `translate3d(-fracX * stageScale, -fracY * stageScale, 0)` for smooth subpixel scrolling.
-2. **Subpixel-Smooth Dithered Entity Stamping (`drawLitEntityStamp`)**:
-   * Entities (players, monsters, projectiles, loot) are shaded pixel-by-pixel via `sampleLitPixelU32()` into a contiguous `24×24` offscreen `ImageData` scratch buffer (`stampU32`), then blitted onto `#highResCanvas` with a single `drawImage()` call at exact floating-point subpixel screen coordinates `(wx - camera.x) * stageScale`.
+2. **Subpixel-Smooth Dithered Sprite & Entity Stamping (`SpriteRegistry.js`, `drawLitSpriteStamp`, `drawLitEntityStamp`)**:
+   * `SpriteRegistry` loads `/data/sprites.json` hex-grid rows (`0`–`f` → `0..15`, `.` → `255` transparent) into `Uint8Array` frames, automatically feeding `tiles/*` into `LightingSystem.bakeFloorIndices()` and `entities/*` (2-frame animated heroes & monsters) into `drawLitSpriteStamp()` (supporting horizontal flip and arbitrary rotation).
+   * Entities are shaded pixel-by-pixel via `sampleLitPixelU32()` into a contiguous `24×24` offscreen `ImageData` scratch buffer (`stampU32`), then blitted onto `#highResCanvas` with a single `drawImage()` call at exact floating-point subpixel screen coordinates `(wx - camera.x) * stageScale`.
    * Gives 60+ FPS subpixel-smooth entity motion with the exact same pixelated Bayer-dithered + additive colored lighting as the floor and zero internal grid seams.
 3. **High-DPI UI Overlay (`#highResCanvas`)**:
    * Camera locks directly to the local player's interpolated position (`myP.rx`, `myP.ry`).
    * Renders crisp selection rings, monster health bars, player nametags, floating combat text (`DAMAGE`, `CRIT`, `HEAL`, `LEVEL UP!`, `Too Heavy!`), and hovered loot tooltips with 1px offset drop shadows.
+
+### Lanthorn-PSG Audio Engine (`AudioPSG.js` & `data/sfx.json`)
+* Ported directly from `Edwigeon/Lanthorn-PSG` (`Oscillator` + `Modifiers` + preset JSON schema) into pure JS `Float32Array` DSP:
+  * **Dual Oscillator (`Oscillator`)**: Continuous phase integration supporting `sine`, `square` (static or array PWM `duty_cycle`), `sawtooth`, `triangle`, and deterministic LFSR `noise`, with `wave_type_2` + `mix` blending.
+  * **Modifiers (`Modifiers`)**: `applyADSR`, `applyTremolo`, `generateVibratoProfile`, `generateSlideProfile`, `generatePitchSweep`, `generatePWMProfile`, `applySaturation` (`Math.tanh`), `applyBitcrush`, `applyRingMod`, `applyRetrigger`, and multi-tap `applyEcho`.
+  * **Visual SFX Painter (`renderPainterPatch`)**: Supports PICO-8 / Lanthorn-style 3-layer 32-step `patch.painter` definitions (`step_ms`, `slide`, per-layer waveform/duty, 32-step MIDI pitch & `0..7` volume arrays) routed through the same FX chain (`ring_mod`, `saturation`, `bit_depth`, `echo`) and authored visually in `/dev`.
+  * **Cached Web Audio Playback**: Pre-renders each named SFX patch (parametric, multi-note arpeggio via `notes[]`, or 3-layer `painter`) once into an `AudioBuffer` at `22050 Hz` and plays it with slight `pitchJitter`, anti-spam throttling, and spatial `StereoPannerNode` panning based on world X position (`M` toggles mute).
 
 ### Snapshot Interpolation (`Interpolator.js`)
 * Buffers up to 6 incoming `WORLD_SNAPSHOT` packets (broadcast at 15 Hz).

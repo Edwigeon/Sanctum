@@ -22,10 +22,10 @@ function sendJson(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
-function readBody(req) {
+function readBody(req, maxBytes = 131072) {
   return new Promise((resolve, reject) => {
     let body = '';
-    req.on('data', chunk => { body += chunk; if (body.length > 131072) req.destroy(); });
+    req.on('data', chunk => { body += chunk; if (body.length > maxBytes) req.destroy(); });
     req.on('end', () => {
       try { resolve(body ? JSON.parse(body) : {}); }
       catch (e) { reject(e); }
@@ -164,9 +164,38 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 404, { error: 'Not Found' });
   }
 
+  // --- DEV ASSET & PSG STUDIO API ---
+  if (reqPath === '/api/dev/sprites' || reqPath === '/api/dev/sfx') {
+    const filename = reqPath === '/api/dev/sprites' ? 'sprites.json' : 'sfx.json';
+    const targetPath = path.join(DATA_DIR, filename);
+
+    if (req.method === 'GET') {
+      try {
+        const raw = fs.readFileSync(targetPath, 'utf-8');
+        return sendJson(res, 200, JSON.parse(raw));
+      } catch {
+        return sendJson(res, 200, {});
+      }
+    }
+
+    if (req.method === 'PUT') {
+      const account = authService.validateSession(getBearerToken(req));
+      if (!account) return sendJson(res, 401, { error: 'Sign in as a moderator to save directly to disk.' });
+      if (account.role !== 'moderator') return sendJson(res, 403, { error: 'Moderator role required to write data files.' });
+      try {
+        const data = await readBody(req, 1048576);
+        fs.writeFileSync(targetPath, JSON.stringify(data, null, 2), 'utf-8');
+        return sendJson(res, 200, { ok: true, saved: filename });
+      } catch {
+        return sendJson(res, 400, { error: 'Invalid JSON payload' });
+      }
+    }
+  }
+
   // --- STATIC ASSETS ---
   if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
   if (reqPath === '/mod') reqPath = '/mod.html';
+  if (reqPath === '/dev') reqPath = '/dev.html';
 
   let filePath;
   if (reqPath.startsWith('/shared/')) {

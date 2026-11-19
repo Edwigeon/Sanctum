@@ -247,9 +247,9 @@ export class LightingSystem {
   }
 
   /**
-   * Bakes the floor's 0..15 palette indices and builds merged continuous wall segments.
+   * Bakes the floor's 0..15 palette indices (using SpriteRegistry tiles when loaded) and builds merged wall segments.
    */
-  bakeFloorIndices(dungeon) {
+  bakeFloorIndices(dungeon, sprites = null) {
     this.clearStaticWorld();
     if (!dungeon) {
       this.mapIndices = null;
@@ -286,34 +286,154 @@ export class LightingSystem {
       }
     };
 
+    const stampTileSprite = (tx, ty, spr, frameIdx = 0, rot90 = 0, flipX = false) => {
+      const state = spr.getState ? spr.getState('idle') : spr;
+      const frames = state?.frames || spr.frames;
+      if (!frames || frames.length === 0) return;
+      const frame = frames[frameIdx % frames.length];
+      const sw = Math.min(ts, spr.w);
+      const sh = Math.min(ts, spr.h);
+      const rot = rot90 & 3;
+      for (let py = 0; py < sh; py++) {
+        const wy = ty + py;
+        if (wy < 0 || wy >= this.mapIndexH) continue;
+        const mapRow = wy * this.mapIndexW;
+        for (let px = 0; px < sw; px++) {
+          let sx = flipX ? (sw - 1 - px) : px;
+          let sy = py;
+          if (rot === 1) {
+            const tmp = sx;
+            sx = sy;
+            sy = sw - 1 - tmp;
+          } else if (rot === 2) {
+            sx = sw - 1 - sx;
+            sy = sh - 1 - sy;
+          } else if (rot === 3) {
+            const tmp = sx;
+            sx = sh - 1 - sy;
+            sy = tmp;
+          }
+          const palIdx = frame[sy * spr.w + sx];
+          if (palIdx === 255) continue;
+          const wx = tx + px;
+          if (wx >= 0 && wx < this.mapIndexW) {
+            this.mapIndices[mapRow + wx] = palIdx;
+          }
+        }
+      }
+    };
+
+    const wallFrontSpr = sprites?.get('tiles', 'wall_front') || sprites?.get('tiles', 'wall_brick');
+    const wallTopSpr = sprites?.get('tiles', 'wall_top') || wallFrontSpr;
+    const wallSideSpr = sprites?.get('tiles', 'wall_side') || wallFrontSpr;
+    const wallCornerSpr = sprites?.get('tiles', 'wall_corner') || wallFrontSpr;
+    const floorSpr = sprites?.get('tiles', 'floor_stone');
+    const stairsSpr = sprites?.get('tiles', 'stairs_down');
+
+    const isOpenTile = (r, c) => {
+      if (r < 0 || r >= dungeon.height || c < 0 || c >= dungeon.width) return false;
+      const val = dungeon.map[r][c];
+      return val !== TILES.WALL && val !== TILES.EMPTY;
+    };
+
     for (let r = 0; r < dungeon.height; r++) {
       const row = dungeon.map[r];
+      const rotRow = dungeon.tileRot?.[r];
       const ty = r * ts;
       const tileRowOff = r * this.tileCols;
       for (let c = 0; c < dungeon.width; c++) {
         const t = row[c];
         const tx = c * ts;
+        const explicitRot = rotRow ? (rotRow[c] || 0) : -1;
         this.opaqueTiles[tileRowOff + c] = (t === TILES.WALL || t === TILES.EMPTY) ? 1 : 0;
 
         if (t === TILES.WALL) {
-          fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_GRAY);
-          fillRectIdx(tx, ty, ts - 1, 2, PALETTE_INDEX.INDIGO);
-          fillRectIdx(tx, ty + 6, ts, 1, PALETTE_INDEX.DARK_BLUE);
-          fillRectIdx(tx + ((r & 1) ? 5 : 3), ty + 2, 1, 4, PALETTE_INDEX.DARK_BLUE);
-          fillRectIdx(tx + ((r & 1) ? 9 : 7), ty + 7, 1, 5, PALETTE_INDEX.DARK_BLUE);
+          if (wallFrontSpr?.frames?.length) {
+            const openN = isOpenTile(r - 1, c);
+            const openS = isOpenTile(r + 1, c);
+            const openW = isOpenTile(r, c - 1);
+            const openE = isOpenTile(r, c + 1);
+
+            let chosenSpr = wallFrontSpr;
+            let rot = 0;
+            let flip = false;
+
+            if (openN && openW) {
+              // Top-left interior room corner
+              chosenSpr = wallCornerSpr;
+              rot = 2; // Face opening SE
+            } else if (openN && openE) {
+              chosenSpr = wallCornerSpr;
+              rot = 3;
+            } else if (openS && openW) {
+              // Bottom-left room corner (where south wall meets west wall)
+              chosenSpr = wallCornerSpr;
+              rot = 1;
+            } else if (openS && openE) {
+              chosenSpr = wallCornerSpr;
+              rot = 0;
+            } else if (openN) {
+              // Wall below a room (facing North into the floor)
+              chosenSpr = wallTopSpr;
+              flip = wallTopSpr.allowFlip && (((r * 19 + c * 43) & 1) !== 0);
+            } else if (openS) {
+              // Wall above a room (facing South into the floor - classic front face)
+              chosenSpr = wallFrontSpr;
+              flip = wallFrontSpr.allowFlip && (((r * 19 + c * 43) & 1) !== 0);
+            } else if (openW) {
+              // Vertical right-hand wall (facing West into the floor)
+              chosenSpr = wallSideSpr;
+              flip = true; // Mirror to face west
+            } else if (openE) {
+              // Vertical left-hand wall (facing East into the floor)
+              chosenSpr = wallSideSpr;
+              flip = false;
+            } else {
+              // Fully interior hidden wall or void border
+              chosenSpr = wallFrontSpr;
+            }
+
+            if (explicitRot >= 0) {
+              rot = explicitRot & 3;
+              flip = (explicitRot & 4) !== 0;
+            }
+
+            const variant = (r * 13 + c * 29) % chosenSpr.frames.length;
+            stampTileSprite(tx, ty, chosenSpr, variant, rot, flip);
+          } else {
+            fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_GRAY);
+            fillRectIdx(tx, ty, ts - 1, 2, PALETTE_INDEX.INDIGO);
+            fillRectIdx(tx, ty + 6, ts, 1, PALETTE_INDEX.DARK_BLUE);
+            fillRectIdx(tx + ((r & 1) ? 5 : 3), ty + 2, 1, 4, PALETTE_INDEX.DARK_BLUE);
+            fillRectIdx(tx + ((r & 1) ? 9 : 7), ty + 7, 1, 5, PALETTE_INDEX.DARK_BLUE);
+          }
         } else if (t === TILES.STAIRS_DOWN) {
-          fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_BLUE);
-          fillRectIdx(tx + 2, ty + 2, ts - 4, ts - 4, PALETTE_INDEX.ORANGE);
-          fillRectIdx(tx + 4, ty + 4, ts - 8, ts - 8, PALETTE_INDEX.YELLOW);
+          if (stairsSpr?.frames?.length) {
+            const rot = explicitRot >= 0 ? (explicitRot & 3) : (stairsSpr.allowRotate ? (((r * 37 + c * 73) ^ (r * 17)) & 3) : 0);
+            const flip = explicitRot >= 0 ? ((explicitRot & 4) !== 0) : false;
+            stampTileSprite(tx, ty, stairsSpr, 0, rot, flip);
+          } else {
+            fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_BLUE);
+            fillRectIdx(tx + 2, ty + 2, ts - 4, ts - 4, PALETTE_INDEX.ORANGE);
+            fillRectIdx(tx + 4, ty + 4, ts - 8, ts - 8, PALETTE_INDEX.YELLOW);
+          }
         } else if (t !== TILES.EMPTY) {
-          fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_BLUE);
-          const hash = (r * 37 + c * 73) & 7;
-          if (hash === 0) {
-            fillRectIdx(tx + 2, ty + 2, 3, 1, PALETTE_INDEX.DARK_GRAY);
-          } else if (hash === 3) {
-            fillRectIdx(tx + 7, ty + 8, 2, 1, PALETTE_INDEX.DARK_GRAY);
-          } else if (hash === 5) {
-            fillRectIdx(tx + 4, ty + 6, 1, 1, PALETTE_INDEX.INDIGO);
+          if (floorSpr?.frames?.length) {
+            // Full D4 dihedral symmetry (8-way permutation) for natural stone texture variety
+            const rot = explicitRot >= 0 ? (explicitRot & 3) : (floorSpr.allowRotate ? (((r * 37 + c * 73) ^ (r * 17)) & 3) : 0);
+            const flip = explicitRot >= 0 ? ((explicitRot & 4) !== 0) : (floorSpr.allowFlip ? (((r * 53 + c * 89) & 1) !== 0) : false);
+            const variant = (r * 13 + c * 29) % floorSpr.frames.length;
+            stampTileSprite(tx, ty, floorSpr, variant, rot, flip);
+          } else {
+            fillRectIdx(tx, ty, ts, ts, PALETTE_INDEX.DARK_BLUE);
+            const hash = (r * 37 + c * 73) & 7;
+            if (hash === 0) {
+              fillRectIdx(tx + 2, ty + 2, 3, 1, PALETTE_INDEX.DARK_GRAY);
+            } else if (hash === 3) {
+              fillRectIdx(tx + 7, ty + 8, 2, 1, PALETTE_INDEX.DARK_GRAY);
+            } else if (hash === 5) {
+              fillRectIdx(tx + 4, ty + 6, 1, 1, PALETTE_INDEX.INDIGO);
+            }
           }
         }
       }
@@ -704,6 +824,83 @@ export class LightingSystem {
               buf[rowOff + px] = SHADE_U32[0][0];
             }
           } else if (u32 !== SHADE_U32[0][0]) {
+            buf[rowOff + px] = u32;
+          }
+        }
+      }
+    }
+
+    this.stampCtx.putImageData(this.stampImageData, 0, 0, 0, 0, sw, sh);
+    const screenX = (wx + ox - camX) * scale;
+    const screenY = (wy + oy - camY) * scale;
+    hCtx.drawImage(this.stampCanvas, 0, 0, sw, sh, screenX, screenY, sw * scale, sh * scale);
+  }
+
+  /**
+   * Stamps a palette-indexed SpriteRegistry frame (with optional flipX and rotation) into the 24x24
+   * scratch ImageData buffer using per-pixel Bayer-dithered + additive colored lighting, then blits
+   * onto hCtx at exact subpixel screen coordinates.
+   */
+  drawLitSpriteStamp(hCtx, { sprite, state = 'idle', frameIdx = 0, wx, wy, camX, camY, scale, flipX = false, rot90 = 0, angleRad = 0 }) {
+    if (!this.lightGrid || !sprite) return;
+    const st = sprite.getState ? sprite.getState(state) : sprite;
+    const frames = st?.frames || sprite.frames;
+    if (!frames || frames.length === 0) return;
+    const frame = frames[frameIdx % frames.length];
+    const sw = Math.min(24, sprite.w);
+    const sh = Math.min(24, sprite.h);
+    const ox = -sprite.anchorX;
+    const oy = -sprite.anchorY;
+    const buf = this.stampU32;
+    const blackU32 = SHADE_U32[0][0];
+
+    for (let py = 0; py < sh; py++) {
+      buf.fill(0, py * 24, py * 24 + sw);
+    }
+
+    const r90 = rot90 & 3;
+    const hasRot = r90 === 0 && Math.abs(angleRad) > 1e-4;
+    const cosA = hasRot ? Math.cos(-angleRad) : 1;
+    const sinA = hasRot ? Math.sin(-angleRad) : 0;
+    const cx = (sw - 1) * 0.5;
+    const cy = (sh - 1) * 0.5;
+
+    for (let py = 0; py < sh; py++) {
+      const worldY = wy + oy + py;
+      const rowOff = py * 24;
+      for (let px = 0; px < sw; px++) {
+        let sx = flipX ? (sw - 1 - px) : px;
+        let sy = py;
+        if (r90 === 1) {
+          const tmp = sx;
+          sx = sy;
+          sy = sw - 1 - tmp;
+        } else if (r90 === 2) {
+          sx = sw - 1 - sx;
+          sy = sh - 1 - sy;
+        } else if (r90 === 3) {
+          const tmp = sx;
+          sx = sh - 1 - sy;
+          sy = tmp;
+        } else if (hasRot) {
+          const dx = px - cx;
+          const dy = py - cy;
+          sx = Math.round(dx * cosA - dy * sinA + cx);
+          sy = Math.round(dx * sinA + dy * cosA + cy);
+          if (sx < 0 || sx >= sprite.w || sy < 0 || sy >= sprite.h) continue;
+          if (flipX) sx = sprite.w - 1 - sx;
+        }
+        const palIdx = frame[sy * sprite.w + sx];
+        if (palIdx === 255) continue;
+
+        const worldX = wx + ox + px;
+        if (palIdx === PALETTE_INDEX.BLACK) {
+          if (this.sampleLightAtWorld(worldX, worldY) > 0.25) {
+            buf[rowOff + px] = blackU32;
+          }
+        } else {
+          const u32 = this.sampleLitPixelU32(worldX, worldY, palIdx);
+          if (u32 !== blackU32) {
             buf[rowOff + px] = u32;
           }
         }

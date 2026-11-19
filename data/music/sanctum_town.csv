@@ -1,0 +1,286 @@
+LANTHORN_V1.1,8,7,76,4,A,Minor,16
+PATCH,CampLute,"{""name"": ""CampLute"", ""wave_type"": ""triangle"", ""wave_type_2"": ""sawtooth"", ""mix"": 0.22, ""envelope"": {""attack"": 0.002, ""decay"": 0.4, ""sustain_level"": 0.08, ""release"": 0.45}, ""echo"": {""delay_time"": 0.26, ""feedback"": 0.26}}"
+PATCH,HearthDrone,"{""name"": ""HearthDrone"", ""wave_type"": ""sine"", ""wave_type_2"": ""triangle"", ""mix"": 0.45, ""envelope"": {""attack"": 0.5, ""decay"": 0.3, ""sustain_level"": 0.8, ""release"": 0.7}, ""lfo"": {""vibrato_speed"": 1.6, ""vibrato_depth"": 0.08}}"
+PATCH,EmberCrackle,"{""name"": ""EmberCrackle"", ""wave_type"": ""noise"", ""bit_depth"": 10, ""envelope"": {""attack"": 0.001, ""decay"": 0.04, ""sustain_level"": 0.0, ""release"": 0.02}}"
+PATCH,CampFlute,"{""name"": ""CampFlute"", ""wave_type"": ""triangle"", ""wave_type_2"": ""sine"", ""mix"": 0.4, ""envelope"": {""attack"": 0.12, ""decay"": 0.2, ""sustain_level"": 0.72, ""release"": 0.45}, ""lfo"": {""vibrato_speed"": 4.8, ""vibrato_depth"": 0.16}, ""echo"": {""delay_time"": 0.32, ""feedback"": 0.28}}"
+PATCH,NightWind,"{""name"": ""NightWind"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.18, ""envelope"": {""attack"": 0.65, ""decay"": 0.3, ""sustain_level"": 0.65, ""release"": 0.85}, ""lfo"": {""tremolo_speed"": 1.2, ""tremolo_depth"": 0.28}}"
+PATCH,VesperBell,"{""name"": ""VesperBell"", ""wave_type"": ""sine"", ""wave_type_2"": ""square"", ""mix"": 0.18, ""duty_cycle"": 0.25, ""envelope"": {""attack"": 0.004, ""decay"": 0.85, ""sustain_level"": 0.04, ""release"": 0.85}, ""ring_mod"": {""carrier_freq"": 330.0, ""mix"": 0.14}, ""echo"": {""delay_time"": 0.39, ""feedback"": 0.38}}"
+PATCH,DuskCello,"{""name"": ""DuskCello"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""triangle"", ""mix"": 0.48, ""envelope"": {""attack"": 0.16, ""decay"": 0.25, ""sustain_level"": 0.78, ""release"": 0.45}, ""lfo"": {""vibrato_speed"": 4.2, ""vibrato_depth"": 0.18}, ""saturation"": 1.2}"
+PATCH,SoftDrum,"{""name"": ""SoftDrum"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.08, ""envelope"": {""attack"": 0.004, ""decay"": 0.26, ""sustain_level"": 0.0, ""release"": 0.14}, ""portamento"": {""slide_time"": 0.025}}"
+--- ORDER LIST ---,SeqIndex,PatternID
+SEQ,0,A
+SEQ,1,B
+SEQ,2,C
+SEQ,3,D
+--- PATTERNS ---,Type,ID,Length
+PATTERN,A,64,76,4,16,A,Minor,Campfire Hearth
+EVENT,0,0,A-3,CampLute,148,6,--,PAN 92
+EVENT,0,1,A-2,HearthDrone,125,16,--,PAN 128
+EVENT,0,4,E-4,NightWind,88,32,--,PAN 48
+EVENT,0,5,A-4,VesperBell,108,14,--,PAN 192
+EVENT,0,6,A-3,DuskCello,148,16,VIB 46,PAN 162
+EVENT,0,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,2,0,E-4,CampLute,124,6,--,--
+EVENT,3,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,4,0,B-4,CampLute,124,6,--,--
+EVENT,6,0,C-5,CampLute,124,6,--,--
+EVENT,8,0,E-4,CampLute,148,6,--,--
+EVENT,8,3,E-5,CampFlute,120,8,--,PAN 156
+EVENT,10,0,B-4,CampLute,124,6,--,--
+EVENT,10,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,11,2,A-5,EmberCrackle,56,2,--,PAN 184
+EVENT,12,0,A-4,CampLute,124,6,--,--
+EVENT,14,0,E-4,CampLute,124,6,--,--
+EVENT,16,0,F-3,CampLute,148,6,--,PAN 92
+EVENT,16,1,F-2,HearthDrone,122,16,--,PAN 128
+EVENT,16,6,F-3,DuskCello,148,16,VIB 46,--
+EVENT,16,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,18,0,C-4,CampLute,124,6,--,--
+EVENT,19,2,A-5,EmberCrackle,66,2,--,PAN 72
+EVENT,20,0,G-4,CampLute,124,6,--,--
+EVENT,22,0,A-4,CampLute,124,6,--,--
+EVENT,24,0,C-4,CampLute,148,6,--,--
+EVENT,24,3,C-5,CampFlute,115,8,--,--
+EVENT,26,0,G-4,CampLute,124,6,--,--
+EVENT,26,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,28,0,F-4,CampLute,124,6,--,--
+EVENT,29,2,A-5,EmberCrackle,46,2,--,PAN 184
+EVENT,30,0,C-4,CampLute,124,6,--,--
+EVENT,32,0,D-3,CampLute,148,6,--,PAN 92
+EVENT,32,1,D-2,HearthDrone,125,16,--,PAN 128
+EVENT,32,4,B-3,NightWind,92,32,--,PAN 208
+EVENT,32,5,E-4,VesperBell,108,14,--,PAN 64
+EVENT,32,6,D-3,DuskCello,148,16,VIB 46,--
+EVENT,32,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,34,0,A-3,CampLute,124,6,--,--
+EVENT,36,0,E-4,CampLute,124,6,--,--
+EVENT,37,2,A-5,EmberCrackle,56,2,--,PAN 72
+EVENT,38,0,F-4,CampLute,124,6,--,--
+EVENT,40,0,A-3,CampLute,148,6,--,--
+EVENT,40,3,D-5,CampFlute,122,8,--,--
+EVENT,42,0,E-4,CampLute,124,6,--,--
+EVENT,42,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,44,0,D-4,CampLute,124,6,--,--
+EVENT,45,2,A-5,EmberCrackle,66,2,--,PAN 184
+EVENT,46,0,A-3,CampLute,124,6,--,--
+EVENT,48,0,E-3,CampLute,148,6,--,PAN 92
+EVENT,48,1,E-2,HearthDrone,128,16,--,PAN 128
+EVENT,48,6,E-3,DuskCello,148,16,VIB 46,--
+EVENT,48,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,50,0,B-3,CampLute,124,6,--,--
+EVENT,52,0,E-4,CampLute,124,6,--,--
+EVENT,52,3,B-4,CampFlute,118,12,--,--
+EVENT,54,0,A-4,CampLute,124,6,--,--
+EVENT,55,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,56,0,B-3,CampLute,148,6,--,--
+EVENT,58,0,G#4,CampLute,124,6,--,--
+EVENT,58,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,60,0,E-4,CampLute,124,6,--,--
+EVENT,61,2,A-5,EmberCrackle,56,2,--,PAN 184
+EVENT,62,0,B-3,CampLute,124,6,--,--
+PATTERN,B,64,76,4,16,A,Minor,Wistful Dusk
+EVENT,0,0,A-3,CampLute,148,6,--,PAN 92
+EVENT,0,1,"A-2,E-3",HearthDrone,128,16,--,PAN 128
+EVENT,0,3,A-4,CampFlute,138,6,--,PAN 152
+EVENT,0,4,A-3,NightWind,88,32,--,PAN 48
+EVENT,0,5,E-5,VesperBell,108,14,--,PAN 196
+EVENT,0,6,C-4,DuskCello,148,12,VIB 46,PAN 162
+EVENT,0,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,2,0,E-4,CampLute,124,6,--,--
+EVENT,4,0,C-5,CampLute,124,6,--,--
+EVENT,5,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,6,0,E-4,CampLute,124,6,--,--
+EVENT,6,3,C-5,CampFlute,138,6,--,--
+EVENT,8,0,B-4,CampLute,148,6,--,--
+EVENT,10,0,E-4,CampLute,124,6,--,--
+EVENT,10,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,12,0,A-4,CampLute,124,6,--,--
+EVENT,12,3,B-4,CampFlute,138,4,--,--
+EVENT,13,2,A-5,EmberCrackle,56,2,--,PAN 184
+EVENT,14,0,E-4,CampLute,124,6,--,--
+EVENT,16,0,G-3,CampLute,148,6,--,PAN 92
+EVENT,16,1,"G-2,D-3",HearthDrone,125,16,--,PAN 128
+EVENT,16,3,G-4,CampFlute,138,8,--,--
+EVENT,16,6,B-3,DuskCello,148,12,VIB 46,--
+EVENT,16,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,18,0,D-4,CampLute,124,6,--,--
+EVENT,20,0,B-4,CampLute,124,6,--,--
+EVENT,21,2,A-5,EmberCrackle,66,2,--,PAN 72
+EVENT,22,0,D-4,CampLute,124,6,--,--
+EVENT,24,0,A-4,CampLute,148,6,--,--
+EVENT,24,3,D-5,CampFlute,138,8,--,--
+EVENT,26,0,D-4,CampLute,124,6,--,--
+EVENT,26,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,28,0,G-4,CampLute,124,6,--,--
+EVENT,30,0,D-4,CampLute,124,6,--,--
+EVENT,31,2,A-5,EmberCrackle,46,2,--,PAN 184
+EVENT,32,0,F-3,CampLute,148,6,--,PAN 92
+EVENT,32,1,"F-2,C-3",HearthDrone,125,16,--,PAN 128
+EVENT,32,3,C-5,CampFlute,138,6,--,--
+EVENT,32,4,G#3,NightWind,92,32,--,PAN 208
+EVENT,32,6,A-3,DuskCello,148,12,VIB 46,--
+EVENT,32,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,34,0,C-4,CampLute,124,6,--,--
+EVENT,36,0,A-4,CampLute,124,6,--,--
+EVENT,38,0,C-4,CampLute,124,6,--,--
+EVENT,38,3,A-4,CampFlute,138,6,--,--
+EVENT,39,2,A-5,EmberCrackle,56,2,--,PAN 72
+EVENT,40,0,G-4,CampLute,148,6,--,--
+EVENT,42,0,C-4,CampLute,124,6,--,--
+EVENT,42,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,44,0,F-4,CampLute,124,6,--,--
+EVENT,44,3,G-4,CampFlute,138,4,--,--
+EVENT,46,0,C-4,CampLute,124,6,--,--
+EVENT,47,2,A-5,EmberCrackle,66,2,--,PAN 184
+EVENT,48,0,E-3,CampLute,148,6,--,PAN 92
+EVENT,48,1,"E-2,B-2",HearthDrone,130,16,--,PAN 128
+EVENT,48,3,B-4,CampFlute,138,10,--,--
+EVENT,48,5,B-4,VesperBell,108,14,--,PAN 64
+EVENT,48,6,G#3,DuskCello,148,16,VIB 46,--
+EVENT,48,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,50,0,B-3,CampLute,124,6,--,--
+EVENT,52,0,G#4,CampLute,124,6,--,--
+EVENT,54,0,B-3,CampLute,124,6,--,--
+EVENT,56,0,F#4,CampLute,148,6,--,--
+EVENT,57,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,58,0,B-3,CampLute,124,6,--,--
+EVENT,58,3,E-4,CampFlute,138,6,--,--
+EVENT,58,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,60,0,E-4,CampLute,124,6,--,--
+EVENT,62,0,B-3,CampLute,124,6,--,--
+EVENT,63,2,A-5,EmberCrackle,56,2,--,PAN 184
+PATTERN,C,64,76,4,16,A,Dorian,Dorian Lantern
+EVENT,0,0,F-3,CampLute,148,6,--,PAN 92
+EVENT,0,1,F-2,HearthDrone,126,16,--,PAN 128
+EVENT,0,3,A-4,CampFlute,142,8,--,PAN 152
+EVENT,0,4,C-4,NightWind,88,32,--,PAN 48
+EVENT,0,6,A-3,DuskCello,148,16,VIB 46,PAN 162
+EVENT,0,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,2,0,C-4,CampLute,124,6,--,--
+EVENT,2,2,A-5,EmberCrackle,56,2,--,PAN 184
+EVENT,4,0,A-4,CampLute,124,6,--,--
+EVENT,6,0,G-4,CampLute,124,6,--,--
+EVENT,8,0,C-4,CampLute,148,6,--,--
+EVENT,8,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,8,3,C-5,CampFlute,142,8,--,--
+EVENT,10,0,F-4,CampLute,124,6,--,--
+EVENT,10,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,12,0,A-4,CampLute,124,6,--,--
+EVENT,14,0,C-4,CampLute,124,6,--,--
+EVENT,16,0,G-3,CampLute,148,6,--,PAN 92
+EVENT,16,1,G-2,HearthDrone,126,16,--,PAN 128
+EVENT,16,2,A-5,EmberCrackle,56,2,--,PAN 184
+EVENT,16,3,D-5,CampFlute,142,10,--,--
+EVENT,16,5,D-5,VesperBell,108,14,--,PAN 188
+EVENT,16,6,B-3,DuskCello,148,16,VIB 46,--
+EVENT,16,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,18,0,D-4,CampLute,124,6,--,--
+EVENT,20,0,B-4,CampLute,124,6,--,--
+EVENT,22,0,A-4,CampLute,124,6,--,--
+EVENT,24,0,D-4,CampLute,148,6,--,--
+EVENT,24,2,A-5,EmberCrackle,66,2,--,PAN 72
+EVENT,26,0,G-4,CampLute,124,6,--,--
+EVENT,26,3,B-4,CampFlute,142,6,--,--
+EVENT,26,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,28,0,B-4,CampLute,124,6,--,--
+EVENT,30,0,D-4,CampLute,124,6,--,--
+EVENT,32,0,A-3,CampLute,148,6,--,PAN 92
+EVENT,32,1,A-2,HearthDrone,128,16,--,PAN 128
+EVENT,32,3,E-5,CampFlute,142,10,--,--
+EVENT,32,4,B-3,NightWind,92,32,--,PAN 208
+EVENT,32,6,C-4,DuskCello,148,16,VIB 46,--
+EVENT,32,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,34,0,E-4,CampLute,124,6,--,--
+EVENT,34,2,A-5,EmberCrackle,46,2,--,PAN 184
+EVENT,36,0,C-5,CampLute,124,6,--,--
+EVENT,38,0,B-4,CampLute,124,6,--,--
+EVENT,40,0,E-4,CampLute,148,6,--,--
+EVENT,42,0,A-4,CampLute,124,6,--,--
+EVENT,42,2,A-5,EmberCrackle,56,2,--,PAN 72
+EVENT,42,3,C-5,CampFlute,142,6,--,--
+EVENT,42,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,44,0,B-4,CampLute,124,6,--,--
+EVENT,46,0,E-4,CampLute,124,6,--,--
+EVENT,48,0,D-3,CampLute,148,6,--,PAN 92
+EVENT,48,1,D-2,HearthDrone,126,8,--,PAN 128
+EVENT,48,3,F#4,CampFlute,142,8,--,--
+EVENT,48,5,F#4,VesperBell,108,14,--,PAN 72
+EVENT,48,6,D-4,DuskCello,148,8,VIB 46,--
+EVENT,48,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,50,0,A-3,CampLute,124,6,--,--
+EVENT,50,2,A-5,EmberCrackle,66,2,--,PAN 184
+EVENT,52,0,F#4,CampLute,124,6,--,--
+EVENT,54,0,D-4,CampLute,124,6,--,--
+EVENT,56,0,E-3,CampLute,148,6,--,--
+EVENT,56,1,E-2,HearthDrone,130,8,--,PAN 128
+EVENT,56,3,E-4,CampFlute,142,8,--,--
+EVENT,56,6,B-3,DuskCello,148,8,VIB 46,--
+EVENT,58,0,B-3,CampLute,124,6,--,--
+EVENT,58,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,60,0,G#4,CampLute,124,6,--,--
+EVENT,60,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,62,0,E-4,CampLute,124,6,--,--
+PATTERN,D,64,76,4,16,A,Minor,Ember Turnaround
+EVENT,0,0,D-3,CampLute,148,6,--,PAN 92
+EVENT,0,1,"D-2,A-2",HearthDrone,124,16,--,PAN 128
+EVENT,0,3,F-4,CampFlute,126,12,--,PAN 156
+EVENT,0,4,D-4,NightWind,88,32,--,PAN 48
+EVENT,0,5,A-4,VesperBell,108,14,--,PAN 192
+EVENT,0,6,F-3,DuskCello,148,16,VIB 46,PAN 162
+EVENT,0,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,2,0,A-3,CampLute,124,6,--,--
+EVENT,4,0,F-4,CampLute,124,6,--,--
+EVENT,4,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,6,0,E-4,CampLute,124,6,--,--
+EVENT,8,0,A-3,CampLute,148,6,--,--
+EVENT,10,0,D-4,CampLute,124,6,--,--
+EVENT,10,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,12,0,C-4,CampLute,124,6,--,--
+EVENT,12,2,A-5,EmberCrackle,56,2,--,PAN 184
+EVENT,14,0,A-3,CampLute,124,6,--,--
+EVENT,16,0,C-3,CampLute,148,6,--,PAN 92
+EVENT,16,1,"C-2,G-2",HearthDrone,122,16,--,PAN 128
+EVENT,16,3,E-4,CampFlute,122,12,--,--
+EVENT,16,6,E-3,DuskCello,148,16,VIB 46,--
+EVENT,16,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,18,0,G-3,CampLute,124,6,--,--
+EVENT,20,0,E-4,CampLute,124,6,--,--
+EVENT,20,2,A-5,EmberCrackle,66,2,--,PAN 72
+EVENT,22,0,D-4,CampLute,124,6,--,--
+EVENT,24,0,G-3,CampLute,148,6,--,--
+EVENT,26,0,C-4,CampLute,124,6,--,--
+EVENT,26,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,28,0,B-3,CampLute,124,6,--,--
+EVENT,30,0,G-3,CampLute,124,6,--,--
+EVENT,30,2,A-5,EmberCrackle,46,2,--,PAN 184
+EVENT,32,0,B-2,CampLute,148,6,--,PAN 92
+EVENT,32,1,"B-1,F-2",HearthDrone,124,16,--,PAN 128
+EVENT,32,3,D-4,CampFlute,120,14,--,--
+EVENT,32,4,E-4,NightWind,92,32,--,PAN 208
+EVENT,32,6,D-3,DuskCello,148,16,VIB 46,--
+EVENT,32,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,34,0,F-3,CampLute,124,6,--,--
+EVENT,36,0,D-4,CampLute,124,6,--,--
+EVENT,38,0,C-4,CampLute,124,6,--,--
+EVENT,38,2,A-5,EmberCrackle,56,2,--,PAN 72
+EVENT,40,0,F-3,CampLute,148,6,--,--
+EVENT,42,0,B-3,CampLute,124,6,--,--
+EVENT,42,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,44,0,A-3,CampLute,124,6,--,--
+EVENT,46,0,F-3,CampLute,124,6,--,--
+EVENT,46,2,A-5,EmberCrackle,66,2,--,PAN 184
+EVENT,48,0,E-3,CampLute,148,6,--,PAN 92
+EVENT,48,1,"E-2,B-2",HearthDrone,128,16,--,PAN 128
+EVENT,48,3,E-4,CampFlute,118,14,--,--
+EVENT,48,5,E-4,VesperBell,108,14,--,PAN 68
+EVENT,48,6,E-3,DuskCello,148,16,VIB 46,--
+EVENT,48,7,A-1,SoftDrum,135,5,SDN 8,PAN 128
+EVENT,50,0,B-3,CampLute,124,6,--,--
+EVENT,52,0,E-4,CampLute,124,6,--,--
+EVENT,54,0,G#4,CampLute,124,6,--,--
+EVENT,56,0,B-3,CampLute,148,6,--,--
+EVENT,56,2,A-5,EmberCrackle,46,2,--,PAN 72
+EVENT,58,0,E-4,CampLute,124,6,--,--
+EVENT,58,7,E-2,SoftDrum,105,4,SDN 6,--
+EVENT,60,0,B-3,CampLute,124,6,--,--
+EVENT,62,2,A-5,EmberCrackle,56,2,--,PAN 184
