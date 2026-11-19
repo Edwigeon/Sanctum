@@ -17,6 +17,7 @@ let latestSnapshot = null;
 let myPrivateState = null;
 let lastInterp = { players: [], monsters: [], projectiles: [], loot: [] };
 let lastFrameTime = performance.now();
+let lastCombatAt = 0;
 
 const interpolator = new Interpolator();
 const sprites = new SpriteRegistry();
@@ -24,7 +25,7 @@ const renderer = new Renderer({ sprites });
 const audio = new AudioPSG();
 audio.loadManifest('/data/sfx.json');
 const music = new MusicPlayer({ audio });
-music.loadProject('/data/music/sanctum_cathedral.csv');
+music.setBiome('town', { immediate: false });
 sprites.load('/data/sprites.json').then((ok) => {
   if (ok && dungeon) renderer.bakeDungeonBuffer(dungeon);
 });
@@ -65,7 +66,7 @@ function exitToMainMenu() {
     ws.close();
     ws = null;
   }
-  music.stop();
+  music.setBiome('town', { fadeSec: 1.5 });
   myPlayerId = null;
   dungeon = null;
   latestSnapshot = null;
@@ -132,7 +133,9 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       if (packet.data.floor) {
         hud.setFloorStatus(packet.data.floor);
       }
-      music.playSection('explore');
+      const floorNum = packet.data.floor || 1;
+      const targetSuite = floorNum <= 2 ? 'crypts' : (floorNum <= 4 ? 'caverns' : 'cathedral');
+      music.setBiome(targetSuite, { immediate: false, fadeSec: 1.5 });
     } else if (packet.type === PACKET_TYPES.WORLD_SNAPSHOT) {
       const snap = packet.data;
       latestSnapshot = snap;
@@ -185,7 +188,7 @@ function processEvents(events) {
     } else if (ev.type === 'FLOOR_DESCENT') {
       hud.setFloorStatus(ev.floor);
       audio.play('floor_descent', { pitchJitter: 0 });
-      music.playSection('descent', { immediate: true });
+      music.playSection('descent', { immediate: true, fadeSec: 1.0, lockMs: 4000 });
     }
   }
 }
@@ -207,12 +210,17 @@ function render(now) {
     const env = (latestSnapshot?.floor ?? 1) >= 4 ? 'cavern' : 'cathedral';
     audio.setMacroState({ lowHealth: isLowHp, environment: env });
 
-    // Adaptive Music State: Switch between Combat and Exploration sections
-    const hasNearbyMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 95);
-    if (input.lockedMonsterId !== null || hasNearbyMob) {
-      music.playSection('combat');
-    } else {
-      music.playSection('explore');
+    // Adaptive Music State with Hysteresis (smooth combat decay, no jitter)
+    if (!music.isLocked()) {
+      const hasNearbyMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 95);
+      if (input.lockedMonsterId !== null || hasNearbyMob) {
+        lastCombatAt = now;
+      }
+      if (now - lastCombatAt < 3500) {
+        music.playSection('combat');
+      } else {
+        music.playSection('explore');
+      }
     }
   }
 

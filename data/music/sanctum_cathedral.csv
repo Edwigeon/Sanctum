@@ -156,7 +156,7 @@ EVENT,12,7,D-6,BoneShaker,64,2,--,PAN 88
 EVENT,14,0,A-3,TristramGuitar,126,6,--,--
 EVENT,16,0,A#2,TristramGuitar,146,6,--,PAN 76
 EVENT,16,1,"A#1,F-2",CatacombDrone,150,16,--,PAN 128
-EVENT,16,3,F-3,CelloLament,184,8,VIB 52,--
+EVENT,16,3,F-3,CelloLament,184,8,--,--
 EVENT,16,5,A#4,Harpsichord,118,4,--,--
 EVENT,16,6,D-2,WarDrum,150,5,SDN 10,--
 EVENT,18,0,F-3,TristramGuitar,124,6,--,--
@@ -207,7 +207,7 @@ EVENT,56,5,C#4,Harpsichord,118,4,--,--
 EVENT,58,0,G-3,TristramGuitar,128,6,--,--
 EVENT,58,6,A-1,WarDrum,120,4,SDN 8,--
 EVENT,60,0,C#4,TristramGuitar,128,6,--,--
-EVENT,60,3,C#3,CelloLament,182,4,VIB 50,--
+EVENT,60,3,C#3,CelloLament,182,4,--,--
 EVENT,60,7,D-6,BoneShaker,64,2,--,PAN 88
 EVENT,62,0,E-4,TristramGuitar,128,6,--,--
 PATTERN,D,64,80,4,16,D,Phrygian,Descent into Crypt
@@ -230,7 +230,7 @@ EVENT,12,7,D-6,BoneShaker,68,2,--,PAN 165
 EVENT,14,0,A-3,TristramGuitar,126,6,--,--
 EVENT,16,0,C-3,TristramGuitar,145,6,--,PAN 72
 EVENT,16,1,C-2,CatacombDrone,152,16,--,PAN 128
-EVENT,16,3,D#3,CelloLament,175,10,VIB 48,--
+EVENT,16,3,D#3,CelloLament,175,10,--,--
 EVENT,16,6,D-2,WarDrum,185,6,SDN 14,PAN 128
 EVENT,18,0,D#3,TristramGuitar,123,6,--,--
 EVENT,20,0,G-3,TristramGuitar,123,6,--,--
@@ -264,7 +264,7 @@ EVENT,44,7,D-6,BoneShaker,68,2,--,PAN 165
 EVENT,46,0,F-3,TristramGuitar,126,6,--,--
 EVENT,48,0,A-2,TristramGuitar,152,6,--,PAN 72
 EVENT,48,1,A-1,CatacombDrone,160,16,--,PAN 128
-EVENT,48,3,A-3,CelloLament,190,12,VIB 54,--
+EVENT,48,3,A-3,CelloLament,190,12,--,--
 EVENT,48,6,D-2,WarDrum,185,6,SDN 14,PAN 128
 EVENT,50,0,C#3,TristramGuitar,130,6,--,--
 EVENT,52,0,E-3,TristramGuitar,130,6,--,--
@@ -379,7 +379,7 @@ PATTERN,F,64,80,4,16,D,Phrygian,The Butcher's Hall
 EVENT,0,0,"D-3,F-3,A-3",TristramGuitar,142,16,ARP 4,PAN 64
 EVENT,0,1,"D-2,A-2",CatacombDrone,172,16,--,PAN 128
 EVENT,0,2,"A-3,D-4",HollowWind,100,32,--,PAN 40
-EVENT,0,3,D-4,CelloLament,200,6,VIB 54,PAN 148
+EVENT,0,3,D-4,CelloLament,200,6,--,PAN 148
 EVENT,0,4,D-5,CryptBell,145,12,--,PAN 200
 EVENT,0,5,D-5,Harpsichord,142,3,--,PAN 192
 EVENT,0,6,D-2,WarDrum,220,6,SDN 14,PAN 128
@@ -399,7 +399,7 @@ EVENT,14,6,D-2,WarDrum,195,4,SDN 12,--
 EVENT,14,7,D-6,BoneShaker,92,2,--,PAN 95
 EVENT,16,0,"D#3,G-3,A#3",TristramGuitar,140,16,ARP 4,PAN 64
 EVENT,16,1,"D#2,A#2",CatacombDrone,168,16,--,PAN 128
-EVENT,16,3,D#4,CelloLament,202,8,VIB 56,--
+EVENT,16,3,D#4,CelloLament,202,8,--,--
 EVENT,16,5,D#5,Harpsichord,142,3,--,--
 EVENT,16,6,D-2,WarDrum,220,6,SDN 14,PAN 128
 EVENT,18,7,D-6,BoneShaker,92,2,--,PAN 95
@@ -427,7 +427,7 @@ EVENT,36,5,D-5,Harpsichord,142,3,--,--
 EVENT,36,7,D-6,BoneShaker,92,2,--,PAN 165
 EVENT,38,6,A-1,WarDrum,145,4,SDN 10,--
 EVENT,40,1,"G#2,D-3",CatacombDrone,178,8,--,PAN 128
-EVENT,40,3,G#4,CelloLament,212,8,VIB 60,--
+EVENT,40,3,G#4,CelloLament,212,8,--,--
 EVENT,40,4,G#4,CryptBell,150,8,--,PAN 56
 EVENT,40,5,G#4,Harpsichord,142,3,--,--
 EVENT,40,6,D-2,WarDrum,180,5,SDN 12,--
@@ -441,7 +441,7 @@ EVENT,46,6,D-2,WarDrum,195,4,SDN 12,--
 EVENT,46,7,D-6,BoneShaker,92,2,--,PAN 95
 EVENT,48,0,"A-2,C#3,E-3,G-3",TristramGuitar,148,16,ARP 4,PAN 64
 EVENT,48,1,"A-1,E-2,A-2",CatacombDrone,182,16,--,PAN 128
-EVENT,48,3,A-4,CelloLament,215,10,VIB 58,--
+EVENT,48,3,A-4,CelloLament,215,10,--,--
 EVENT,48,4,A-4,CryptBell,155,14,--,PAN 128
 EVENT,48,5,E-5,Harpsichord,142,3,--,--
 EVENT,48,6,D-2,WarDrum,220,6,SDN 14,PAN 128
@@ -466,7 +466,7 @@ EVENT,62,7,D-6,BoneShaker,92,2,--,PAN 95
 PATTERN,G,64,80,4,16,D,Harmonic Minor,Labyrinth Tension
 EVENT,0,0,G-2,TristramGuitar,148,6,--,PAN 68
 EVENT,0,1,"G-1,D-2",CatacombDrone,168,16,--,PAN 128
-EVENT,0,3,A#3,CelloLament,195,8,VIB 52,PAN 152
+EVENT,0,3,A#3,CelloLament,195,8,--,PAN 152
 EVENT,0,4,G-4,CryptBell,130,12,--,PAN 64
 EVENT,0,6,D-2,WarDrum,220,6,SDN 14,PAN 128
 EVENT,2,0,D-3,TristramGuitar,126,6,--,--
@@ -492,7 +492,7 @@ EVENT,14,6,D-2,WarDrum,195,4,SDN 12,--
 EVENT,14,7,D-6,BoneShaker,92,2,--,PAN 95
 EVENT,16,0,F-2,TristramGuitar,145,6,--,PAN 68
 EVENT,16,1,"F-1,C-2",CatacombDrone,165,16,--,PAN 128
-EVENT,16,3,A-3,CelloLament,195,8,VIB 52,--
+EVENT,16,3,A-3,CelloLament,195,8,--,--
 EVENT,16,6,D-2,WarDrum,220,6,SDN 14,PAN 128
 EVENT,18,0,C-3,TristramGuitar,123,6,--,--
 EVENT,18,7,D-6,BoneShaker,92,2,--,PAN 95
@@ -517,7 +517,7 @@ EVENT,30,6,D-2,WarDrum,195,4,SDN 12,--
 EVENT,30,7,D-6,BoneShaker,92,2,--,PAN 95
 EVENT,32,0,D#2,TristramGuitar,148,6,--,PAN 68
 EVENT,32,1,"D#1,A#1",CatacombDrone,170,16,--,PAN 128
-EVENT,32,3,G-3,CelloLament,198,8,VIB 54,--
+EVENT,32,3,G-3,CelloLament,198,8,--,--
 EVENT,32,4,D#5,CryptBell,135,12,--,PAN 192
 EVENT,32,6,D-2,WarDrum,220,6,SDN 14,PAN 128
 EVENT,34,0,A#2,TristramGuitar,126,6,--,--
@@ -554,7 +554,7 @@ EVENT,54,0,G-4,TristramGuitar,133,6,--,--
 EVENT,54,5,A#4,Harpsichord,140,3,--,--
 EVENT,54,6,A-1,WarDrum,145,4,SDN 10,--
 EVENT,56,0,E-4,TristramGuitar,155,6,--,--
-EVENT,56,3,C#4,CelloLament,210,8,VIB 60,--
+EVENT,56,3,C#4,CelloLament,210,8,--,--
 EVENT,56,4,C#5,CryptBell,145,8,--,PAN 128
 EVENT,56,5,G-4,Harpsichord,140,3,--,--
 EVENT,56,6,D-2,WarDrum,180,5,SDN 12,--

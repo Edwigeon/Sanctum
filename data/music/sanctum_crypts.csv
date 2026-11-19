@@ -1,12 +1,12 @@
-LANTHORN_V1.1,8,7,72,4,D,Phrygian,16
-PATCH,StoneDrone,"{""name"": ""StoneDrone"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""triangle"", ""mix"": 0.6, ""envelope"": {""attack"": 0.55, ""decay"": 0.3, ""sustain_level"": 0.85, ""release"": 0.85}, ""lfo"": {""vibrato_speed"": 1.4, ""vibrato_depth"": 0.12}, ""saturation"": 1.25}"
-PATCH,CryptMist,"{""name"": ""CryptMist"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.2, ""envelope"": {""attack"": 0.7, ""decay"": 0.35, ""sustain_level"": 0.62, ""release"": 0.9}, ""lfo"": {""tremolo_speed"": 1.3, ""tremolo_depth"": 0.3}, ""echo"": {""delay_time"": 0.4, ""feedback"": 0.4}}"
-PATCH,StoneDrip,"{""name"": ""StoneDrip"", ""wave_type"": ""sine"", ""envelope"": {""attack"": 0.001, ""decay"": 0.12, ""sustain_level"": 0.0, ""release"": 0.1}, ""echo"": {""delay_time"": 0.31, ""feedback"": 0.48}}"
-PATCH,CryptGuitar,"{""name"": ""CryptGuitar"", ""wave_type"": ""triangle"", ""wave_type_2"": ""sawtooth"", ""mix"": 0.26, ""envelope"": {""attack"": 0.002, ""decay"": 0.45, ""sustain_level"": 0.08, ""release"": 0.5}, ""echo"": {""delay_time"": 0.34, ""feedback"": 0.36}}"
-PATCH,CryptCello,"{""name"": ""CryptCello"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""triangle"", ""mix"": 0.38, ""envelope"": {""attack"": 0.06, ""decay"": 0.2, ""sustain_level"": 0.75, ""release"": 0.32}, ""lfo"": {""vibrato_speed"": 5.0, ""vibrato_depth"": 0.22}, ""saturation"": 1.65}"
-PATCH,CryptDrum,"{""name"": ""CryptDrum"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.16, ""envelope"": {""attack"": 0.002, ""decay"": 0.34, ""sustain_level"": 0.0, ""release"": 0.18}, ""saturation"": 2.2, ""portamento"": {""slide_time"": 0.03}, ""echo"": {""delay_time"": 0.38, ""feedback"": 0.25}}"
-PATCH,ChainRattle,"{""name"": ""ChainRattle"", ""wave_type"": ""noise"", ""wave_type_2"": ""square"", ""mix"": 0.12, ""bit_depth"": 8, ""envelope"": {""attack"": 0.001, ""decay"": 0.08, ""sustain_level"": 0.0, ""release"": 0.05}}"
-PATCH,CryptBell,"{""name"": ""CryptBell"", ""wave_type"": ""sine"", ""wave_type_2"": ""square"", ""mix"": 0.22, ""duty_cycle"": 0.22, ""envelope"": {""attack"": 0.003, ""decay"": 0.9, ""sustain_level"": 0.04, ""release"": 0.85}, ""ring_mod"": {""carrier_freq"": 415.0, ""mix"": 0.24}, ""echo"": {""delay_time"": 0.42, ""feedback"": 0.42}}"
+LANTHORN_V1.1,8,7,76,4,D,Phrygian,16
+PATCH,CryptGuitar,"{""name"": ""CryptGuitar"", ""wave_type"": ""triangle"", ""wave_type_2"": ""sawtooth"", ""mix"": 0.26, ""envelope"": {""attack"": 0.002, ""decay"": 0.44, ""sustain_level"": 0.09, ""release"": 0.5}, ""saturation"": 1.12, ""echo"": {""delay_time"": 0.31, ""feedback"": 0.34}}"
+PATCH,CryptDrone,"{""name"": ""CryptDrone"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""triangle"", ""mix"": 0.58, ""envelope"": {""attack"": 0.5, ""decay"": 0.3, ""sustain_level"": 0.84, ""release"": 0.8}, ""lfo"": {""vibrato_speed"": 1.6, ""vibrato_depth"": 0.1}, ""saturation"": 1.22}"
+PATCH,CryptWind,"{""name"": ""CryptWind"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.18, ""envelope"": {""attack"": 0.65, ""decay"": 0.35, ""sustain_level"": 0.64, ""release"": 0.9}, ""lfo"": {""vibrato_speed"": 1.1, ""vibrato_depth"": 0.14, ""tremolo_speed"": 1.3, ""tremolo_depth"": 0.26}, ""echo"": {""delay_time"": 0.38, ""feedback"": 0.38}}"
+PATCH,CryptCello,"{""name"": ""CryptCello"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""triangle"", ""mix"": 0.44, ""envelope"": {""attack"": 0.12, ""decay"": 0.25, ""sustain_level"": 0.78, ""release"": 0.44}, ""lfo"": {""vibrato_speed"": 4.4, ""vibrato_depth"": 0.2}, ""saturation"": 1.3, ""echo"": {""delay_time"": 0.26, ""feedback"": 0.24}}"
+PATCH,CryptBell,"{""name"": ""CryptBell"", ""wave_type"": ""sine"", ""wave_type_2"": ""square"", ""mix"": 0.2, ""duty_cycle"": 0.24, ""envelope"": {""attack"": 0.003, ""decay"": 0.95, ""sustain_level"": 0.04, ""release"": 0.9}, ""ring_mod"": {""carrier_freq"": 415.0, ""mix"": 0.2}, ""echo"": {""delay_time"": 0.39, ""feedback"": 0.42}}"
+PATCH,CryptHarp,"{""name"": ""CryptHarp"", ""wave_type"": ""sawtooth"", ""wave_type_2"": ""square"", ""mix"": 0.42, ""duty_cycle"": 0.18, ""envelope"": {""attack"": 0.001, ""decay"": 0.26, ""sustain_level"": 0.06, ""release"": 0.22}, ""saturation"": 1.1, ""echo"": {""delay_time"": 0.197, ""feedback"": 0.24}}"
+PATCH,CryptDrum,"{""name"": ""CryptDrum"", ""wave_type"": ""sine"", ""wave_type_2"": ""noise"", ""mix"": 0.14, ""envelope"": {""attack"": 0.002, ""decay"": 0.34, ""sustain_level"": 0.0, ""release"": 0.18}, ""saturation"": 1.95, ""portamento"": {""slide_time"": 0.03}, ""echo"": {""delay_time"": 0.395, ""feedback"": 0.26}}"
+PATCH,BoneRattle,"{""name"": ""BoneRattle"", ""wave_type"": ""noise"", ""wave_type_2"": ""triangle"", ""mix"": 0.14, ""bit_depth"": 10, ""envelope"": {""attack"": 0.001, ""decay"": 0.07, ""sustain_level"": 0.0, ""release"": 0.04}}"
 --- ORDER LIST ---,SeqIndex,PatternID
 SEQ,0,A
 SEQ,1,B
@@ -18,434 +18,588 @@ SEQ,6,H
 SEQ,7,B
 SEQ,8,D
 --- PATTERNS ---,Type,ID,Length
-PATTERN,A,64,72,4,16,D,Phrygian,Torchlit Nave
-EVENT,0,0,D-2,StoneDrone,136,32,--,PAN 128
-EVENT,0,1,A-3,CryptMist,96,32,--,PAN 40
-EVENT,0,3,D-3,CryptGuitar,138,8,--,PAN 88
-EVENT,0,4,D-3,CryptCello,172,8,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,0,7,D-4,CryptBell,130,14,--,PAN 196
-EVENT,4,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,6,2,A-5,StoneDrip,78,3,SUP 6,PAN 196
-EVENT,6,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,8,3,A-3,CryptGuitar,138,8,--,--
-EVENT,8,4,F-3,CryptCello,172,4,VIB 52,--
-EVENT,8,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,10,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,12,4,D#3,CryptCello,172,4,VIB 52,--
-EVENT,12,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,14,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,16,3,E-4,CryptGuitar,138,8,--,--
-EVENT,16,4,D-3,CryptCello,172,12,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,20,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,22,2,F-5,StoneDrip,78,3,SUP 6,PAN 60
-EVENT,22,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,24,3,F-4,CryptGuitar,138,8,--,--
-EVENT,24,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,26,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,28,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,30,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,32,0,D#2,StoneDrone,136,32,--,PAN 128
-EVENT,32,1,G#3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,D#3,CryptGuitar,138,8,--,--
-EVENT,32,4,D#3,CryptCello,172,8,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,32,7,G#4,CryptBell,130,14,--,PAN 60
-EVENT,36,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,38,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,40,3,A#3,CryptGuitar,138,8,--,--
-EVENT,40,4,G-3,CryptCello,172,4,VIB 52,--
-EVENT,40,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,42,2,D#5,StoneDrip,78,3,SUP 6,PAN 184
-EVENT,42,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,44,4,F-3,CryptCello,172,4,VIB 52,--
-EVENT,44,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,46,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,48,3,G-4,CryptGuitar,138,8,--,--
-EVENT,48,4,D#3,CryptCello,172,12,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,52,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,54,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,56,3,D#4,CryptGuitar,138,8,--,--
-EVENT,56,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,58,2,D-5,StoneDrip,78,3,SUP 6,PAN 72
-EVENT,58,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,60,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,62,5,D#2,CryptDrum,152,4,SDN 10,--
-PATTERN,B,64,72,4,16,D,Phrygian,Bone Ossuary
-EVENT,0,0,"D-2,A-2",StoneDrone,136,32,--,PAN 128
-EVENT,0,1,D-4,CryptMist,96,32,--,PAN 40
-EVENT,0,3,D-3,CryptGuitar,138,6,--,PAN 88
-EVENT,0,4,A-3,CryptCello,172,8,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,0,7,A-4,CryptBell,130,14,--,PAN 64
-EVENT,4,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,6,3,F-3,CryptGuitar,138,6,--,--
-EVENT,6,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,8,4,A#3,CryptCello,172,4,VIB 52,--
-EVENT,8,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,10,2,G#5,StoneDrip,78,3,SUP 6,PAN 64
-EVENT,10,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,12,3,G#3,CryptGuitar,138,6,--,--
-EVENT,12,4,A-3,CryptCello,172,4,VIB 52,--
-EVENT,12,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,14,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,16,4,G#3,CryptCello,172,8,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,20,3,A-3,CryptGuitar,138,8,--,--
-EVENT,20,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,22,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,24,4,F-3,CryptCello,172,8,VIB 52,--
-EVENT,24,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,26,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,28,2,A-5,StoneDrip,78,3,SUP 6,PAN 192
-EVENT,28,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,30,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,32,0,"G-1,D-2",StoneDrone,136,32,--,PAN 128
-EVENT,32,1,A#3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,G-2,CryptGuitar,138,6,--,--
-EVENT,32,4,G-3,CryptCello,172,8,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,32,7,G-4,CryptBell,130,14,--,PAN 196
-EVENT,36,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,38,3,A#2,CryptGuitar,138,6,--,--
-EVENT,38,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,40,4,A#3,CryptCello,172,8,VIB 52,--
-EVENT,40,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,42,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,44,3,D-3,CryptGuitar,138,6,--,--
-EVENT,44,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,46,2,D-5,StoneDrip,78,3,SUP 6,PAN 68
-EVENT,46,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,48,4,A-3,CryptCello,172,8,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,52,3,F-3,CryptGuitar,138,8,--,--
-EVENT,52,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,54,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,56,4,G-3,CryptCello,172,8,VIB 52,--
-EVENT,56,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,58,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,60,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,62,5,D#2,CryptDrum,152,4,SDN 10,--
-PATTERN,C,64,72,4,16,D,Harmonic Minor,Sunken Altar
-EVENT,0,0,"A#1,F-2",StoneDrone,136,32,--,PAN 128
-EVENT,0,1,F-3,CryptMist,96,32,--,PAN 40
-EVENT,0,3,A#2,CryptGuitar,138,8,--,PAN 88
-EVENT,0,4,F-3,CryptCello,172,8,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,0,7,A#4,CryptBell,130,14,--,PAN 192
-EVENT,4,2,F-5,StoneDrip,78,3,SUP 6,PAN 188
-EVENT,4,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,6,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,8,3,F-3,CryptGuitar,138,8,--,--
-EVENT,8,4,D-3,CryptCello,172,8,VIB 52,--
-EVENT,8,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,10,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,12,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,14,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,16,3,D-4,CryptGuitar,138,8,--,--
-EVENT,16,4,G#3,CryptCello,172,8,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,20,2,D-5,StoneDrip,78,3,SUP 6,PAN 76
-EVENT,20,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,22,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,24,3,A#3,CryptGuitar,138,8,--,--
-EVENT,24,4,F-3,CryptCello,172,8,VIB 52,--
-EVENT,24,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,26,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,28,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,30,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,32,0,"A-1,E-2",StoneDrone,136,32,--,PAN 128
-EVENT,32,1,E-3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,A-2,CryptGuitar,138,8,--,--
-EVENT,32,4,E-3,CryptCello,172,8,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,32,7,C#5,CryptBell,130,14,--,PAN 68
-EVENT,36,2,C#5,StoneDrip,78,3,SUP 6,PAN 196
-EVENT,36,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,38,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,40,3,E-3,CryptGuitar,138,8,--,--
-EVENT,40,4,G-3,CryptCello,172,8,VIB 52,--
-EVENT,40,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,42,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,44,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,46,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,48,3,C#4,CryptGuitar,138,8,--,--
-EVENT,48,4,C#3,CryptCello,172,8,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,52,2,A-5,StoneDrip,78,3,SUP 6,PAN 64
-EVENT,52,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,54,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,56,3,G-3,CryptGuitar,138,8,--,--
-EVENT,56,4,E-3,CryptCello,172,8,VIB 52,--
-EVENT,56,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,58,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,60,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,62,5,D#2,CryptDrum,152,4,SDN 10,--
-PATTERN,D,64,72,4,16,D,Phrygian,Crypt Turnaround
-EVENT,0,0,D#2,StoneDrone,136,32,--,PAN 128
-EVENT,0,1,D#4,CryptMist,96,32,--,PAN 40
-EVENT,0,3,D#3,CryptGuitar,138,8,--,PAN 88
-EVENT,0,4,G-3,CryptCello,172,8,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,0,7,D#5,CryptBell,130,14,--,PAN 60
-EVENT,4,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,6,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,8,2,D#5,StoneDrip,78,3,SUP 6,PAN 68
-EVENT,8,3,A#3,CryptGuitar,138,8,--,--
-EVENT,8,4,D#3,CryptCello,172,8,VIB 52,--
-EVENT,8,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,10,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,12,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,14,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,16,3,F-4,CryptGuitar,138,8,--,--
-EVENT,16,4,F-3,CryptCello,172,8,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,20,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,22,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,24,3,D#4,CryptGuitar,138,8,--,--
-EVENT,24,4,D#3,CryptCello,172,8,VIB 52,--
-EVENT,24,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,26,2,A-5,StoneDrip,78,3,SUP 6,PAN 192
-EVENT,26,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,28,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,30,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,32,0,A-1,StoneDrone,136,32,--,PAN 128
-EVENT,32,1,C#4,CryptMist,98,32,--,PAN 216
-EVENT,32,3,A-2,CryptGuitar,138,8,--,--
-EVENT,32,4,E-3,CryptCello,172,8,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,36,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,38,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,40,3,E-3,CryptGuitar,138,8,--,--
-EVENT,40,4,C#3,CryptCello,172,8,VIB 52,--
-EVENT,40,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,42,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,44,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,46,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,48,2,D-5,StoneDrip,78,3,SUP 6,PAN 128
-EVENT,48,3,A#3,CryptGuitar,138,8,--,--
-EVENT,48,4,A-2,CryptCello,172,8,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,48,7,A-4,CryptBell,130,14,--,PAN 196
-EVENT,52,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,54,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,56,3,C#4,CryptGuitar,138,8,--,--
-EVENT,56,4,C#3,CryptCello,172,8,VIB 52,--
-EVENT,56,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,58,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,60,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,62,5,D#2,CryptDrum,152,4,SDN 10,--
-PATTERN,E,64,72,4,16,D,Phrygian,Echoing Vault
-EVENT,0,0,D-2,StoneDrone,136,32,--,PAN 128
-EVENT,0,1,A-3,CryptMist,96,32,--,PAN 40
-EVENT,0,3,D-3,CryptGuitar,138,10,ECH 66,PAN 88
-EVENT,0,4,D-3,CryptCello,152,16,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,0,7,D-5,CryptBell,130,14,--,PAN 192
-EVENT,4,2,A-5,StoneDrip,78,3,SUP 6,PAN 196
-EVENT,4,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,10,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,12,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,14,2,D#5,StoneDrip,78,3,SUP 6,PAN 56
-EVENT,16,3,E-4,CryptGuitar,138,10,ECH 66,--
-EVENT,16,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,20,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,24,4,D#3,CryptCello,152,8,VIB 52,--
-EVENT,26,2,F-5,StoneDrip,78,3,SUP 6,PAN 188
-EVENT,26,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,28,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,32,0,A-1,StoneDrone,136,32,--,PAN 128
-EVENT,32,1,E-3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,A-3,CryptGuitar,138,10,ECH 66,--
-EVENT,32,4,A-2,CryptCello,152,16,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,32,7,A-4,CryptBell,130,14,--,PAN 64
-EVENT,36,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,38,2,D-5,StoneDrip,78,3,SUP 6,PAN 64
-EVENT,42,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,44,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,48,3,D#4,CryptGuitar,138,10,ECH 66,--
-EVENT,48,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,50,2,G#5,StoneDrip,78,3,SUP 6,PAN 192
-EVENT,52,4,C#3,CryptCello,152,10,VIB 52,--
-EVENT,52,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,58,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,60,2,A-5,StoneDrip,78,3,SUP 6,PAN 72
-EVENT,60,6,D-6,ChainRattle,68,2,--,PAN 176
-PATTERN,F,64,72,4,16,D,Harmonic Minor,Reliquary Dread
-EVENT,0,0,"C-2,G-2",StoneDrone,136,16,--,PAN 128
-EVENT,0,1,G-3,CryptMist,96,32,--,PAN 40
-EVENT,0,3,C-3,CryptGuitar,138,6,--,PAN 88
-EVENT,0,4,G-3,CryptCello,172,8,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,0,7,C-5,CryptBell,130,14,--,PAN 192
-EVENT,4,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,6,3,D#3,CryptGuitar,138,6,--,--
-EVENT,6,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,8,2,G-5,StoneDrip,78,3,SUP 6,PAN 64
-EVENT,8,4,D#3,CryptCello,172,8,VIB 52,--
-EVENT,8,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,10,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,12,3,G-3,CryptGuitar,138,6,--,--
-EVENT,12,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,14,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,16,0,"A#1,F-2",StoneDrone,136,16,--,PAN 128
-EVENT,16,3,A#2,CryptGuitar,138,6,--,--
-EVENT,16,4,F-3,CryptCello,172,8,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,20,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,22,3,D-3,CryptGuitar,138,6,--,--
-EVENT,22,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,24,2,F-5,StoneDrip,78,3,SUP 6,PAN 192
-EVENT,24,4,D-3,CryptCello,172,8,VIB 52,--
-EVENT,24,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,26,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,28,3,F-3,CryptGuitar,138,6,--,--
-EVENT,28,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,30,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,32,0,"G-1,D-2",StoneDrone,136,16,--,PAN 128
-EVENT,32,1,E-3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,G-2,CryptGuitar,138,6,--,--
-EVENT,32,4,G-3,CryptCello,172,8,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,32,7,G#4,CryptBell,130,14,--,PAN 60
-EVENT,36,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,38,3,A#2,CryptGuitar,138,6,--,--
-EVENT,38,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,40,4,G#3,CryptCello,172,8,VIB 52,--
-EVENT,40,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,42,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,44,2,D-5,StoneDrip,78,3,SUP 6,PAN 68
-EVENT,44,3,D-3,CryptGuitar,138,6,--,--
-EVENT,44,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,46,5,D#2,CryptDrum,152,4,SDN 10,--
-EVENT,48,0,"A-1,E-2",StoneDrone,136,16,--,PAN 128
-EVENT,48,3,A-2,CryptGuitar,138,6,--,--
-EVENT,48,4,A-3,CryptCello,172,10,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,192,6,SDN 14,PAN 128
-EVENT,48,7,A-4,CryptBell,130,14,--,PAN 196
-EVENT,52,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,54,3,C#3,CryptGuitar,138,6,--,--
-EVENT,54,5,A-1,CryptDrum,140,4,SDN 10,--
-EVENT,56,5,D-2,CryptDrum,168,5,SDN 12,--
-EVENT,58,2,C#5,StoneDrip,78,3,SUP 6,PAN 188
-EVENT,58,4,E-3,CryptCello,172,6,VIB 52,--
-EVENT,58,6,D-6,ChainRattle,82,2,--,PAN 80
-EVENT,60,3,G-3,CryptGuitar,138,6,--,--
-EVENT,60,6,D-6,ChainRattle,82,2,--,PAN 176
-EVENT,62,5,D#2,CryptDrum,152,4,SDN 10,--
-PATTERN,G,64,72,4,16,D,Phrygian,Catacomb Ambush
-EVENT,0,0,"D-2,A-2",StoneDrone,136,16,--,PAN 128
-EVENT,0,1,D-4,CryptMist,96,32,--,PAN 40
-EVENT,0,3,"D-3,A-3",CryptGuitar,138,8,--,PAN 88
-EVENT,0,4,D-4,CryptCello,180,8,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,205,6,SDN 14,PAN 128
-EVENT,0,7,D-5,CryptBell,140,14,--,PAN 196
-EVENT,2,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,4,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,6,2,A-5,StoneDrip,78,3,SUP 6,PAN 184
-EVENT,6,5,A-1,CryptDrum,148,4,SDN 10,--
-EVENT,8,3,F-4,CryptGuitar,138,6,--,--
-EVENT,8,4,D#4,CryptCello,180,4,VIB 52,--
-EVENT,8,5,D-2,CryptDrum,180,5,SDN 12,--
-EVENT,10,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,12,4,F-4,CryptCello,180,4,VIB 52,--
-EVENT,12,5,A-1,CryptDrum,155,4,SDN 10,--
-EVENT,12,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,14,3,D#4,CryptGuitar,138,4,--,--
-EVENT,14,5,D#2,CryptDrum,162,4,SDN 10,--
-EVENT,14,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,16,0,"D#2,A#2",StoneDrone,136,16,--,PAN 128
-EVENT,16,3,"D#3,A#3",CryptGuitar,138,8,--,--
-EVENT,16,4,G-4,CryptCello,180,8,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,205,6,SDN 14,PAN 128
-EVENT,16,7,D#5,CryptBell,140,14,--,PAN 60
-EVENT,18,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,20,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,22,2,G#5,StoneDrip,78,3,SUP 6,PAN 72
-EVENT,22,5,A-1,CryptDrum,148,4,SDN 10,--
-EVENT,24,3,G-4,CryptGuitar,138,6,--,--
-EVENT,24,4,D#4,CryptCello,180,8,VIB 52,--
-EVENT,24,5,D-2,CryptDrum,180,5,SDN 12,--
-EVENT,26,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,28,5,A-1,CryptDrum,155,4,SDN 10,--
-EVENT,28,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,30,3,F-4,CryptGuitar,138,4,--,--
-EVENT,30,5,D#2,CryptDrum,162,4,SDN 10,--
-EVENT,30,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,32,0,"F-2,C-3",StoneDrone,136,16,--,PAN 128
-EVENT,32,1,G#3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,"F-3,C-4",CryptGuitar,138,8,--,--
-EVENT,32,4,F-4,CryptCello,180,8,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,205,6,SDN 14,PAN 128
-EVENT,34,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,36,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,38,2,F-5,StoneDrip,78,3,SUP 6,PAN 192
-EVENT,38,5,A-1,CryptDrum,148,4,SDN 10,--
-EVENT,40,3,G#4,CryptGuitar,138,6,--,--
-EVENT,40,4,G#4,CryptCello,180,8,VIB 52,--
-EVENT,40,5,D-2,CryptDrum,180,5,SDN 12,--
-EVENT,40,7,G#4,CryptBell,140,14,--,PAN 196
-EVENT,42,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,44,5,A-1,CryptDrum,155,4,SDN 10,--
-EVENT,44,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,46,3,F-4,CryptGuitar,138,4,--,--
-EVENT,46,5,D#2,CryptDrum,162,4,SDN 10,--
-EVENT,46,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,48,0,"A-1,E-2",StoneDrone,136,16,--,PAN 128
-EVENT,48,3,"A-2,E-3",CryptGuitar,138,8,--,--
-EVENT,48,4,A-4,CryptCello,180,10,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,205,6,SDN 14,PAN 128
-EVENT,48,7,A-4,CryptBell,140,14,--,PAN 64
-EVENT,50,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,52,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,54,2,E-5,StoneDrip,78,3,SUP 6,PAN 64
-EVENT,54,5,A-1,CryptDrum,148,4,SDN 10,--
-EVENT,56,3,C#4,CryptGuitar,138,6,--,--
-EVENT,56,5,D-2,CryptDrum,180,5,SDN 12,--
-EVENT,58,4,G-4,CryptCello,180,6,VIB 52,--
-EVENT,58,6,D-6,ChainRattle,88,2,--,PAN 80
-EVENT,60,5,A-1,CryptDrum,155,4,SDN 10,--
-EVENT,60,6,D-6,ChainRattle,88,2,--,PAN 176
-EVENT,62,3,G-3,CryptGuitar,138,4,--,--
-EVENT,62,5,D#2,CryptDrum,162,4,SDN 10,--
-EVENT,62,6,D-6,ChainRattle,88,2,--,PAN 80
-PATTERN,H,64,72,4,16,D,Phrygian,Hollow Corridor
-EVENT,0,0,G-1,StoneDrone,136,32,--,PAN 128
-EVENT,0,1,A#3,CryptMist,96,32,--,PAN 40
-EVENT,0,3,G-2,CryptGuitar,138,8,ECH 66,PAN 88
-EVENT,0,4,A#3,CryptCello,152,12,VIB 52,PAN 156
-EVENT,0,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,0,7,G-4,CryptBell,130,14,--,PAN 64
-EVENT,2,2,G-5,StoneDrip,78,3,SUP 6,PAN 60
-EVENT,4,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,10,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,12,3,D-3,CryptGuitar,138,8,ECH 66,--
-EVENT,12,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,16,4,G-3,CryptCello,152,12,VIB 52,--
-EVENT,16,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,18,2,D-5,StoneDrip,78,3,SUP 6,PAN 196
-EVENT,20,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,24,3,A#3,CryptGuitar,138,8,ECH 66,--
-EVENT,26,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,28,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,32,0,D#2,StoneDrone,136,32,--,PAN 128
-EVENT,32,1,G-3,CryptMist,98,32,--,PAN 216
-EVENT,32,3,D#3,CryptGuitar,138,8,ECH 66,--
-EVENT,32,4,G-3,CryptCello,152,12,VIB 52,--
-EVENT,32,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,32,7,D#5,CryptBell,130,14,--,PAN 192
-EVENT,34,2,D#5,StoneDrip,78,3,SUP 6,PAN 68
-EVENT,36,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,42,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,44,3,A#3,CryptGuitar,138,8,ECH 66,--
-EVENT,44,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,48,4,D#3,CryptCello,152,14,VIB 52,--
-EVENT,48,5,D-2,CryptDrum,168,6,SDN 14,PAN 128
-EVENT,52,2,A-5,StoneDrip,78,3,SUP 6,PAN 188
-EVENT,52,6,D-6,ChainRattle,68,2,--,PAN 176
-EVENT,56,3,F-4,CryptGuitar,138,8,ECH 66,--
-EVENT,58,5,A-1,CryptDrum,130,4,SDN 10,--
-EVENT,60,6,D-6,ChainRattle,68,2,--,PAN 176
+PATTERN,A,64,76,4,16,D,Phrygian,Torchlit Nave
+EVENT,0,0,D-3,CryptGuitar,148,6,--,PAN 76
+EVENT,0,1,D-2,CryptDrone,146,16,--,PAN 128
+EVENT,0,2,A-3,CryptWind,98,32,--,PAN 44
+EVENT,0,3,A-3,CryptCello,158,12,--,PAN 156
+EVENT,0,4,D-4,CryptBell,120,14,--,PAN 196
+EVENT,0,6,D-2,CryptDrum,142,5,SDN 10,PAN 128
+EVENT,2,0,A-3,CryptGuitar,128,6,--,--
+EVENT,4,0,E-4,CryptGuitar,128,6,--,--
+EVENT,4,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,6,0,F-4,CryptGuitar,128,6,--,--
+EVENT,8,0,A-3,CryptGuitar,148,6,--,--
+EVENT,8,5,F-4,CryptHarp,114,3,--,PAN 188
+EVENT,10,0,E-4,CryptGuitar,128,6,--,--
+EVENT,10,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,12,0,D#4,CryptGuitar,128,6,--,--
+EVENT,12,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,14,0,A-3,CryptGuitar,128,6,--,--
+EVENT,16,0,D#3,CryptGuitar,148,6,--,PAN 76
+EVENT,16,1,D#2,CryptDrone,146,16,--,PAN 128
+EVENT,16,3,A#3,CryptCello,154,12,PRT 45,--
+EVENT,16,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,18,0,A#3,CryptGuitar,128,6,--,--
+EVENT,20,0,D-4,CryptGuitar,128,6,--,--
+EVENT,20,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,22,0,G-4,CryptGuitar,128,6,--,--
+EVENT,24,0,A#3,CryptGuitar,148,6,--,--
+EVENT,24,5,G-4,CryptHarp,114,3,--,--
+EVENT,26,0,F-4,CryptGuitar,128,6,--,--
+EVENT,26,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,28,0,D#4,CryptGuitar,128,6,--,--
+EVENT,28,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,30,0,A#3,CryptGuitar,128,6,--,--
+EVENT,32,0,D-3,CryptGuitar,148,6,--,PAN 76
+EVENT,32,1,"D-2,A-2",CryptDrone,146,16,--,PAN 128
+EVENT,32,2,D#4,CryptWind,102,32,--,PAN 212
+EVENT,32,3,A-3,CryptCello,158,12,--,--
+EVENT,32,4,G#4,CryptBell,120,14,--,PAN 60
+EVENT,32,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,34,0,A-3,CryptGuitar,128,6,--,--
+EVENT,36,0,F-4,CryptGuitar,128,6,--,--
+EVENT,36,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,38,0,G#4,CryptGuitar,128,6,--,--
+EVENT,40,0,A-3,CryptGuitar,148,6,--,--
+EVENT,40,5,G#4,CryptHarp,114,3,--,--
+EVENT,42,0,F-4,CryptGuitar,128,6,--,--
+EVENT,42,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,44,0,E-4,CryptGuitar,128,6,--,--
+EVENT,44,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,46,0,D-4,CryptGuitar,128,6,--,--
+EVENT,48,0,A-2,CryptGuitar,148,6,--,PAN 76
+EVENT,48,1,"A-1,E-2",CryptDrone,146,16,--,PAN 128
+EVENT,48,3,G-3,CryptCello,152,8,--,--
+EVENT,48,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,50,0,E-3,CryptGuitar,128,6,--,--
+EVENT,52,0,A#3,CryptGuitar,128,6,--,--
+EVENT,52,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,54,0,C#4,CryptGuitar,128,6,--,--
+EVENT,56,0,E-4,CryptGuitar,148,6,--,--
+EVENT,56,3,E-3,CryptCello,150,8,--,--
+EVENT,56,5,C#4,CryptHarp,114,3,--,--
+EVENT,58,0,C#4,CryptGuitar,128,6,--,--
+EVENT,58,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,60,0,A#3,CryptGuitar,128,6,--,--
+EVENT,60,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,62,0,E-3,CryptGuitar,128,6,--,--
+PATTERN,B,64,76,4,16,D,Phrygian,Bone Ossuary
+EVENT,0,0,D-3,CryptGuitar,148,6,--,PAN 76
+EVENT,0,1,"D-2,A-2",CryptDrone,146,16,--,PAN 128
+EVENT,0,2,D-4,CryptWind,98,32,--,PAN 44
+EVENT,0,3,D-3,CryptCello,174,8,--,PAN 156
+EVENT,0,4,D-5,CryptBell,120,14,--,PAN 192
+EVENT,0,6,D-2,CryptDrum,172,6,SDN 12,PAN 128
+EVENT,2,0,A-3,CryptGuitar,128,6,--,--
+EVENT,4,0,F-4,CryptGuitar,128,6,--,--
+EVENT,4,5,F-4,CryptHarp,126,3,--,PAN 188
+EVENT,4,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,6,0,E-4,CryptGuitar,128,6,--,--
+EVENT,6,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,8,0,A-3,CryptGuitar,148,6,--,--
+EVENT,8,3,F-3,CryptCello,178,6,PRT 40,--
+EVENT,8,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,10,0,D-4,CryptGuitar,128,6,--,--
+EVENT,12,0,F-4,CryptGuitar,128,6,--,--
+EVENT,12,5,E-4,CryptHarp,126,3,--,--
+EVENT,12,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,14,0,A-3,CryptGuitar,128,6,--,--
+EVENT,14,3,E-3,CryptCello,168,2,--,--
+EVENT,16,0,A#2,CryptGuitar,148,6,--,PAN 76
+EVENT,16,1,"A#1,F-2",CryptDrone,146,16,--,PAN 128
+EVENT,16,3,D-3,CryptCello,176,8,--,--
+EVENT,16,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,18,0,F-3,CryptGuitar,128,6,--,--
+EVENT,20,0,D-4,CryptGuitar,128,6,--,--
+EVENT,20,5,D-4,CryptHarp,126,3,--,--
+EVENT,20,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,22,0,C-4,CryptGuitar,128,6,--,--
+EVENT,22,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,24,0,F-3,CryptGuitar,148,6,--,--
+EVENT,24,3,A#2,CryptCello,168,8,--,--
+EVENT,24,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,26,0,A#3,CryptGuitar,128,6,--,--
+EVENT,28,0,D-4,CryptGuitar,128,6,--,--
+EVENT,28,5,C-4,CryptHarp,126,3,--,--
+EVENT,28,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,30,0,F-3,CryptGuitar,128,6,--,--
+EVENT,30,6,A-1,CryptDrum,130,4,SDN 10,--
+EVENT,32,0,G-2,CryptGuitar,148,6,--,PAN 76
+EVENT,32,1,"G-1,D-2",CryptDrone,146,16,--,PAN 128
+EVENT,32,2,A-3,CryptWind,102,32,--,PAN 212
+EVENT,32,3,G-3,CryptCello,180,8,--,--
+EVENT,32,4,G-4,CryptBell,120,14,--,PAN 64
+EVENT,32,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,34,0,D-3,CryptGuitar,128,6,--,--
+EVENT,36,0,A#3,CryptGuitar,128,6,--,--
+EVENT,36,5,A#3,CryptHarp,126,3,--,--
+EVENT,36,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,38,0,A-3,CryptGuitar,128,6,--,--
+EVENT,38,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,40,0,D-3,CryptGuitar,148,6,--,--
+EVENT,40,3,G#3,CryptCello,186,8,PRT 45,--
+EVENT,40,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,42,0,G-3,CryptGuitar,128,6,--,--
+EVENT,44,0,A#3,CryptGuitar,128,6,--,--
+EVENT,44,5,A-3,CryptHarp,126,3,--,--
+EVENT,44,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,46,0,D-4,CryptGuitar,128,6,--,--
+EVENT,48,0,A-2,CryptGuitar,148,6,--,PAN 76
+EVENT,48,1,"A-1,E-2",CryptDrone,146,16,--,PAN 128
+EVENT,48,3,A-3,CryptCello,184,10,--,--
+EVENT,48,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,50,0,E-3,CryptGuitar,128,6,--,--
+EVENT,52,0,C#4,CryptGuitar,128,6,--,--
+EVENT,52,5,G-3,CryptHarp,126,3,--,--
+EVENT,52,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,54,0,G-3,CryptGuitar,128,6,--,--
+EVENT,54,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,56,0,E-3,CryptGuitar,148,6,--,--
+EVENT,56,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,58,0,A#3,CryptGuitar,128,6,--,--
+EVENT,58,3,E-3,CryptCello,170,6,--,--
+EVENT,60,0,C#4,CryptGuitar,128,6,--,--
+EVENT,60,5,C#4,CryptHarp,126,3,--,--
+EVENT,60,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,62,0,E-4,CryptGuitar,128,6,--,--
+EVENT,62,6,A-1,CryptDrum,130,4,SDN 10,--
+PATTERN,C,64,76,4,16,D,Harmonic Minor,Sunken Altar
+EVENT,0,0,D-3,CryptGuitar,148,6,--,PAN 76
+EVENT,0,1,"D-2,D-3",CryptDrone,146,16,--,PAN 128
+EVENT,0,2,F-3,CryptWind,98,32,--,PAN 44
+EVENT,0,3,A-3,CryptCello,178,8,--,PAN 156
+EVENT,0,4,A-4,CryptBell,120,14,--,PAN 60
+EVENT,0,5,D-5,CryptHarp,126,3,--,PAN 188
+EVENT,0,6,D-2,CryptDrum,172,6,SDN 12,PAN 128
+EVENT,2,0,F-3,CryptGuitar,128,6,--,--
+EVENT,4,0,A-3,CryptGuitar,128,6,--,--
+EVENT,4,5,A-4,CryptHarp,126,3,--,--
+EVENT,4,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,6,0,D-4,CryptGuitar,128,6,--,--
+EVENT,6,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,8,0,A-3,CryptGuitar,148,6,--,--
+EVENT,8,3,G#3,CryptCello,182,8,PRT 45,--
+EVENT,8,5,G#4,CryptHarp,126,3,--,--
+EVENT,8,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,10,0,G#3,CryptGuitar,128,6,--,--
+EVENT,12,0,F-3,CryptGuitar,128,6,--,--
+EVENT,12,5,F-4,CryptHarp,126,3,--,--
+EVENT,12,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,14,0,A-3,CryptGuitar,128,6,--,--
+EVENT,16,0,C-3,CryptGuitar,148,6,--,PAN 76
+EVENT,16,1,"C-2,G-2",CryptDrone,146,16,--,PAN 128
+EVENT,16,3,G-3,CryptCello,176,10,--,--
+EVENT,16,5,C-5,CryptHarp,126,3,--,--
+EVENT,16,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,18,0,D#3,CryptGuitar,128,6,--,--
+EVENT,20,0,G-3,CryptGuitar,128,6,--,--
+EVENT,20,5,G-4,CryptHarp,126,3,--,--
+EVENT,20,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,22,0,C-4,CryptGuitar,128,6,--,--
+EVENT,22,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,24,0,G-3,CryptGuitar,148,6,--,--
+EVENT,24,5,D#4,CryptHarp,126,3,--,--
+EVENT,24,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,26,0,F-3,CryptGuitar,128,6,--,--
+EVENT,26,3,D#3,CryptCello,170,6,--,--
+EVENT,28,0,D#3,CryptGuitar,128,6,--,--
+EVENT,28,5,G-4,CryptHarp,126,3,--,--
+EVENT,28,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,30,0,G-3,CryptGuitar,128,6,--,--
+EVENT,30,6,A-1,CryptDrum,130,4,SDN 10,--
+EVENT,32,0,A#2,CryptGuitar,148,6,--,PAN 76
+EVENT,32,1,"A#1,F-2",CryptDrone,146,16,--,PAN 128
+EVENT,32,2,E-3,CryptWind,102,32,--,PAN 212
+EVENT,32,3,F-3,CryptCello,178,8,--,--
+EVENT,32,5,A#4,CryptHarp,126,3,--,--
+EVENT,32,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,34,0,D-3,CryptGuitar,128,6,--,--
+EVENT,36,0,F-3,CryptGuitar,128,6,--,--
+EVENT,36,5,F-4,CryptHarp,126,3,--,--
+EVENT,36,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,38,0,A#3,CryptGuitar,128,6,--,--
+EVENT,38,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,40,0,F-3,CryptGuitar,148,6,--,--
+EVENT,40,3,D-3,CryptCello,174,8,--,--
+EVENT,40,5,D-4,CryptHarp,126,3,--,--
+EVENT,40,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,42,0,E-3,CryptGuitar,128,6,--,--
+EVENT,44,0,D-3,CryptGuitar,128,6,--,--
+EVENT,44,5,F-4,CryptHarp,126,3,--,--
+EVENT,44,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,46,0,F-3,CryptGuitar,128,6,--,--
+EVENT,48,0,A-2,CryptGuitar,148,6,--,PAN 76
+EVENT,48,1,"A-1,E-2",CryptDrone,146,16,--,PAN 128
+EVENT,48,3,E-3,CryptCello,182,10,--,--
+EVENT,48,4,C#5,CryptBell,120,14,--,PAN 196
+EVENT,48,5,E-4,CryptHarp,126,3,--,--
+EVENT,48,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,50,0,C#3,CryptGuitar,128,6,--,--
+EVENT,52,0,E-3,CryptGuitar,128,6,--,--
+EVENT,52,5,G-4,CryptHarp,126,3,--,--
+EVENT,52,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,54,0,A-3,CryptGuitar,128,6,--,--
+EVENT,54,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,56,0,G-3,CryptGuitar,148,6,--,--
+EVENT,56,5,A#4,CryptHarp,126,3,--,--
+EVENT,56,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,58,0,E-3,CryptGuitar,128,6,--,--
+EVENT,58,3,C#3,CryptCello,174,6,--,--
+EVENT,60,0,C#3,CryptGuitar,128,6,--,--
+EVENT,60,5,C#5,CryptHarp,126,3,--,--
+EVENT,60,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,62,0,E-3,CryptGuitar,128,6,--,--
+EVENT,62,6,A-1,CryptDrum,130,4,SDN 10,--
+PATTERN,D,64,76,4,16,D,Phrygian,Crypt Turnaround
+EVENT,0,0,D-3,CryptGuitar,148,6,--,PAN 76
+EVENT,0,1,"D-2,A-2",CryptDrone,146,16,--,PAN 128
+EVENT,0,2,A-3,CryptWind,98,32,--,PAN 44
+EVENT,0,3,F-3,CryptCello,172,12,--,PAN 156
+EVENT,0,4,D-4,CryptBell,120,14,--,PAN 192
+EVENT,0,6,D-2,CryptDrum,142,5,SDN 10,PAN 128
+EVENT,2,0,A-3,CryptGuitar,128,6,--,--
+EVENT,4,0,E-4,CryptGuitar,128,6,--,--
+EVENT,4,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,6,0,F-4,CryptGuitar,128,6,--,--
+EVENT,8,0,A-3,CryptGuitar,148,6,--,--
+EVENT,8,5,F-4,CryptHarp,114,3,--,PAN 188
+EVENT,10,0,E-4,CryptGuitar,128,6,--,--
+EVENT,10,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,12,0,D-4,CryptGuitar,128,6,--,--
+EVENT,12,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,14,0,A-3,CryptGuitar,128,6,--,--
+EVENT,16,0,D#3,CryptGuitar,148,6,--,PAN 76
+EVENT,16,1,"D#2,A#2",CryptDrone,146,16,--,PAN 128
+EVENT,16,3,D#3,CryptCello,170,12,--,--
+EVENT,16,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,18,0,A#3,CryptGuitar,128,6,--,--
+EVENT,20,0,G-4,CryptGuitar,128,6,--,--
+EVENT,20,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,22,0,F-4,CryptGuitar,128,6,--,--
+EVENT,24,0,A#3,CryptGuitar,148,6,--,--
+EVENT,24,5,D#4,CryptHarp,114,3,--,--
+EVENT,26,0,D#4,CryptGuitar,128,6,--,--
+EVENT,26,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,28,0,D-4,CryptGuitar,128,6,--,--
+EVENT,28,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,30,0,A#3,CryptGuitar,128,6,--,--
+EVENT,32,0,G-2,CryptGuitar,148,6,--,PAN 76
+EVENT,32,1,"G-1,D-2",CryptDrone,146,16,--,PAN 128
+EVENT,32,2,E-4,CryptWind,102,32,--,PAN 212
+EVENT,32,3,D-3,CryptCello,172,12,--,--
+EVENT,32,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,34,0,D-3,CryptGuitar,128,6,--,--
+EVENT,36,0,A#3,CryptGuitar,128,6,--,--
+EVENT,36,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,38,0,A-3,CryptGuitar,128,6,--,--
+EVENT,40,0,D-3,CryptGuitar,148,6,--,--
+EVENT,40,5,A#3,CryptHarp,114,3,--,--
+EVENT,42,0,G-3,CryptGuitar,128,6,--,--
+EVENT,42,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,44,0,F-3,CryptGuitar,128,6,--,--
+EVENT,44,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,46,0,D-3,CryptGuitar,128,6,--,--
+EVENT,48,0,A-2,CryptGuitar,148,6,--,PAN 76
+EVENT,48,1,"A-1,E-2",CryptDrone,146,16,--,PAN 128
+EVENT,48,3,E-3,CryptCello,176,14,--,--
+EVENT,48,4,C#5,CryptBell,120,14,--,PAN 64
+EVENT,48,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,50,0,E-3,CryptGuitar,128,6,--,--
+EVENT,52,0,A#3,CryptGuitar,128,6,--,--
+EVENT,52,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,54,0,C#4,CryptGuitar,128,6,--,--
+EVENT,56,0,E-4,CryptGuitar,148,6,--,--
+EVENT,56,5,C#4,CryptHarp,114,3,--,--
+EVENT,58,0,C#4,CryptGuitar,128,6,--,--
+EVENT,58,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,60,0,A-3,CryptGuitar,128,6,--,--
+EVENT,60,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,62,0,E-3,CryptGuitar,128,6,--,--
+PATTERN,E,64,76,4,16,D,Phrygian,Echoing Vault
+EVENT,0,0,D-3,CryptGuitar,142,6,ECH 66,PAN 76
+EVENT,0,1,D-2,CryptDrone,146,32,--,PAN 128
+EVENT,0,2,A-3,CryptWind,98,32,--,PAN 44
+EVENT,0,4,D-5,CryptBell,120,14,--,PAN 196
+EVENT,0,6,D-2,CryptDrum,142,5,SDN 10,PAN 128
+EVENT,4,0,A-3,CryptGuitar,122,6,ECH 66,--
+EVENT,4,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,8,0,E-4,CryptGuitar,142,6,ECH 66,--
+EVENT,8,3,A-3,CryptCello,150,14,--,PAN 156
+EVENT,10,0,F-4,CryptGuitar,122,6,ECH 66,--
+EVENT,10,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,12,5,F-4,CryptHarp,114,3,--,PAN 188
+EVENT,12,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,16,0,D-3,CryptGuitar,142,6,ECH 66,PAN 76
+EVENT,16,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,20,0,A-3,CryptGuitar,122,6,ECH 66,--
+EVENT,20,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,24,0,D#4,CryptGuitar,142,6,ECH 66,--
+EVENT,26,0,D-4,CryptGuitar,122,6,ECH 66,--
+EVENT,26,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,28,5,D#4,CryptHarp,114,3,--,--
+EVENT,28,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,32,0,A-2,CryptGuitar,142,6,ECH 66,PAN 76
+EVENT,32,1,A-1,CryptDrone,146,32,--,PAN 128
+EVENT,32,2,D#4,CryptWind,102,32,--,PAN 212
+EVENT,32,4,G#4,CryptBell,120,14,--,PAN 56
+EVENT,32,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,36,0,E-3,CryptGuitar,122,6,ECH 66,--
+EVENT,36,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,40,0,A#3,CryptGuitar,142,6,ECH 66,--
+EVENT,40,3,G-3,CryptCello,148,14,PRT 50,--
+EVENT,42,0,C#4,CryptGuitar,122,6,ECH 66,--
+EVENT,42,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,44,5,C#4,CryptHarp,114,3,--,--
+EVENT,44,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,48,0,D-3,CryptGuitar,142,6,ECH 66,PAN 76
+EVENT,48,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,52,0,A-3,CryptGuitar,122,6,ECH 66,--
+EVENT,52,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,56,0,F-4,CryptGuitar,142,6,ECH 66,--
+EVENT,58,0,E-4,CryptGuitar,122,6,ECH 66,--
+EVENT,58,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,60,5,A-3,CryptHarp,114,3,--,--
+EVENT,60,7,D-6,BoneRattle,56,2,--,PAN 88
+PATTERN,F,64,76,4,16,D,Harmonic Minor,Reliquary Lament
+EVENT,0,0,G-2,CryptGuitar,148,6,--,PAN 76
+EVENT,0,1,"G-1,D-2",CryptDrone,146,16,--,PAN 128
+EVENT,0,2,A#3,CryptWind,98,32,--,PAN 44
+EVENT,0,3,A#3,CryptCello,184,8,--,PAN 156
+EVENT,0,4,G-4,CryptBell,120,14,--,PAN 64
+EVENT,0,6,D-2,CryptDrum,172,6,SDN 12,PAN 128
+EVENT,2,0,D-3,CryptGuitar,128,6,--,--
+EVENT,2,5,D-5,CryptHarp,126,3,--,PAN 188
+EVENT,4,0,A#3,CryptGuitar,128,6,--,--
+EVENT,4,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,6,0,D-4,CryptGuitar,128,6,--,--
+EVENT,6,5,A#4,CryptHarp,126,3,--,--
+EVENT,6,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,8,0,A#3,CryptGuitar,148,6,--,--
+EVENT,8,3,G-3,CryptCello,178,8,--,--
+EVENT,8,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,10,0,A-3,CryptGuitar,128,6,--,--
+EVENT,10,5,A-4,CryptHarp,126,3,--,--
+EVENT,12,0,G-3,CryptGuitar,128,6,--,--
+EVENT,12,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,14,0,D-3,CryptGuitar,128,6,--,--
+EVENT,14,5,G-4,CryptHarp,126,3,--,--
+EVENT,16,0,F-2,CryptGuitar,148,6,--,PAN 76
+EVENT,16,1,"F-1,C-2",CryptDrone,146,16,--,PAN 128
+EVENT,16,3,A-3,CryptCello,184,8,--,--
+EVENT,16,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,18,0,C-3,CryptGuitar,128,6,--,--
+EVENT,18,5,C-5,CryptHarp,126,3,--,--
+EVENT,20,0,A-3,CryptGuitar,128,6,--,--
+EVENT,20,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,22,0,C-4,CryptGuitar,128,6,--,--
+EVENT,22,5,A-4,CryptHarp,126,3,--,--
+EVENT,22,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,24,0,A-3,CryptGuitar,148,6,--,--
+EVENT,24,3,F-3,CryptCello,176,8,--,--
+EVENT,24,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,26,0,G-3,CryptGuitar,128,6,--,--
+EVENT,26,5,G-4,CryptHarp,126,3,--,--
+EVENT,28,0,F-3,CryptGuitar,128,6,--,--
+EVENT,28,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,30,0,C-3,CryptGuitar,128,6,--,--
+EVENT,30,5,F-4,CryptHarp,126,3,--,--
+EVENT,30,6,A-1,CryptDrum,130,4,SDN 10,--
+EVENT,32,0,D#2,CryptGuitar,148,6,--,PAN 76
+EVENT,32,1,"D#1,A#1",CryptDrone,146,16,--,PAN 128
+EVENT,32,2,E-3,CryptWind,102,32,--,PAN 212
+EVENT,32,3,G-3,CryptCello,186,8,PRT 40,--
+EVENT,32,4,D#5,CryptBell,120,14,--,PAN 192
+EVENT,32,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,34,0,A#2,CryptGuitar,128,6,--,--
+EVENT,34,5,A#4,CryptHarp,126,3,--,--
+EVENT,36,0,G-3,CryptGuitar,128,6,--,--
+EVENT,36,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,38,0,A#3,CryptGuitar,128,6,--,--
+EVENT,38,5,G-4,CryptHarp,126,3,--,--
+EVENT,38,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,40,0,D-4,CryptGuitar,148,6,--,--
+EVENT,40,3,D#3,CryptCello,180,8,--,--
+EVENT,40,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,42,0,A#3,CryptGuitar,128,6,--,--
+EVENT,42,5,F-4,CryptHarp,126,3,--,--
+EVENT,44,0,G-3,CryptGuitar,128,6,--,--
+EVENT,44,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,46,0,D#3,CryptGuitar,128,6,--,--
+EVENT,46,5,D#4,CryptHarp,126,3,--,--
+EVENT,48,0,A-2,CryptGuitar,148,6,--,PAN 76
+EVENT,48,1,"A-1,E-2",CryptDrone,146,16,--,PAN 128
+EVENT,48,3,E-3,CryptCello,188,8,--,--
+EVENT,48,6,D-2,CryptDrum,172,6,SDN 12,--
+EVENT,50,0,E-3,CryptGuitar,128,6,--,--
+EVENT,50,5,C#5,CryptHarp,126,3,--,--
+EVENT,52,0,C#4,CryptGuitar,128,6,--,--
+EVENT,52,7,D-6,BoneRattle,68,2,--,PAN 172
+EVENT,54,0,G-4,CryptGuitar,128,6,--,--
+EVENT,54,5,A#4,CryptHarp,126,3,--,--
+EVENT,54,6,A-1,CryptDrum,125,4,SDN 10,--
+EVENT,56,0,E-4,CryptGuitar,148,6,--,--
+EVENT,56,3,C#4,CryptCello,192,8,--,--
+EVENT,56,4,C#5,CryptBell,120,14,--,PAN 128
+EVENT,56,6,D-2,CryptDrum,148,5,SDN 12,--
+EVENT,58,0,C#4,CryptGuitar,128,6,--,--
+EVENT,58,5,G-4,CryptHarp,126,3,--,--
+EVENT,60,0,A#3,CryptGuitar,128,6,--,--
+EVENT,60,7,D-6,BoneRattle,68,2,--,PAN 84
+EVENT,62,0,E-3,CryptGuitar,128,6,--,--
+EVENT,62,5,E-4,CryptHarp,126,3,--,--
+EVENT,62,6,A-1,CryptDrum,130,4,SDN 10,--
+PATTERN,G,64,76,4,16,D,Phrygian,Catacomb Vigil
+EVENT,0,0,D-3,CryptGuitar,154,6,--,PAN 76
+EVENT,0,1,"D-2,A-2",CryptDrone,146,16,--,PAN 128
+EVENT,0,2,D-4,CryptWind,98,32,--,PAN 44
+EVENT,0,3,D-4,CryptCello,194,6,--,PAN 156
+EVENT,0,4,D-5,CryptBell,132,14,--,PAN 196
+EVENT,0,5,D-5,CryptHarp,136,3,--,PAN 188
+EVENT,0,6,D-2,CryptDrum,198,6,SDN 14,PAN 128
+EVENT,2,0,A-3,CryptGuitar,134,6,--,--
+EVENT,2,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,4,0,F-4,CryptGuitar,134,6,--,--
+EVENT,4,5,A-4,CryptHarp,136,3,--,--
+EVENT,4,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,6,0,A-3,CryptGuitar,134,6,--,--
+EVENT,6,3,F-4,CryptCello,190,6,--,--
+EVENT,6,6,A-1,CryptDrum,145,4,SDN 10,--
+EVENT,8,0,G#4,CryptGuitar,154,6,--,--
+EVENT,8,5,F-4,CryptHarp,136,3,--,--
+EVENT,8,6,D-2,CryptDrum,175,5,SDN 12,--
+EVENT,10,0,F-4,CryptGuitar,134,6,--,--
+EVENT,10,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,12,0,E-4,CryptGuitar,134,6,--,--
+EVENT,12,3,E-4,CryptCello,184,4,--,--
+EVENT,12,5,D-4,CryptHarp,136,3,--,--
+EVENT,12,6,A-1,CryptDrum,150,4,SDN 10,--
+EVENT,12,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,14,0,A-3,CryptGuitar,134,6,--,--
+EVENT,14,6,D-2,CryptDrum,180,4,SDN 12,--
+EVENT,14,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,16,0,D#3,CryptGuitar,154,6,--,PAN 76
+EVENT,16,1,"D#2,A#2",CryptDrone,146,16,--,PAN 128
+EVENT,16,3,D#4,CryptCello,196,8,--,--
+EVENT,16,5,D#5,CryptHarp,136,3,--,--
+EVENT,16,6,D-2,CryptDrum,198,6,SDN 14,--
+EVENT,18,0,A#3,CryptGuitar,134,6,--,--
+EVENT,18,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,20,0,G-4,CryptGuitar,134,6,--,--
+EVENT,20,5,A#4,CryptHarp,136,3,--,--
+EVENT,20,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,22,0,A#3,CryptGuitar,134,6,--,--
+EVENT,22,6,A-1,CryptDrum,145,4,SDN 10,--
+EVENT,24,0,F-4,CryptGuitar,154,6,--,--
+EVENT,24,3,A#3,CryptCello,182,8,--,--
+EVENT,24,5,G-4,CryptHarp,136,3,--,--
+EVENT,24,6,D-2,CryptDrum,175,5,SDN 12,--
+EVENT,26,0,D#4,CryptGuitar,134,6,--,--
+EVENT,26,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,28,0,D-4,CryptGuitar,134,6,--,--
+EVENT,28,5,D#4,CryptHarp,136,3,--,--
+EVENT,28,6,A-1,CryptDrum,150,4,SDN 10,--
+EVENT,28,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,30,0,A#3,CryptGuitar,134,6,--,--
+EVENT,30,6,D-2,CryptDrum,180,4,SDN 12,--
+EVENT,30,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,32,0,F-3,CryptGuitar,154,6,--,PAN 76
+EVENT,32,1,"F-2,C-3",CryptDrone,146,16,--,PAN 128
+EVENT,32,2,G#3,CryptWind,102,32,--,PAN 212
+EVENT,32,3,F-4,CryptCello,198,8,PRT 38,--
+EVENT,32,4,G#4,CryptBell,132,14,--,PAN 56
+EVENT,32,5,F-5,CryptHarp,136,3,--,--
+EVENT,32,6,D-2,CryptDrum,198,6,SDN 14,--
+EVENT,34,0,C-4,CryptGuitar,134,6,--,--
+EVENT,34,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,36,0,G#4,CryptGuitar,134,6,--,--
+EVENT,36,5,D-5,CryptHarp,136,3,--,--
+EVENT,36,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,38,0,C-4,CryptGuitar,134,6,--,--
+EVENT,38,6,A-1,CryptDrum,145,4,SDN 10,--
+EVENT,40,0,F-4,CryptGuitar,154,6,--,--
+EVENT,40,3,G#4,CryptCello,204,8,--,--
+EVENT,40,5,G#4,CryptHarp,136,3,--,--
+EVENT,40,6,D-2,CryptDrum,175,5,SDN 12,--
+EVENT,42,0,D-4,CryptGuitar,134,6,--,--
+EVENT,42,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,44,0,C-4,CryptGuitar,134,6,--,--
+EVENT,44,5,D-5,CryptHarp,136,3,--,--
+EVENT,44,6,A-1,CryptDrum,150,4,SDN 10,--
+EVENT,44,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,46,0,G#3,CryptGuitar,134,6,--,--
+EVENT,46,6,D-2,CryptDrum,180,4,SDN 12,--
+EVENT,46,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,48,0,A-2,CryptGuitar,154,6,--,PAN 76
+EVENT,48,1,"A-1,E-2",CryptDrone,146,16,--,PAN 128
+EVENT,48,3,A-4,CryptCello,206,10,--,--
+EVENT,48,4,A-4,CryptBell,132,14,--,PAN 128
+EVENT,48,5,E-5,CryptHarp,136,3,--,--
+EVENT,48,6,D-2,CryptDrum,198,6,SDN 14,--
+EVENT,50,0,E-3,CryptGuitar,134,6,--,--
+EVENT,50,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,52,0,C#4,CryptGuitar,134,6,--,--
+EVENT,52,5,C#5,CryptHarp,136,3,--,--
+EVENT,52,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,54,0,E-3,CryptGuitar,134,6,--,--
+EVENT,54,6,A-1,CryptDrum,145,4,SDN 10,--
+EVENT,56,0,A#3,CryptGuitar,154,6,--,--
+EVENT,56,5,A#4,CryptHarp,136,3,--,--
+EVENT,56,6,D-2,CryptDrum,175,5,SDN 12,--
+EVENT,58,0,G-3,CryptGuitar,134,6,--,--
+EVENT,58,3,G-4,CryptCello,186,6,--,--
+EVENT,58,7,D-6,BoneRattle,82,2,--,PAN 84
+EVENT,60,0,E-3,CryptGuitar,134,6,--,--
+EVENT,60,5,G-4,CryptHarp,136,3,--,--
+EVENT,60,6,A-1,CryptDrum,150,4,SDN 10,--
+EVENT,60,7,D-6,BoneRattle,82,2,--,PAN 172
+EVENT,62,0,C#3,CryptGuitar,134,6,--,--
+EVENT,62,6,D-2,CryptDrum,180,4,SDN 12,--
+EVENT,62,7,D-6,BoneRattle,82,2,--,PAN 84
+PATTERN,H,64,76,4,16,D,Phrygian,Whispering Stone
+EVENT,0,0,A-2,CryptGuitar,138,6,ECH 65,PAN 76
+EVENT,0,1,A-1,CryptDrone,146,32,--,PAN 128
+EVENT,0,2,E-4,CryptWind,98,32,--,PAN 44
+EVENT,0,4,E-5,CryptBell,120,14,--,PAN 200
+EVENT,0,6,D-2,CryptDrum,142,5,SDN 10,PAN 128
+EVENT,2,0,E-3,CryptGuitar,118,6,ECH 65,--
+EVENT,4,3,E-3,CryptCello,152,12,--,PAN 156
+EVENT,4,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,6,0,A#3,CryptGuitar,118,6,ECH 65,--
+EVENT,8,0,C#4,CryptGuitar,138,6,ECH 65,--
+EVENT,10,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,12,0,E-3,CryptGuitar,118,6,ECH 65,--
+EVENT,12,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,16,0,A-2,CryptGuitar,138,6,ECH 65,PAN 76
+EVENT,16,5,C#4,CryptHarp,114,3,--,PAN 188
+EVENT,16,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,18,0,E-3,CryptGuitar,118,6,ECH 65,--
+EVENT,20,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,22,0,G-3,CryptGuitar,118,6,ECH 65,--
+EVENT,24,0,F-3,CryptGuitar,138,6,ECH 65,--
+EVENT,26,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,28,0,E-3,CryptGuitar,118,6,ECH 65,--
+EVENT,28,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,32,0,D-3,CryptGuitar,138,6,ECH 65,PAN 76
+EVENT,32,1,D-2,CryptDrone,146,32,--,PAN 128
+EVENT,32,2,D#4,CryptWind,102,32,--,PAN 212
+EVENT,32,4,D-5,CryptBell,120,14,--,PAN 60
+EVENT,32,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,34,0,A-3,CryptGuitar,118,6,ECH 65,--
+EVENT,36,3,F-3,CryptCello,154,14,PRT 48,--
+EVENT,36,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,38,0,E-4,CryptGuitar,118,6,ECH 65,--
+EVENT,40,0,F-4,CryptGuitar,138,6,ECH 65,--
+EVENT,42,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,44,0,A-3,CryptGuitar,118,6,ECH 65,--
+EVENT,44,7,D-6,BoneRattle,56,2,--,PAN 88
+EVENT,48,0,D-3,CryptGuitar,138,6,ECH 65,PAN 76
+EVENT,48,5,D#4,CryptHarp,114,3,--,--
+EVENT,48,6,D-2,CryptDrum,142,5,SDN 10,--
+EVENT,50,0,A-3,CryptGuitar,118,6,ECH 65,--
+EVENT,52,7,D-6,BoneRattle,56,2,--,PAN 168
+EVENT,54,0,D#4,CryptGuitar,118,6,ECH 65,--
+EVENT,56,0,D-4,CryptGuitar,138,6,ECH 65,--
+EVENT,58,6,A-1,CryptDrum,112,4,SDN 8,--
+EVENT,60,0,A-3,CryptGuitar,118,6,ECH 65,--
+EVENT,60,7,D-6,BoneRattle,56,2,--,PAN 88
