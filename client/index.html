@@ -152,11 +152,11 @@
             <div class="grid grid-cols-2 gap-2">
               <button id="btn-enter-solo" disabled
                 class="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg shadow-lg transition">
-                Quick Play (Private)
+                Solo Play (Private)
               </button>
               <button id="btn-open-lobbies" disabled
                 class="bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg shadow-lg transition">
-                Multiplayer Lobbies
+                Multiplayer Realms
               </button>
             </div>
           </div>
@@ -358,13 +358,16 @@
               </select>
             </div>
             <div>
-              <label class="block text-slate-300 mb-1">Visibility</label>
+              <label class="block text-slate-300 mb-1">Realm Listing</label>
               <div class="grid grid-cols-2 gap-1.5">
                 <button id="btn-vis-public" type="button"
-                  class="border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center">Public</button>
+                  class="border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center">Listed</button>
                 <button id="btn-vis-private" type="button"
-                  class="border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center">Private</button>
+                  class="border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center">Unlisted</button>
               </div>
+            </div>
+            <div class="text-[10px] text-slate-400 col-span-2">
+              Listed realms appear in the Diablo 2 realm browser for this mode. Set a password above to protect with a key.
             </div>
           </div>
           <button id="btn-enter-multi" type="button"

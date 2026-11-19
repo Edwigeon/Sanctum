@@ -63,6 +63,7 @@ const input = new InputController({
 });
 
 const menus = new MenuController({
+  audio,
   onConnect: connect,
   getCurrentInviteCode: () => hud.currentInviteCode
 });
@@ -78,6 +79,7 @@ function exitToMainMenu() {
     ws.close();
     ws = null;
   }
+  audio.resetMacroState();
   music.setBiome('cathedral', { fadeSec: 1.5 });
   myPlayerId = null;
   dungeon = null;
@@ -92,11 +94,11 @@ function exitToMainMenu() {
   menus.showMainMenu();
 }
 
-function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteCode = '', inviteToken = '') {
+function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteCode = '', inviteToken = '', maxPlayers = 4) {
   if (ws) {
     const oldWs = ws;
     ws = null;
-    oldWs.onclose = () => connect(playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode, inviteToken);
+    oldWs.onclose = () => connect(playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode, inviteToken, maxPlayers);
     oldWs.close();
     return;
   }
@@ -120,6 +122,7 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
         password,
         inviteCode,
         inviteToken,
+        maxPlayers,
         token: menus.getAuthToken()
       }
     });

@@ -493,6 +493,38 @@ export class AudioPSG {
     }
   }
 
+  resetMacroState() {
+    this.macroState = {
+      lowHealth: false,
+      environment: 'cathedral',
+      poisoned: false
+    };
+
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    if (this.lowHealthFilter) {
+      try {
+        this.lowHealthFilter.frequency.cancelScheduledValues(now);
+        this.lowHealthFilter.frequency.setValueAtTime(22000, now);
+        this.lowHealthFilter.Q.cancelScheduledValues(now);
+        this.lowHealthFilter.Q.setValueAtTime(0.7, now);
+      } catch {
+        this.lowHealthFilter.frequency.value = 22000;
+        this.lowHealthFilter.Q.value = 0.7;
+      }
+    }
+
+    if (this.envDelayGain) {
+      try {
+        this.envDelayGain.gain.cancelScheduledValues(now);
+        this.envDelayGain.gain.setValueAtTime(0.0, now);
+      } catch {
+        this.envDelayGain.gain.value = 0.0;
+      }
+    }
+  }
+
   setMuted(muted) {
     this.settings.muted = !!muted;
     if (this.masterGain && this.ctx) {

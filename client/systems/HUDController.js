@@ -232,6 +232,7 @@ export class HUDController {
     this.panelInv.classList.add('hidden');
     this.panelPause.classList.add('hidden');
     this.panelDeath.classList.add('hidden');
+    this.audio?.resetMacroState?.();
   }
 
   update({ myP, priv, activeRoomMode }) {

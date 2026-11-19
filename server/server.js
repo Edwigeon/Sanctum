@@ -350,10 +350,12 @@ wss.on('connection', (ws) => {
             }
             currentRoom = existing;
           } else {
+            const isPublic = joinType !== 'private' && joinType !== 'unlisted';
+            const maxPlayers = Math.max(2, Math.min(4, Number(packet.data?.maxPlayers) || 4));
             currentRoom = getOrCreateRoom(roomId, targetMode, {
               displayName: cleanRoom,
-              isPublic: joinType !== 'private',
-              maxPlayers: 4,
+              isPublic,
+              maxPlayers,
               password: password || ''
             });
           }

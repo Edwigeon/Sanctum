@@ -25,9 +25,10 @@ export function extractInviteCode(raw) {
 }
 
 export class MenuController {
-  constructor({ onConnect, getCurrentInviteCode }) {
+  constructor({ onConnect, getCurrentInviteCode, audio = null }) {
     this.onConnect = onConnect;
     this.getCurrentInviteCode = getCurrentInviteCode;
+    this.audio = audio;
 
     this.screenMain = document.getElementById('screen-main-menu');
     this.screenAuth = document.getElementById('screen-auth');
@@ -48,6 +49,7 @@ export class MenuController {
     this.selectedLobby = null;
     this.cachedLobbies = [];
     this.currentLobbyTab = 'join';
+    this.lobbyPollInterval = null;
 
     this.bindEvents();
     this.checkAuth();
@@ -66,6 +68,8 @@ export class MenuController {
   }
 
   showMainMenu() {
+    this.audio?.resetMacroState?.();
+    this.stopLobbyPolling();
     this.screenMain.classList.remove('hidden');
   }
 
@@ -75,6 +79,7 @@ export class MenuController {
     errEl.classList.remove('hidden');
     this.screenLobby.classList.remove('hidden');
     this.loadLobbies(mode);
+    this.startLobbyPolling();
   }
 
   updateAuthUI() {
@@ -327,19 +332,53 @@ export class MenuController {
     }
   }
 
-  async loadLobbies(mode) {
+  startLobbyPolling() {
+    this.stopLobbyPolling();
+    this.lobbyPollInterval = setInterval(() => {
+      if (!this.screenLobby.classList.contains('hidden') && this.currentLobbyTab === 'join') {
+        const char = this.getSelectedCharacter();
+        if (char) {
+          this.loadLobbies(char.mode, true);
+        }
+      }
+    }, 3000);
+  }
+
+  stopLobbyPolling() {
+    if (this.lobbyPollInterval) {
+      clearInterval(this.lobbyPollInterval);
+      this.lobbyPollInterval = null;
+    }
+  }
+
+  async loadLobbies(mode, silent = false) {
     const list = document.getElementById('lobby-list');
-    list.innerHTML = '<div class="text-slate-500 py-4 text-center">Scanning realms...</div>';
-    this.selectedLobby = null;
-    this.renderSelectedLobby();
+    if (!silent) {
+      list.innerHTML = '<div class="text-slate-500 py-4 text-center">Scanning realms...</div>';
+      this.selectedLobby = null;
+      this.renderSelectedLobby();
+    }
 
     try {
       const res = await fetch(`/api/lobbies?mode=${encodeURIComponent(mode)}`);
       const { lobbies } = await res.json();
       this.cachedLobbies = lobbies || [];
+
+      // Preserve currently selected lobby if it still exists
+      if (this.selectedLobby) {
+        const stillActive = this.cachedLobbies.find(l => l.roomId === this.selectedLobby.roomId);
+        if (stillActive) {
+          this.selectedLobby = stillActive;
+        } else if (!silent) {
+          this.selectedLobby = null;
+        }
+      }
+
       this.filterLobbies();
     } catch {
-      list.innerHTML = '<div class="text-rose-400 py-4 text-center">Failed to scan realm lobbies</div>';
+      if (!silent) {
+        list.innerHTML = '<div class="text-rose-400 py-4 text-center">Failed to scan realm lobbies</div>';
+      }
     }
   }
 
@@ -548,7 +587,18 @@ export class MenuController {
       if (this.pendingInvite?.inviteToken || this.pendingInvite?.inviteCode) {
         document.getElementById('inp-invite-code').value = this.pendingInvite.inviteToken || this.pendingInvite.inviteCode;
       }
+
+      // Always default visibility to public when entering lobby
+      this.roomVisibility = 'public';
+      const btnVisPub = document.getElementById('btn-vis-public');
+      const btnVisPriv = document.getElementById('btn-vis-private');
+      if (btnVisPub && btnVisPriv) {
+        btnVisPub.className = 'border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center';
+        btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center';
+      }
+
       this.loadLobbies(char.mode);
+      this.startLobbyPolling();
     });
 
     // Diablo 2 Tab Switching
@@ -564,6 +614,8 @@ export class MenuController {
         tabCreate.className = 'flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 bg-transparent transition text-center flex items-center justify-center gap-1.5';
         contentJoin?.classList.remove('hidden');
         contentCreate?.classList.add('hidden');
+        const char = this.getSelectedCharacter();
+        if (char) this.loadLobbies(char.mode, true);
       });
 
       tabCreate.addEventListener('click', () => {
@@ -584,11 +636,13 @@ export class MenuController {
       const l = this.selectedLobby;
       if (!char || !l) return;
       const pass = document.getElementById('detail-inp-pass')?.value || '';
+      this.stopLobbyPolling();
       this.onConnect(char.name, l.name, char.mode, char.classId, char.id, 'public', pass);
       this.screenLobby.classList.add('hidden');
     });
 
     document.getElementById('btn-lobby-back').addEventListener('click', () => {
+      this.stopLobbyPolling();
       this.screenLobby.classList.add('hidden');
       this.screenChar.classList.remove('hidden');
     });
@@ -616,6 +670,7 @@ export class MenuController {
       if (!char || !this.pendingInvite || char.mode !== this.pendingInvite.mode) return;
       const code = this.pendingInvite.inviteCode || '';
       const token = this.pendingInvite.inviteToken || '';
+      this.stopLobbyPolling();
       this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
       this.screenChar.classList.add('hidden');
     });
@@ -625,6 +680,7 @@ export class MenuController {
       const raw = document.getElementById('inp-invite-code').value;
       const { token, code } = parseInviteInput(raw);
       if (!char || (!token && !code)) return;
+      this.stopLobbyPolling();
       this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
       this.screenLobby.classList.add('hidden');
     });
@@ -634,7 +690,9 @@ export class MenuController {
       if (!char) return;
       const room = document.getElementById('inp-room').value.trim() || 'cathedral_01';
       const pass = document.getElementById('inp-room-pass').value;
-      this.onConnect(char.name, room, char.mode, char.classId, char.id, this.roomVisibility, pass);
+      const maxPlayers = parseInt(document.getElementById('sel-max-players')?.value, 10) || 4;
+      this.stopLobbyPolling();
+      this.onConnect(char.name, room, char.mode, char.classId, char.id, this.roomVisibility, pass, '', '', maxPlayers);
       this.screenLobby.classList.add('hidden');
     });
 

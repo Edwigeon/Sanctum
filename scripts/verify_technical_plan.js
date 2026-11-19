@@ -258,4 +258,54 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   console.log('✔ P3.11 Diablo 2 lobby metadata & cryptographic invite links verified.');
 }
 
+// 12. Low-health audio macro reset & lobby discovery validation
+{
+  const { AudioPSG } = await import('../client/systems/AudioPSG.js');
+  const audio = new AudioPSG();
+  audio.macroState.lowHealth = true;
+  audio.macroState.environment = 'cavern';
+  audio.macroState.poisoned = true;
+
+  // Mock lowHealthFilter
+  audio.lowHealthFilter = {
+    frequency: { value: 450, cancelScheduledValues: () => {}, setValueAtTime: function(v) { this.value = v; } },
+    Q: { value: 2.2, cancelScheduledValues: () => {}, setValueAtTime: function(v) { this.value = v; } }
+  };
+  audio.ctx = { currentTime: 1.0 };
+
+  audio.resetMacroState();
+  console.assert(audio.macroState.lowHealth === false, '[P3.12] lowHealth must reset to false');
+  console.assert(audio.lowHealthFilter.frequency.value === 22000, '[P3.12] lowHealth filter frequency must restore to 22 kHz');
+  console.assert(audio.lowHealthFilter.Q.value === 0.7, '[P3.12] lowHealth filter Q must restore to 0.7');
+
+  // Verify lobby discovery rules:
+  // Public room appears in lobbies; unlisted room does not; both can be joined via cryptographic inviteToken
+  const publicRoom = new GameRoom('CLASSIC_pub_test', GAME_MODES.CLASSIC, 0, {
+    displayName: 'Public Realm',
+    isPublic: true,
+    maxPlayers: 4,
+    password: 'secret'
+  });
+  const unlistedRoom = new GameRoom('CLASSIC_unlisted_test', GAME_MODES.CLASSIC, 0, {
+    displayName: 'Secret Realm',
+    isPublic: false,
+    maxPlayers: 2
+  });
+
+  const allRooms = [publicRoom, unlistedRoom];
+  const publicLobbies = allRooms.filter(r => r.isPublic && r.mode === GAME_MODES.CLASSIC).map(r => r.getSummary());
+
+  console.assert(publicLobbies.length === 1, '[P3.12] Exactly 1 public lobby must be discoverable');
+  console.assert(publicLobbies[0].roomId === 'CLASSIC_pub_test', '[P3.12] Public room must match');
+  console.assert(publicLobbies[0].hasPassword === true, '[P3.12] Password protected room must indicate hasPassword=true');
+
+  // Unlisted room must be joinable via cryptographic inviteToken
+  const foundByToken = allRooms.find(r => r.inviteToken === unlistedRoom.inviteToken);
+  console.assert(foundByToken && foundByToken.roomId === 'CLASSIC_unlisted_test', '[P3.12] Unlisted room must resolve via inviteToken');
+
+  publicRoom.destroy();
+  unlistedRoom.destroy();
+  console.log('✔ P3.12 Audio low-health macro reset & lobby discovery rules verified.');
+}
+
 console.log('\n=== ALL TECHNICAL PLAN ITEMS VERIFIED SUCCESSFULLY! ===');
