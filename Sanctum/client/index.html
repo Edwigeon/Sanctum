@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PROJECT: SANCTUM (WIP Demake Engine)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { user-select: none; -webkit-user-select: none; }
+    canvas.pixelated { image-rendering: pixelated; image-rendering: crisp-edges; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 p-2 font-sans antialiased overflow-hidden flex flex-col items-center">
+  <div id="lobby-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-lg p-6 max-w-md w-full shadow-2xl">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+        <h1 class="font-bold text-lg text-slate-100 tracking-wider">PROJECT: SANCTUM</h1>
+        <span class="text-[10px] font-mono bg-slate-800 text-indigo-300 px-2 py-0.5 rounded border border-indigo-900">v0.1.0-WIP</span>
+      </div>
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Character Name</label>
+          <input id="inp-name" type="text" value="Wanderer" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Game Mode</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-mode-classic" type="button" class="border border-indigo-500 bg-indigo-950/40 text-indigo-200 py-2 rounded text-center font-bold">
+              Classic<span class="block text-[10px] font-normal text-slate-400">Normal Respawn</span>
+            </button>
+            <button id="btn-mode-hardcore" type="button" class="border border-slate-800 bg-slate-950/40 text-slate-400 py-2 rounded text-center font-bold hover:border-rose-900 transition">
+              Hardcore<span class="block text-[10px] font-normal text-rose-400">Permadeath</span>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Dungeon Room Code</label>
+          <input id="inp-room" type="text" value="crypt_01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+        </div>
+        <button id="btn-enter" class="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold py-2.5 rounded shadow-lg transition">
+          Enter Sanctum (Connect)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full max-w-4xl flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800 text-xs">
+    <div class="flex items-center gap-3">
+      <span class="font-bold tracking-wider text-slate-200">PROJECT: SANCTUM</span>
+      <span id="badge-mode" class="bg-indigo-900/60 text-indigo-300 px-1.5 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50">Classic Mode</span>
+      <span id="badge-net" class="text-slate-400 font-mono text-[10px]">Disconnected</span>
+    </div>
+    <div class="text-slate-400 font-mono text-[11px] flex gap-3">
+      <span><strong class="text-amber-400">LMB:</strong> Move / Attack / Loot</span>
+      <span><strong class="text-cyan-400">RMB:</strong> Cast Spell</span>
+      <span><strong class="text-rose-400">1:</strong> Potion</span>
+    </div>
+  </div>
+
+  <div id="game-stage" class="relative w-[720px] h-[432px] rounded-lg overflow-hidden border-2 border-slate-800 shadow-2xl bg-black cursor-crosshair">
+    <canvas id="pixelCanvas" width="240" height="144" class="pixelated absolute inset-0 w-full h-full z-0"></canvas>
+    <canvas id="highResCanvas" width="720" height="432" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+    <div class="absolute bottom-2 left-3 right-3 z-20 flex items-end justify-between pointer-events-auto">
+      <div class="flex items-center gap-2 bg-slate-900/90 border border-red-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm">
+        <div class="w-7 h-7 rounded-full bg-gradient-to-t from-red-800 to-rose-500 border border-red-400/50 flex items-center justify-center shadow-inner">
+          <span class="text-[10px] font-bold text-white drop-shadow">HP</span>
+        </div>
+        <div class="text-left font-mono">
+          <div id="hud-hp" class="text-xs font-bold text-rose-300">100 / 100</div>
+          <div class="text-[9px] text-slate-400 uppercase tracking-wider">Health</div>
+        </div>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="flex gap-1.5 bg-slate-900/90 border border-slate-700/60 p-1.5 rounded-lg shadow-lg backdrop-blur-sm">
+          <button id="btn-pot" class="w-8 h-8 rounded bg-slate-800 border border-rose-700/60 flex flex-col items-center justify-center hover:bg-slate-700 transition">
+            <span class="text-[9px] font-mono text-rose-400 font-bold">1</span>
+            <span id="hud-pot" class="text-[10px] font-bold text-slate-200">x3</span>
+          </button>
+          <div class="w-8 h-8 rounded bg-slate-800 border border-amber-600/60 flex flex-col items-center justify-center">
+            <span class="text-[8px] font-mono text-amber-300">LMB</span>
+            <span class="text-[9px] text-slate-200 font-semibold">Strike</span>
+          </div>
+          <div class="w-8 h-8 rounded bg-slate-800 border border-cyan-600/60 flex flex-col items-center justify-center">
+            <span class="text-[8px] font-mono text-cyan-300">RMB</span>
+            <span class="text-[9px] text-slate-200 font-semibold">Spark</span>
+          </div>
+        </div>
+        <div id="status-line" class="text-[10px] font-mono text-slate-300 bg-black/60 px-2 py-0.5 rounded">Connected to Authoritative 15 Hz Host.</div>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-900/90 border border-blue-900/60 rounded-full px-3 py-1 shadow-lg backdrop-blur-sm">
+        <div class="text-right font-mono">
+          <div id="hud-mp" class="text-xs font-bold text-cyan-300">50 / 50</div>
+          <div class="text-[9px] text-slate-400 uppercase tracking-wider">Mana</div>
+        </div>
+        <div class="w-7 h-7 rounded-full bg-gradient-to-t from-blue-800 to-cyan-400 border border-cyan-400/50 flex items-center justify-center shadow-inner">
+          <span class="text-[10px] font-bold text-white drop-shadow">MP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

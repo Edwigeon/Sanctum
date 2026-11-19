@@ -1,0 +1,14 @@
+{
+  "name": "project-sanctum-arpg",
+  "version": "0.1.0-wip",
+  "description": "Server-authoritative, microscopic dual-resolution ARPG engine",
+  "type": "module",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "cluster": "node server/cluster.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
