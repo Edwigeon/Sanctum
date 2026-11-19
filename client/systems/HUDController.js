@@ -97,6 +97,9 @@ export class HUDController {
       const iconEl = el?.querySelector('.slot-icon');
       if (iconEl) iconEl.src = getBitSpriteDataUrl('slot_' + slot, 2);
     }
+
+    const goldEl = document.getElementById('icon-inv-gold');
+    if (goldEl) goldEl.src = getBitSpriteDataUrl('coin', 2);
   }
 
   initAudioSettings() {
@@ -532,32 +535,26 @@ export class HUDController {
         const el = document.getElementById(`slot-${slot}`);
         if (!el) continue;
         const item = priv.equipment[slot];
-        const nameEl = el.querySelector('.slot-name');
         const iconEl = el.querySelector('.slot-icon');
         if (item) {
           const col = RARITY_COLORS[item.rarity] || '#FFFFFF';
           el.style.borderColor = col;
           el.classList.add('socket-occupied');
-          if (nameEl) {
-            nameEl.textContent = item.name;
-            nameEl.style.color = col;
-          }
           if (iconEl) {
             iconEl.src = getBitSpriteDataUrl(getItemSpriteKey(item), 2);
           }
         } else {
           el.style.borderColor = '';
           el.classList.remove('socket-occupied');
-          if (nameEl) {
-            nameEl.textContent = '—';
-            nameEl.style.color = '';
-          }
           if (iconEl) {
             iconEl.src = getBitSpriteDataUrl('slot_' + slot, 2);
           }
         }
       }
     }
+
+    const goldTextEl = document.getElementById('inv-gold-text');
+    if (goldTextEl) goldTextEl.textContent = (priv.gold ?? 0).toLocaleString();
 
     const curW = priv.carryWeight ?? 0;
     const maxW = priv.maxWeight ?? 60;
@@ -578,9 +575,20 @@ export class HUDController {
       list.innerHTML = '<div class="text-[10px] font-mono text-slate-500 py-4 text-center">Pack is empty</div>';
     } else {
       for (const item of inv) {
-        const col = RARITY_COLORS[item.rarity] || '#FFFFFF';
+        const isConsumable = item.type === 'potion' || item.type === 'consumable';
+        const col = RARITY_COLORS[item.rarity] || (isConsumable ? '#38bdf8' : '#FFFFFF');
         const sprKey = getItemSpriteKey(item);
         const sprUrl = getBitSpriteDataUrl(sprKey, 2);
+
+        const countBadge = (item.count && item.count > 1) || isConsumable
+          ? `<span class="bg-amber-950/90 border border-amber-600/70 text-amber-300 font-bold px-1.5 py-0.2 rounded text-[10px] shrink-0 font-mono">x${item.count || 1}</span>`
+          : '';
+
+        const subtitleText = isConsumable
+          ? (item.subType === 'mp' || item.name?.includes('Mana') ? 'Restores 30 Mana' : 'Restores 40 Health')
+          : formatItemStats(item.stats);
+
+        const typeLabel = isConsumable ? 'CONSUMABLE' : (item.slot || 'GEAR');
 
         const row = document.createElement('button');
         row.type = 'button';
@@ -592,23 +600,34 @@ export class HUDController {
           <div class="min-w-0 flex-1 space-y-0.5">
             <div class="flex items-center justify-between gap-1 text-[11px] font-mono">
               <span class="font-bold truncate" style="color:${col}">${item.name}</span>
-              <span class="text-[9px] text-slate-400 shrink-0">${(item.weight || 1).toFixed(1)} lb</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${countBadge}
+                <span class="text-[9px] text-slate-400">${((item.weight || 0.2) * (item.count || 1)).toFixed(1)} lb</span>
+              </div>
             </div>
             <div class="flex items-center justify-between text-[9px] font-mono">
-              <span class="text-emerald-300 truncate">${formatItemStats(item.stats)}</span>
-              <span class="text-slate-500 uppercase ml-1 shrink-0">${item.slot}</span>
+              <span class="text-emerald-300 truncate">${subtitleText}</span>
+              <span class="text-slate-500 uppercase ml-1 shrink-0">${typeLabel}</span>
             </div>
           </div>
         `;
         row.addEventListener('mouseenter', () => {
-          const eq = priv.equipment?.[item.slot] || null;
-          this.showComparisonTooltip(item, eq, row);
+          if (isConsumable) {
+            this.showConsumableTooltip(item, row);
+          } else {
+            const eq = priv.equipment?.[item.slot] || null;
+            this.showComparisonTooltip(item, eq, row);
+          }
         });
         row.addEventListener('mouseleave', () => {
           this.hideComparisonTooltip();
         });
         row.addEventListener('click', () => {
-          this.sendPacket({ type: PACKET_TYPES.EQUIP_ITEM, itemId: item.id });
+          if (isConsumable) {
+            this.sendPacket({ type: PACKET_TYPES.USE_ITEM, itemId: item.id });
+          } else {
+            this.sendPacket({ type: PACKET_TYPES.EQUIP_ITEM, itemId: item.id });
+          }
           this.hideComparisonTooltip();
         });
         row.addEventListener('contextmenu', (ev) => {
@@ -619,6 +638,51 @@ export class HUDController {
         list.appendChild(row);
       }
     }
+  }
+
+  showConsumableTooltip(item, targetEl) {
+    const tooltip = document.getElementById('tooltip-item-compare');
+    if (!tooltip || !item) return;
+
+    const eqCard = document.getElementById('compare-equipped-card');
+    const hoverCard = document.getElementById('compare-hover-card');
+
+    if (eqCard) eqCard.classList.add('hidden');
+    if (hoverCard) {
+      hoverCard.classList.remove('hidden');
+      const col = RARITY_COLORS[item.rarity] || '#38bdf8';
+      const badgeEl = document.getElementById('compare-hover-badge');
+      if (badgeEl) badgeEl.textContent = 'CONSUMABLE';
+      const slotEl = document.getElementById('compare-hover-slot');
+      if (slotEl) slotEl.textContent = `STACK: ${item.count || 1} / ${item.maxStack || 20}`;
+      const nameEl = document.getElementById('compare-hover-name');
+      if (nameEl) {
+        nameEl.textContent = item.name;
+        nameEl.style.color = col;
+      }
+      hoverCard.style.borderColor = col;
+
+      const typeEl = document.getElementById('compare-hover-type');
+      const totalW = ((item.weight || 0.2) * (item.count || 1)).toFixed(1);
+      if (typeEl) typeEl.textContent = `Consumable • ${totalW} lb total`;
+
+      const statsEl = document.getElementById('compare-hover-stats');
+      if (statsEl) {
+        if (item.subType === 'mp' || item.name?.includes('Mana')) {
+          statsEl.innerHTML = '<div class="text-sky-300 font-bold">+30 Mana Restored</div><div class="text-[10px] text-slate-400">Instantly restores spiritual energy</div>';
+        } else {
+          statsEl.innerHTML = '<div class="text-rose-400 font-bold">+40 Health Restored</div><div class="text-[10px] text-slate-400">Instantly restores life wounds</div>';
+        }
+      }
+
+      const actionsEl = document.getElementById('compare-hover-actions');
+      if (actionsEl) {
+        actionsEl.innerHTML = `<span class="text-emerald-300 font-bold">[LMB] Consume</span><span class="text-slate-400">[RMB] Drop 1</span>`;
+      }
+    }
+
+    tooltip.classList.remove('hidden');
+    this.positionTooltip(tooltip, targetEl);
   }
 
   showComparisonTooltip(hoverItem, equippedItem, targetEl) {

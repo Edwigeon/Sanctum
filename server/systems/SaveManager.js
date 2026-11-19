@@ -16,7 +16,7 @@ const DEFAULT_EQUIPMENT = {
 
 function rowToCharacter(row) {
   if (!row) return null;
-  let data = { stats: {}, equipment: {}, inventory: [] };
+  let data = { stats: {}, equipment: {}, inventory: [], gold: 0 };
   try {
     data = JSON.parse(row.data_json);
   } catch { /* fallback */ }
@@ -31,6 +31,7 @@ function rowToCharacter(row) {
     nextXp: row.next_xp,
     statPoints: row.stat_points,
     potions: row.potions,
+    gold: data.gold || 0,
     isDead: !!row.is_dead,
     highestFloor: row.highest_floor,
     stats: data.stats || {},
@@ -61,7 +62,19 @@ class SaveManager {
     const dataJson = JSON.stringify({
       stats: { ...cls.stats },
       equipment: { ...DEFAULT_EQUIPMENT },
-      inventory: []
+      inventory: [
+        {
+          id: 1,
+          type: 'potion',
+          subType: 'hp',
+          name: 'Health Potion',
+          rarity: 1,
+          count: 3,
+          maxStack: 20,
+          weight: 0.2
+        }
+      ],
+      gold: 50
     });
 
     db.prepare(`
@@ -82,7 +95,8 @@ class SaveManager {
     const dataJson = JSON.stringify({
       stats: p.stats,
       equipment: p.equipment,
-      inventory: p.inventory
+      inventory: p.inventory,
+      gold: p.gold || 0
     });
 
     db.prepare(`

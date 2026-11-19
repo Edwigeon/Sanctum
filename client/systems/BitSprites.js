@@ -14,6 +14,54 @@ export const BIT_SPRITES = {
     '...66.....',
     '..........'
   ],
+  potion_hp: [
+    '...55.....',
+    '...44.....',
+    '..6776....',
+    '.688886...',
+    '.687886...',
+    '.688886...',
+    '.688886...',
+    '..6886....',
+    '...66.....',
+    '..........'
+  ],
+  potion_mp: [
+    '...55.....',
+    '...44.....',
+    '..6776....',
+    '.6cccc6...',
+    '.6c7cc6...',
+    '.6cccc6...',
+    '.6cccc6...',
+    '..6cc6....',
+    '...66.....',
+    '..........'
+  ],
+  coin: [
+    '...aaaa...',
+    '..a77aaa..',
+    '.a7aaaa9a.',
+    '.a7aa999a.',
+    '.a7aa999a.',
+    '.a7aaaa9a.',
+    '..a9999a..',
+    '...aaaa...',
+    '..........',
+    '..........'
+  ],
+  scroll: [
+    '..ffff....',
+    '.f4444f...',
+    '.f4774f...',
+    '.f4cc4f...',
+    '.f4774f...',
+    '.f4444f...',
+    '..ffff....',
+    '..........',
+    '..........',
+    '..........'
+  ],
   sword: [
     '........67',
     '.......676',
@@ -691,6 +739,16 @@ export function getBitSpriteDataUrl(spriteKey, pixelScale = 2) {
 export function getItemSpriteKey(item) {
   if (!item) return 'slot_weapon';
   const name = (item.name || item.base || '').toLowerCase();
+  const type = (item.type || '').toLowerCase();
+
+  // Consumables & Currencies
+  if (type === 'gold' || name.includes('gold')) return 'coin';
+  if (type === 'potion' || name.includes('potion')) {
+    if (item.subType === 'mp' || name.includes('mana')) return 'potion_mp';
+    return 'potion_hp';
+  }
+  if (name.includes('scroll') || name.includes('portal')) return 'scroll';
+
   for (const key of Object.keys(BIT_SPRITES)) {
     if (name.includes(key)) return key;
   }

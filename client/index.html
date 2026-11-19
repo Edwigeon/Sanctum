@@ -475,73 +475,77 @@
         class="hidden absolute top-3 right-3 w-80 max-h-[calc(100%-88px)] z-30 bg-slate-950/92 border border-indigo-900/60 rounded-lg p-3.5 shadow-2xl backdrop-blur-md flex flex-col justify-start text-xs cursor-default">
         <div class="space-y-3 overflow-y-auto pr-1">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <span class="font-bold text-indigo-300 text-sm tracking-wide">INVENTORY</span>
+            <span class="font-bold text-amber-300 text-sm tracking-wide">INVENTORY</span>
             <button id="btn-close-inv"
               class="text-slate-400 hover:text-white font-mono px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">✕</button>
           </div>
 
           <div>
-            <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">
-              <span>Equipped Paperdoll</span>
-              <span class="text-slate-500 normal-case">LMB: Unequip • RMB: Drop</span>
+            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1.5">
+              <span class="uppercase tracking-wider font-semibold text-slate-300">Equipment</span>
+              <span class="text-slate-500">LMB: Unequip • RMB: Drop</span>
             </div>
             <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
               <!-- Row 1: Crest / Helm / Amulet -->
-              <div id="slot-crest" class="paperdoll-socket flex flex-col items-center justify-center p-1 min-h-[54px] opacity-75">
+              <div id="slot-crest" class="paperdoll-socket flex flex-col items-center justify-center p-1.5 min-h-[50px] opacity-80" title="Hero Crest">
                 <span id="crest-class" class="text-[9px] font-bold text-amber-400 uppercase tracking-tight text-center leading-none">HERO</span>
-                <span id="crest-level" class="text-[8px] text-slate-500 font-mono mt-0.5">LVL 1</span>
+                <span id="crest-level" class="text-[8px] text-slate-400 font-mono mt-0.5 font-bold">LVL 1</span>
               </div>
-              <div id="slot-helm" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="helm">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Helm">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Helm</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-helm" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="helm" title="Helm">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Helm">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Helm</div>
               </div>
-              <div id="slot-amulet" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="amulet">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Amulet">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Amulet</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-amulet" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="amulet" title="Amulet">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Amulet">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Amulet</div>
               </div>
 
               <!-- Row 2: Weapon / Armor / Offhand -->
-              <div id="slot-weapon" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="weapon">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Weapon">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Weapon</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-weapon" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="weapon" title="Weapon">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Weapon">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Weapon</div>
               </div>
-              <div id="slot-armor" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="armor">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Armor">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Armor</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-armor" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="armor" title="Armor">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Armor">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Armor</div>
               </div>
-              <div id="slot-offhand" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="offhand">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Off-hand">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Off-hand</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-offhand" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="offhand" title="Off-hand">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Off-hand">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Off-hand</div>
               </div>
 
               <!-- Row 3: Gloves / Boots / Ring -->
-              <div id="slot-gloves" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="gloves">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Gloves">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Gloves</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-gloves" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="gloves" title="Gloves">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Gloves">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Gloves</div>
               </div>
-              <div id="slot-boots" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="boots">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Boots">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Boots</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-boots" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="boots" title="Boots">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Boots">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Boots</div>
               </div>
-              <div id="slot-ring" class="slot-box paperdoll-socket p-1 min-h-[54px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="ring">
-                <img class="slot-icon w-6 h-6 pixelated shrink-0" alt="Ring">
-                <div class="text-[8px] text-slate-500 uppercase leading-tight mt-0.5">Ring</div>
-                <div class="slot-name text-[9px] text-slate-400 truncate max-w-full px-0.5 leading-tight">—</div>
+              <div id="slot-ring" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="ring" title="Ring">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Ring">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Ring</div>
               </div>
             </div>
           </div>
 
           <div class="space-y-1.5">
-            <div class="flex justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
-              <span>Carry Weight</span>
-              <span id="inv-weight-text" class="text-slate-200">0.0 / 60.0 lb</span>
+            <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
+              <!-- Currency -->
+              <div class="flex items-center justify-between bg-slate-900/90 border border-amber-900/40 px-2 py-1.5 rounded">
+                <div class="flex items-center gap-1.5">
+                  <img id="icon-inv-gold" class="w-4 h-4 pixelated shrink-0" alt="Gold">
+                  <span class="text-slate-400 uppercase tracking-wider font-bold">Gold</span>
+                </div>
+                <span id="inv-gold-text" class="text-amber-300 font-bold">0</span>
+              </div>
+
+              <!-- Carry Weight -->
+              <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-2 py-1.5 rounded">
+                <span class="text-slate-400 uppercase tracking-wider font-bold">Weight</span>
+                <span id="inv-weight-text" class="text-slate-200">0.0 / 60 lb</span>
+              </div>
             </div>
             <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
               <div id="inv-weight-bar" class="h-full bg-indigo-400 transition-all" style="width: 0%"></div>
@@ -550,8 +554,8 @@
 
           <div class="space-y-1.5">
             <div class="flex justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
-              <span>Pack Items</span>
-              <span class="text-slate-500 normal-case">Click: Equip • RMB: Drop</span>
+              <span class="font-bold text-slate-300">Pack Items & Supplies</span>
+              <span class="text-slate-500 normal-case">Click: Equip/Use • RMB: Drop</span>
             </div>
             <div id="inv-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1"></div>
           </div>

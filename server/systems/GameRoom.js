@@ -141,7 +141,7 @@ export class GameRoom {
       xp: savedChar?.xp || 0,
       nextXp: savedChar?.nextXp || 100,
       statPoints: savedChar?.statPoints || 0,
-      gold: 0,
+      gold: savedChar?.gold ?? 50,
       stats: savedChar?.stats ? { ...savedChar.stats } : { ...cls.stats },
       equipment: savedChar?.equipment
         ? Object.assign({ helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring: null }, savedChar.equipment)
@@ -156,6 +156,21 @@ export class GameRoom {
       carryWeight: 0, maxWeight: 60, attackCooldown: 0,
       dirtyState: true
     };
+
+    const hasHpPot = player.inventory.some(i => i.type === 'potion' && (!i.subType || i.subType === 'hp' || i.name?.includes('Health')));
+    if (!hasHpPot && player.potions > 0) {
+      player.inventory.push({
+        id: this.nextEntityId++,
+        type: 'potion',
+        subType: 'hp',
+        name: 'Health Potion',
+        rarity: 1,
+        count: player.potions,
+        maxStack: 20,
+        weight: 0.2
+      });
+    }
+
     this.recalculateStats(player, true);
 
     this.players.set(id, player);
@@ -182,8 +197,11 @@ export class GameRoom {
       }
     }
     for (const item of p.inventory) {
-      weightSum += item.weight || 0;
+      weightSum += (item.weight || 0) * (item.count || 1);
     }
+
+    const hpPotions = p.inventory.filter(i => i.type === 'potion' && (!i.subType || i.subType === 'hp' || i.name?.includes('Health')));
+    p.potions = hpPotions.reduce((acc, curr) => acc + (curr.count || 1), 0);
 
     const totalMight = p.stats.might + bonus.might;
     const totalFocus = p.stats.focus + bonus.focus;
@@ -265,6 +283,9 @@ export class GameRoom {
     } else if (packet.type === PACKET_TYPES.UNEQUIP_ITEM) {
       if (typeof packet.slot !== 'string') return;
       this.handleUnequipItem(p, packet.slot);
+    } else if (packet.type === PACKET_TYPES.USE_ITEM) {
+      if (!Number.isInteger(packet.itemId)) return;
+      this.handleUseItem(p, packet.itemId);
     } else if (packet.type === PACKET_TYPES.DROP_ITEM) {
       if (!Number.isInteger(packet.itemId)) return;
       this.handleDropItem(p, packet.itemId);
@@ -307,11 +328,43 @@ export class GameRoom {
     saveManager.saveFromPlayer(p, this.floor);
   }
 
+  handleUseItem(p, itemId) {
+    const idx = p.inventory.findIndex(i => i.id === itemId);
+    if (idx === -1) return;
+    const item = p.inventory[idx];
+    if (item.type === 'potion' || item.type === 'consumable') {
+      if (item.subType === 'mp' || item.name?.includes('Mana')) {
+        if (p.mp >= p.maxMp) return;
+        item.count = (item.count || 1) - 1;
+        if (item.count <= 0) p.inventory.splice(idx, 1);
+        const restore = Math.min(p.maxMp - p.mp, 30);
+        p.mp += restore;
+        this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: restore });
+      } else {
+        if (p.hp >= p.maxHp) return;
+        item.count = (item.count || 1) - 1;
+        if (item.count <= 0) p.inventory.splice(idx, 1);
+        const heal = Math.min(p.maxHp - p.hp, 40);
+        p.hp += heal;
+        this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: heal });
+      }
+      this.recalculateStats(p, false);
+      p.dirtyState = true;
+      saveManager.saveFromPlayer(p, this.floor);
+    }
+  }
+
   handleDropItem(p, itemId) {
     const idx = p.inventory.findIndex(i => i.id === itemId);
     if (idx === -1) return;
-    const [item] = p.inventory.splice(idx, 1);
-    this.groundLoot.push({ ...item, x: p.x, y: p.y });
+    const item = p.inventory[idx];
+    if (item.count && item.count > 1) {
+      item.count--;
+      this.groundLoot.push({ ...item, id: this.nextEntityId++, count: 1, x: p.x, y: p.y });
+    } else {
+      p.inventory.splice(idx, 1);
+      this.groundLoot.push({ ...item, x: p.x, y: p.y });
+    }
     this.recalculateStats(p, false);
     p.dirtyState = true;
     saveManager.saveFromPlayer(p, this.floor);
@@ -348,13 +401,23 @@ export class GameRoom {
   }
 
   handlePlayerPotion(p) {
-    if (p.potions > 0 && p.hp < p.maxHp) {
-      p.potions--;
-      const heal = Math.min(p.maxHp - p.hp, 40);
-      p.hp += heal;
-      p.dirtyState = true;
-      this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: heal });
+    if (p.hp >= p.maxHp) return;
+    const potIdx = p.inventory.findIndex(i => i.type === 'potion' && (!i.subType || i.subType === 'hp' || i.name?.includes('Health')));
+    if (potIdx === -1 && p.potions <= 0) return;
+
+    if (potIdx !== -1) {
+      const pot = p.inventory[potIdx];
+      pot.count = (pot.count || 1) - 1;
+      if (pot.count <= 0) {
+        p.inventory.splice(potIdx, 1);
+      }
     }
+    const heal = Math.min(p.maxHp - p.hp, 40);
+    p.hp += heal;
+    this.recalculateStats(p, false);
+    p.dirtyState = true;
+    this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: heal });
+    saveManager.saveFromPlayer(p, this.floor);
   }
 
   handlePickupLoot(p, lootId) {
@@ -362,17 +425,40 @@ export class GameRoom {
     if (idx === -1) return false;
     const item = this.groundLoot[idx];
     if (dist(p.x, p.y, item.x, item.y) < 18) {
-      if (item.type === 'gear') {
-        const w = item.weight || 1;
-        if (p.carryWeight + w > p.maxWeight) {
-          p.targetLootId = null;
-          this.events.push({ type: 'OVERBURDENED', id: p.id, x: p.x, y: p.y });
-          return false;
-        }
+      if (item.type === 'gold') {
+        this.groundLoot.splice(idx, 1);
+        p.gold = (p.gold || 0) + (item.amount || 10);
+        this.events.push({ type: 'GOLD_PICKUP', id: p.id, x: p.x, y: p.y, amount: item.amount || 10 });
+        p.targetLootId = null;
+        p.dirtyState = true;
+        saveManager.saveFromPlayer(p, this.floor);
+        return true;
+      }
+
+      const w = (item.weight || (item.type === 'potion' ? 0.2 : 1)) * (item.count || 1);
+      if (p.carryWeight + w > p.maxWeight) {
+        p.targetLootId = null;
+        this.events.push({ type: 'OVERBURDENED', id: p.id, x: p.x, y: p.y });
+        return false;
       }
       this.groundLoot.splice(idx, 1);
-      if (item.type === 'potion') {
-        p.potions++;
+      if (item.type === 'potion' || item.stackable) {
+        const existing = p.inventory.find(i => i.type === 'potion' && i.name === item.name && (i.count || 1) < (i.maxStack || 20));
+        if (existing) {
+          existing.count = Math.min(existing.maxStack || 20, (existing.count || 1) + (item.count || 1));
+        } else {
+          p.inventory.push({
+            id: item.id || this.nextEntityId++,
+            type: item.type,
+            subType: item.subType || (item.name?.includes('Mana') ? 'mp' : 'hp'),
+            name: item.name || 'Health Potion',
+            count: item.count || 1,
+            maxStack: 20,
+            weight: 0.2,
+            rarity: item.rarity ?? 1
+          });
+        }
+        this.recalculateStats(p, false);
       } else if (item.type === 'gear') {
         p.inventory.push(item);
         this.recalculateStats(p, false);
@@ -423,12 +509,30 @@ export class GameRoom {
   killMonster(m) {
     this.monsters.delete(m.id);
     this.grantXp(m.xp || (25 + (this.floor - 1) * 10));
-    const dropPotion = this.rng.next() % 3 === 0;
-    if (dropPotion) {
+
+    const roll = this.rng.next() % 100;
+    if (roll < 35) {
+      // Gold drop
+      const amt = Math.max(5, Math.round(this.rng.range(5, 20) * (1 + (this.floor - 1) * 0.4)));
+      this.groundLoot.push({
+        id: this.nextEntityId++,
+        type: 'gold',
+        name: `${amt} Gold`,
+        amount: amt,
+        rarity: RARITY.NORMAL,
+        x: m.x, y: m.y
+      });
+    } else if (roll < 60) {
+      // Potion drop (Health or Mana)
+      const isMana = this.rng.next() % 3 === 0;
       this.groundLoot.push({
         id: this.nextEntityId++,
         type: 'potion',
-        name: 'Health Potion',
+        subType: isMana ? 'mp' : 'hp',
+        name: isMana ? 'Mana Potion' : 'Health Potion',
+        count: 1,
+        maxStack: 20,
+        weight: 0.2,
         rarity: RARITY.MAGIC,
         x: m.x, y: m.y
       });
@@ -670,6 +774,7 @@ export class GameRoom {
             nextXp: p.nextXp,
             statPoints: p.statPoints,
             potions: p.potions,
+            gold: p.gold || 0,
             carryWeight: p.carryWeight,
             maxWeight: p.maxWeight,
             stats: p.stats,
