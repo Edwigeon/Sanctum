@@ -4,6 +4,7 @@ import { dataRegistry } from './DataRegistry.js';
 import { db } from './Database.js';
 
 const DEFAULT_EQUIPMENT = {
+  ring1: null,
   helm: null,
   amulet: null,
   weapon: null,
@@ -11,7 +12,7 @@ const DEFAULT_EQUIPMENT = {
   offhand: null,
   gloves: null,
   boots: null,
-  ring: null
+  ring2: null
 };
 
 function rowToCharacter(row) {
@@ -20,6 +21,10 @@ function rowToCharacter(row) {
   try {
     data = JSON.parse(row.data_json);
   } catch { /* fallback */ }
+  const equipment = Object.assign({ ...DEFAULT_EQUIPMENT }, data.equipment);
+  if (data.equipment?.ring && !equipment.ring1) {
+    equipment.ring1 = data.equipment.ring;
+  }
   return {
     id: row.id,
     accountId: row.account_id,
@@ -35,7 +40,7 @@ function rowToCharacter(row) {
     isDead: !!row.is_dead,
     highestFloor: row.highest_floor,
     stats: data.stats || {},
-    equipment: Object.assign({ ...DEFAULT_EQUIPMENT }, data.equipment),
+    equipment,
     inventory: data.inventory || [],
     updatedAt: row.updated_at
   };

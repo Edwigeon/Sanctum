@@ -1,7 +1,7 @@
 import { GAME_MODES, PACKET_TYPES, RARITY_COLORS } from '../../shared/Constants.js';
 import { getBitSpriteDataUrl, getItemSpriteKey } from './BitSprites.js';
 
-export const PAPERDOLL_SLOTS = ['helm', 'amulet', 'weapon', 'armor', 'offhand', 'gloves', 'boots', 'ring'];
+export const PAPERDOLL_SLOTS = ['ring1', 'helm', 'amulet', 'weapon', 'armor', 'offhand', 'gloves', 'boots', 'ring2'];
 
 const STAT_LABELS = {
   dmg: 'Damage',
@@ -615,7 +615,9 @@ export class HUDController {
           if (isConsumable) {
             this.showConsumableTooltip(item, row);
           } else {
-            const eq = priv.equipment?.[item.slot] || null;
+            const eq = item.slot === 'ring'
+              ? (priv.equipment?.ring1 || priv.equipment?.ring2 || null)
+              : (priv.equipment?.[item.slot] || null);
             this.showComparisonTooltip(item, eq, row);
           }
         });

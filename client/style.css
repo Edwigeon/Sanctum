@@ -471,10 +471,7 @@ button.btn-locked-pressed::after,
 }
 
 /* --- SUNKEN CAST-IRON WELLS: SLOTS, ATTRIBUTES & INPUTS --- */
-#slot-weapon,
-#slot-armor,
-#slot-gloves,
-#slot-ring {
+.paperdoll-socket {
   background: #06070b !important;
   border-top: 3px solid #000000 !important;
   border-left: 3px solid #000000 !important;
@@ -483,6 +480,15 @@ button.btn-locked-pressed::after,
   box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.95) !important;
   min-height: 52px !important;
   padding: 6px 8px !important;
+}
+
+.inv-status-slab {
+  background: #06070b !important;
+  border-top: 2px solid #000000 !important;
+  border-left: 2px solid #000000 !important;
+  border-right: 2px solid var(--bronze-dark) !important;
+  border-bottom: 2px solid var(--bronze-mid) !important;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.95) !important;
 }
 
 #inv-list button {

@@ -486,10 +486,10 @@
               <span class="text-slate-500">LMB: Unequip • RMB: Drop</span>
             </div>
             <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
-              <!-- Row 1: Crest / Helm / Amulet -->
-              <div id="slot-crest" class="paperdoll-socket flex flex-col items-center justify-center p-1.5 min-h-[50px] opacity-80" title="Hero Crest">
-                <span id="crest-class" class="text-[9px] font-bold text-amber-400 uppercase tracking-tight text-center leading-none">HERO</span>
-                <span id="crest-level" class="text-[8px] text-slate-400 font-mono mt-0.5 font-bold">LVL 1</span>
+              <!-- Row 1: Ring 1 / Helm / Amulet -->
+              <div id="slot-ring1" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="ring1" title="Ring 1">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Ring 1">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Ring 1</div>
               </div>
               <div id="slot-helm" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="helm" title="Helm">
                 <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Helm">
@@ -514,7 +514,7 @@
                 <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Off-hand</div>
               </div>
 
-              <!-- Row 3: Gloves / Boots / Ring -->
+              <!-- Row 3: Gloves / Boots / Ring 2 -->
               <div id="slot-gloves" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="gloves" title="Gloves">
                 <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Gloves">
                 <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Gloves</div>
@@ -523,28 +523,24 @@
                 <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Boots">
                 <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Boots</div>
               </div>
-              <div id="slot-ring" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="ring" title="Ring">
-                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Ring">
-                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Ring</div>
+              <div id="slot-ring2" class="slot-box paperdoll-socket p-1.5 min-h-[50px] flex flex-col items-center justify-center text-center cursor-pointer" data-slot="ring2" title="Ring 2">
+                <img class="slot-icon w-7 h-7 pixelated shrink-0" alt="Ring 2">
+                <div class="text-[8px] text-slate-400 uppercase tracking-tighter mt-0.5 font-bold">Ring 2</div>
               </div>
             </div>
           </div>
 
           <div class="space-y-1.5">
-            <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
-              <!-- Currency -->
-              <div class="flex items-center justify-between bg-slate-900/90 border border-amber-900/40 px-2 py-1.5 rounded">
-                <div class="flex items-center gap-1.5">
-                  <img id="icon-inv-gold" class="w-4 h-4 pixelated shrink-0" alt="Gold">
-                  <span class="text-slate-400 uppercase tracking-wider font-bold">Gold</span>
-                </div>
+            <!-- Consolidated Currency & Carry Weight Slab -->
+            <div class="inv-status-slab flex items-center justify-between px-2.5 py-1.5 font-mono text-[11px] whitespace-nowrap">
+              <div class="flex items-center gap-1.5">
+                <img id="icon-inv-gold" class="w-4 h-4 pixelated shrink-0" alt="Gold">
+                <span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Gold:</span>
                 <span id="inv-gold-text" class="text-amber-300 font-bold">0</span>
               </div>
-
-              <!-- Carry Weight -->
-              <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-2 py-1.5 rounded">
-                <span class="text-slate-400 uppercase tracking-wider font-bold">Weight</span>
-                <span id="inv-weight-text" class="text-slate-200">0.0 / 60 lb</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-400 uppercase text-[9px] font-bold tracking-wider">Weight:</span>
+                <span id="inv-weight-text" class="text-slate-200 font-bold">0.0 / 60.0 lb</span>
               </div>
             </div>
             <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">

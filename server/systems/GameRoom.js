@@ -144,8 +144,16 @@ export class GameRoom {
       gold: savedChar?.gold ?? 50,
       stats: savedChar?.stats ? { ...savedChar.stats } : { ...cls.stats },
       equipment: savedChar?.equipment
-        ? Object.assign({ helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring: null }, savedChar.equipment)
-        : { helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring: null },
+        ? (() => {
+            const eq = Object.assign(
+              { ring1: null, helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring2: null },
+              savedChar.equipment
+            );
+            if (eq.ring && !eq.ring1) eq.ring1 = eq.ring;
+            delete eq.ring;
+            return eq;
+          })()
+        : { ring1: null, helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring2: null },
       inventory: savedChar?.inventory ? [...savedChar.inventory] : [],
       x: sx, y: sy, targetX: sx, targetY: sy,
       targetMonsterId: null, targetLootId: null, holdAttack: false,
@@ -306,9 +314,13 @@ export class GameRoom {
     const idx = p.inventory.findIndex(i => i.id === itemId);
     if (idx === -1) return;
     const item = p.inventory[idx];
-    if (!item.slot || !(item.slot in p.equipment)) return;
-    const prev = p.equipment[item.slot];
-    p.equipment[item.slot] = item;
+    let targetSlot = item.slot;
+    if (targetSlot === 'ring') {
+      targetSlot = !p.equipment.ring1 ? 'ring1' : (!p.equipment.ring2 ? 'ring2' : 'ring1');
+    }
+    if (!targetSlot || !(targetSlot in p.equipment)) return;
+    const prev = p.equipment[targetSlot];
+    p.equipment[targetSlot] = item;
     p.inventory.splice(idx, 1);
     if (prev) p.inventory.push(prev);
     this.recalculateStats(p, false);
