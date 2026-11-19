@@ -15,6 +15,7 @@ export class GameRoom {
     this.maxPlayers = options.maxPlayers || 4;
     this.password = options.password || '';
     this.inviteCode = options.inviteCode || crypto.randomBytes(3).toString('hex').toUpperCase();
+    this.inviteToken = options.inviteToken || crypto.randomBytes(16).toString('base64url');
     this.mode = mode;
     this.ngCycle = ngCycle;
     this.floor = 1;
@@ -47,15 +48,26 @@ export class GameRoom {
   }
 
   getSummary() {
+    const biome = this.floor <= 1 ? 'Crypts' : (this.floor <= 2 ? 'Caverns' : (this.floor <= 4 ? 'Cathedral' : 'Sanctum'));
     return {
       roomId: this.roomId,
       name: this.displayName,
       mode: this.mode,
       floor: this.floor,
+      biome,
       ngCycle: this.ngCycle,
       players: this.players.size,
       maxPlayers: this.maxPlayers,
-      hasPassword: !!this.password
+      hasPassword: !!this.password,
+      inviteCode: this.inviteCode,
+      inviteToken: this.inviteToken,
+      playerList: Array.from(this.players.values()).map(p => ({
+        id: p.id,
+        name: p.name,
+        classId: p.classId,
+        className: p.className || p.classId,
+        level: p.level || 1
+      }))
     };
   }
 
@@ -150,7 +162,7 @@ export class GameRoom {
     }
     socket.send(JSON.stringify({
       type: PACKET_TYPES.ROOM_INIT,
-      data: { roomId: this.roomId, mode: this.mode, seed: this.seed, ngCycle: this.ngCycle, floor: this.floor, playerId: id, inviteCode: this.inviteCode, maxPlayers: this.maxPlayers }
+      data: { roomId: this.roomId, mode: this.mode, seed: this.seed, ngCycle: this.ngCycle, floor: this.floor, playerId: id, inviteCode: this.inviteCode, inviteToken: this.inviteToken, maxPlayers: this.maxPlayers }
     }));
     this.broadcastSnapshot();
   }
@@ -560,7 +572,7 @@ export class GameRoom {
       if (p.socket.readyState === 1) {
         p.socket.send(JSON.stringify({
           type: PACKET_TYPES.ROOM_INIT,
-          data: { roomId: this.roomId, mode: this.mode, seed: this.seed, ngCycle: this.ngCycle, floor: this.floor, playerId: p.id, inviteCode: this.inviteCode, maxPlayers: this.maxPlayers }
+          data: { roomId: this.roomId, mode: this.mode, seed: this.seed, ngCycle: this.ngCycle, floor: this.floor, playerId: p.id, inviteCode: this.inviteCode, inviteToken: this.inviteToken, maxPlayers: this.maxPlayers }
         }));
       }
     }

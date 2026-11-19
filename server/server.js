@@ -109,10 +109,22 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (reqPath === '/api/invite' && req.method === 'GET') {
+    const token = (parsedUrl.searchParams.get('token') || '').trim();
     const code = (parsedUrl.searchParams.get('code') || '').trim().toUpperCase();
-    const room = Array.from(rooms.values()).find(r => r.inviteCode === code && r.maxPlayers > 1);
-    if (!room) return sendJson(res, 404, { error: 'Invite not found or room closed.' });
-    return sendJson(res, 200, { invite: { ...room.getSummary(), inviteCode: room.inviteCode } });
+    const room = Array.from(rooms.values()).find(r =>
+      (token && r.inviteToken === token) ||
+      (code && r.inviteCode === code)
+    );
+    if (!room || room.maxPlayers <= 1) {
+      return sendJson(res, 404, { error: 'Invite link or code is invalid or the game room has closed.' });
+    }
+    return sendJson(res, 200, {
+      invite: {
+        ...room.getSummary(),
+        inviteCode: room.inviteCode,
+        inviteToken: room.inviteToken
+      }
+    });
   }
 
   // --- MODERATOR PORTAL API ---
@@ -297,16 +309,32 @@ wss.on('connection', (ws) => {
             maxPlayers: 4
           });
         } else if (joinType === 'invite') {
-          const code = (inviteCode || '').trim().toUpperCase();
-          const target = Array.from(rooms.values()).find(r => r.inviteCode === code && r.maxPlayers > 1);
-          if (!target) {
-            return sendLobbyError(ws, `Invite code "${code}" not found or room closed.`);
+          const rawToken = (packet.data?.inviteToken || '').trim();
+          const rawCode = (inviteCode || '').trim();
+          let token = rawToken;
+          let code = rawCode.toUpperCase();
+          if (rawCode.includes('invite=')) {
+            token = rawCode.split('invite=')[1].split('&')[0];
+          } else if (rawCode.includes('join=')) {
+            const val = rawCode.split('join=')[1].split('&')[0];
+            if (val.length > 12) token = val;
+            else code = val.toUpperCase();
+          } else if (rawCode.length > 12) {
+            token = rawCode;
+          }
+
+          const target = Array.from(rooms.values()).find(r =>
+            (token && r.inviteToken === token) ||
+            (code && r.inviteCode === code)
+          );
+          if (!target || target.maxPlayers <= 1) {
+            return sendLobbyError(ws, 'Invite is invalid or the game room has closed.');
           }
           if (target.mode !== targetMode) {
-            return sendLobbyError(ws, `Mode mismatch: invite is for ${target.mode} mode (your hero is ${targetMode}).`);
+            return sendLobbyError(ws, `Mode mismatch: invite is for ${target.mode} mode, but your hero is ${targetMode}.`);
           }
           if (target.players.size >= target.maxPlayers) {
-            return sendLobbyError(ws, `Room "${target.displayName}" is full (${target.maxPlayers}/${target.maxPlayers}).`);
+            return sendLobbyError(ws, `Game room "${target.displayName}" is full (${target.maxPlayers}/${target.maxPlayers}).`);
           }
           currentRoom = target;
         } else {

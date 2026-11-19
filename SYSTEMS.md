@@ -240,7 +240,19 @@ Each active room runs an independent `15 Hz` (`66.67 ms`) update loop:
 
 ---
 
-## 5. Persistence, Authentication & Moderation
+## 5. Multiplayer Lobby, Persistence & Cryptographic Invites
+
+### Diablo 2 Battle.net Lobby & Cryptographic Invites (`GameRoom.js`, `MenuController.js`, `HUDController.js`)
+* **Diablo 2 Dual-Pane Realm Browser**: Split-view lobby modeled directly after classic Battle.net:
+  * **Left Pane (Game Browser)**: Filterable, searchable table displaying active games, password locks (`🔒`), current occupancy (`2/4`), and dungeon floor/biome.
+  * **Right Pane (Game Details & Roster)**: Inspects the selected game, showing dungeon depth, password prompt, and a live roster of players inside (`🛡️ Vanguard`, `⚡ Arcanist`, `🗡️ Shadow` with character levels).
+  * **Tabbed Sub-Navigation**: Clean toggle between `[ ⚔ JOIN GAME ]` and `[ ⚒ CREATE GAME ]` with configurable party size (2–4 players) and visibility (`Public` / `Private`).
+* **128-Bit CSPRNG Cryptographic Invites**:
+  * In addition to human-friendly 6-character hex codes (`DEMO99`), each game room generates a 128-bit cryptographically secure token (`crypto.randomBytes(16).toString('base64url')`).
+  * Eliminates invite brute-forcing; URL links formatted as `?invite=<token>` are immune to enumeration.
+* **One-Click Clipboard & Query Parameter Auto-Join**:
+  * In-game pause menu and HUD provide instant `"Copy Invite Link"` buttons that format full cryptographic URLs.
+  * Opening an invite link automatically pre-resolves the room via `/api/invite?token=...`, validates character mode compatibility (`Classic` vs `Hardcore`), and presents a one-click entry banner.
 
 ### SQLite Database (`Database.js`)
 Stored at `data/saves/sanctum.db` with `WAL` journaling and `FOREIGN KEY` cascades enabled:

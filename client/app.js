@@ -92,11 +92,11 @@ function exitToMainMenu() {
   menus.showMainMenu();
 }
 
-function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteCode = '') {
+function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteCode = '', inviteToken = '') {
   if (ws) {
     const oldWs = ws;
     ws = null;
-    oldWs.onclose = () => connect(playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode);
+    oldWs.onclose = () => connect(playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode, inviteToken);
     oldWs.close();
     return;
   }
@@ -119,6 +119,7 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
         joinType,
         password,
         inviteCode,
+        inviteToken,
         token: menus.getAuthToken()
       }
     });
@@ -141,7 +142,7 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       interpolator.reset();
       latestSnapshot = null;
       hud.reset();
-      hud.setInviteCode(packet.data.inviteCode || '');
+      hud.setInvite(packet.data.inviteCode || '', packet.data.inviteToken || '');
       if (packet.data.floor) {
         hud.setFloorStatus(packet.data.floor);
       }

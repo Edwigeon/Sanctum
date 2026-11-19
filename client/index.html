@@ -215,72 +215,161 @@
     </div>
   </div>
 
-  <!-- MULTIPLAYER LOBBY BROWSER -->
+  <!-- MULTIPLAYER LOBBY BROWSER (DIABLO 2 BATTLE.NET REALM STYLE) -->
   <div id="screen-lobby"
-    class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-3xl w-full shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <h2 class="font-bold text-base tracking-wider text-indigo-300">MULTIPLAYER LOBBIES</h2>
-          <p id="lobby-hero-subtitle" class="text-[11px] text-slate-400 font-mono">Mode-partitioned active games</p>
+    class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-4xl w-full shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+      <!-- TOP D2 LOBBY HEADER -->
+      <div class="flex items-center justify-between border-b border-slate-800 px-5 py-3 bg-slate-950/80 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="font-bold text-sm tracking-widest text-amber-300 font-mono flex items-center gap-1.5">
+            <span>⚔</span> SANCTUM REALM • BATTLE LOBBY
+          </div>
+          <span id="lobby-mode-badge" class="px-2 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50 bg-indigo-950/60 text-indigo-300">Classic</span>
         </div>
-        <button id="btn-lobby-back"
-          class="text-xs font-mono text-slate-400 hover:text-slate-200 px-2 py-1 rounded border border-slate-800 hover:border-slate-700">
-          ← Hero Roster
+        <div class="flex items-center gap-4">
+          <span id="lobby-hero-subtitle" class="text-xs text-slate-300 font-mono">Hero: Wanderer</span>
+          <button id="btn-lobby-back"
+            class="text-xs font-mono text-slate-400 hover:text-slate-100 px-2.5 py-1 rounded border border-slate-800 hover:border-slate-600 transition">
+            ← Hero Roster
+          </button>
+        </div>
+      </div>
+
+      <!-- D2 TABS: JOIN GAME / CREATE GAME -->
+      <div class="flex border-b border-slate-800 bg-slate-950/40 text-xs font-mono font-bold shrink-0">
+        <button id="tab-btn-join" type="button"
+          class="flex-1 py-2.5 border-b-2 border-amber-500 text-amber-300 bg-slate-900/90 transition text-center flex items-center justify-center gap-1.5">
+          <span>⚔</span> JOIN GAME
+        </button>
+        <button id="tab-btn-create" type="button"
+          class="flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 bg-transparent transition text-center flex items-center justify-center gap-1.5">
+          <span>⚒</span> CREATE GAME
         </button>
       </div>
 
       <div id="lobby-error"
-        class="hidden text-xs font-mono text-rose-300 bg-rose-950/50 border border-rose-800 rounded px-3 py-2"></div>
+        class="hidden mx-5 mt-3 text-xs font-mono text-rose-300 bg-rose-950/50 border border-rose-800 rounded px-3 py-2"></div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- LEFT: ACTIVE PUBLIC GAMES + INVITE JOIN -->
-        <div class="flex flex-col justify-between space-y-2.5 bg-slate-950/60 border border-slate-800 rounded-lg p-3.5">
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Active Public Games</span>
-              <button id="btn-lobby-refresh" type="button"
-                class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Refresh</button>
+      <!-- TAB CONTENT CONTAINER -->
+      <div class="p-5 flex-1 overflow-y-auto">
+        <!-- TAB 1: JOIN GAME (DIABLO 2 DUAL PANE) -->
+        <div id="tab-join-content" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- LEFT PANE: LIVE GAME LIST (7 COLS) -->
+            <div class="md:col-span-7 bg-slate-950/80 border border-slate-800 rounded-lg p-3 flex flex-col space-y-2">
+              <div class="flex items-center justify-between pb-1.5 border-b border-slate-800">
+                <div class="flex items-center gap-2 flex-1 mr-2">
+                  <span class="text-[10px] font-mono text-slate-400">SEARCH</span>
+                  <input id="inp-filter-games" type="text" placeholder="Filter games..."
+                    class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-500">
+                </div>
+                <button id="btn-lobby-refresh" type="button"
+                  class="text-[10px] font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1">
+                  <span>↻</span> Refresh
+                </button>
+              </div>
+
+              <!-- GAME TABLE HEADERS -->
+              <div class="grid grid-cols-12 text-[10px] font-mono uppercase text-slate-400 px-2 py-0.5 border-b border-slate-900">
+                <span class="col-span-6">Game Name</span>
+                <span class="col-span-3 text-center">Players</span>
+                <span class="col-span-3 text-right">Floor</span>
+              </div>
+
+              <!-- SCROLLABLE GAMES LIST -->
+              <div id="lobby-list" class="space-y-1 max-h-56 overflow-y-auto pr-1 text-xs font-mono"></div>
             </div>
-            <div id="lobby-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-xs font-mono"></div>
+
+            <!-- RIGHT PANE: SELECTED GAME DETAILS & ROSTER (5 COLS) -->
+            <div id="lobby-selected-panel" class="md:col-span-5 bg-slate-950/90 border border-slate-800 rounded-lg p-3.5 flex flex-col justify-between space-y-3">
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div class="min-w-0">
+                    <div id="detail-game-name" class="font-bold text-sm text-amber-300 truncate">Select a Game</div>
+                    <div id="detail-game-meta" class="text-[11px] text-slate-400 font-mono">No game selected</div>
+                  </div>
+                  <span id="detail-game-lock" class="hidden text-amber-400 text-sm">🔒</span>
+                </div>
+
+                <!-- PLAYERS IN GAME (DIABLO 2 STYLE) -->
+                <div>
+                  <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+                    <span>Heroes in Realm</span>
+                    <span id="detail-player-count" class="text-slate-500 font-normal">0/4</span>
+                  </div>
+                  <div id="detail-player-list" class="space-y-1 max-h-32 overflow-y-auto bg-slate-900/60 p-2 rounded border border-slate-800 text-xs font-mono">
+                    <div class="text-slate-500 text-center py-2 text-[11px]">Click a game to view roster</div>
+                  </div>
+                </div>
+
+                <!-- PASSWORD PROMPT IF REQUIRED -->
+                <div id="detail-password-box" class="hidden space-y-1">
+                  <label class="block text-[11px] font-mono text-amber-300">Game Password</label>
+                  <input id="detail-inp-pass" type="password" placeholder="Enter password"
+                    class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 font-mono focus:outline-none focus:border-amber-500">
+                </div>
+              </div>
+
+              <!-- JOIN BUTTON -->
+              <button id="btn-detail-join" type="button" disabled
+                class="w-full bg-amber-600 hover:bg-amber-500 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-bold py-2 rounded text-xs uppercase tracking-wider font-mono transition shadow-lg">
+                Join Game
+              </button>
+            </div>
           </div>
 
-          <div class="pt-2 border-t border-slate-800 space-y-1">
-            <div class="text-[10px] font-mono uppercase tracking-wider text-amber-300">Join by Invite Code</div>
-            <div class="flex gap-1.5 text-xs font-mono">
-              <input id="inp-invite-code" type="text" maxlength="10" placeholder="e.g. DEMO99"
-                class="flex-1 bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-slate-100 uppercase focus:outline-none focus:border-amber-500">
-              <button id="btn-join-invite" type="button"
-                class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold">Join</button>
+          <!-- BOTTOM BAR: CRYPTOGRAPHIC INVITE LINK / TOKEN JOIN -->
+          <div class="pt-3 border-t border-slate-800 bg-slate-950/40 p-3 rounded-lg border border-slate-800 flex flex-col sm:flex-row items-center gap-2.5 text-xs font-mono">
+            <div class="shrink-0 flex items-center gap-1.5 text-amber-300 font-bold">
+              <span>🗝</span> Invite Link or Token:
             </div>
+            <input id="inp-invite-code" type="text" placeholder="Paste full invite URL or cryptographic token..."
+              class="flex-1 w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 font-mono focus:outline-none focus:border-amber-500">
+            <button id="btn-join-invite" type="button"
+              class="w-full sm:w-auto px-4 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold whitespace-nowrap transition">
+              Accept & Enter
+            </button>
           </div>
         </div>
 
-        <!-- RIGHT: CREATE / JOIN ROOM -->
-        <div class="space-y-3 bg-slate-950/40 border border-slate-800 rounded-lg p-3.5 text-xs">
-          <div class="text-[10px] font-mono uppercase tracking-wider text-emerald-300">Create or Join by Name</div>
-          <div>
-            <label class="block text-slate-400 mb-1">Room Name</label>
-            <input id="inp-room" type="text" value="crypt_01" maxlength="24"
-              class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+        <!-- TAB 2: CREATE GAME PANEL -->
+        <div id="tab-create-content" class="hidden max-w-lg mx-auto bg-slate-950/70 border border-slate-800 rounded-lg p-5 space-y-3.5 text-xs font-mono">
+          <div class="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold border-b border-slate-800 pb-2">
+            Create Sanctuary Realm
           </div>
           <div>
-            <label class="block text-slate-400 mb-1">Visibility</label>
-            <div class="grid grid-cols-2 gap-2">
-              <button id="btn-vis-public" type="button"
-                class="border border-emerald-500 bg-emerald-950/30 text-emerald-200 py-1.5 rounded font-bold">Public</button>
-              <button id="btn-vis-private" type="button"
-                class="border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded font-bold">Private</button>
+            <label class="block text-slate-300 mb-1">Game Name</label>
+            <input id="inp-room" type="text" value="cathedral_01" maxlength="24"
+              class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">Game Password <span class="text-slate-500">(leave blank for open)</span></label>
+            <input id="inp-room-pass" type="password" maxlength="24" placeholder="Optional password"
+              class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-slate-300 mb-1">Max Players</label>
+              <select id="sel-max-players" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+                <option value="4" selected>4 Players (Full Party)</option>
+                <option value="3">3 Players</option>
+                <option value="2">2 Players (Duo)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-300 mb-1">Visibility</label>
+              <div class="grid grid-cols-2 gap-1.5">
+                <button id="btn-vis-public" type="button"
+                  class="border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center">Public</button>
+                <button id="btn-vis-private" type="button"
+                  class="border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center">Private</button>
+              </div>
             </div>
           </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Password <span class="text-slate-500">(optional)</span></label>
-            <input id="inp-room-pass" type="password" maxlength="24" placeholder="Leave blank for open"
-              class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
-          </div>
           <button id="btn-enter-multi" type="button"
-            class="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold py-2.5 rounded-lg shadow-lg transition">
-            Create / Join Game
+            class="w-full bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-lg shadow-xl transition mt-2 uppercase tracking-wider">
+            Forge & Enter Game
           </button>
         </div>
       </div>

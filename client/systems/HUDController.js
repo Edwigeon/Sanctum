@@ -23,6 +23,7 @@ export class HUDController {
     this.lastVitalsKey = '';
     this.lastPrivRef = null;
     this.currentInviteCode = '';
+    this.currentInviteToken = '';
 
     this.bindEvents();
     this.initAudioSettings();
@@ -113,15 +114,17 @@ export class HUDController {
     });
 
     const copyInvite = async () => {
-      if (!this.currentInviteCode) return;
-      const link = `${window.location.origin}/?join=${this.currentInviteCode}`;
+      const token = this.currentInviteToken;
+      const code = this.currentInviteCode;
+      if (!token && !code) return;
+      const link = token ? `${window.location.origin}/?invite=${token}` : `${window.location.origin}/?join=${code}`;
       await navigator.clipboard?.writeText(link).catch(() => {});
       const btnTop = document.getElementById('btn-copy-invite');
       const btnPause = document.getElementById('btn-pause-copy-invite');
-      if (btnTop) btnTop.textContent = 'Copied!';
-      if (btnPause) btnPause.textContent = 'Copied Invite Link!';
+      if (btnTop) btnTop.textContent = 'Copied Link!';
+      if (btnPause) btnPause.textContent = 'Copied Secure Link!';
       setTimeout(() => {
-        if (btnTop && this.currentInviteCode) btnTop.textContent = `Copy Invite: ${this.currentInviteCode}`;
+        if (btnTop && this.currentInviteCode) btnTop.textContent = `Invite: ${this.currentInviteCode}`;
         if (btnPause) btnPause.textContent = 'Copy Invite Link';
       }, 1500);
     };
@@ -193,20 +196,25 @@ export class HUDController {
     }
   }
 
-  setInviteCode(code) {
+  setInvite(code, token = '') {
     this.currentInviteCode = code || '';
+    this.currentInviteToken = token || '';
     const invBtn = document.getElementById('btn-copy-invite');
     const pauseShare = document.getElementById('pause-share-box');
     const pauseCode = document.getElementById('pause-my-code');
-    if (this.currentInviteCode) {
-      invBtn.textContent = `Copy Invite: ${this.currentInviteCode}`;
+    if (this.currentInviteCode || this.currentInviteToken) {
+      invBtn.textContent = `Copy Invite: ${this.currentInviteCode || 'Link'}`;
       invBtn.classList.remove('hidden');
       pauseShare?.classList.remove('hidden');
-      if (pauseCode) pauseCode.textContent = this.currentInviteCode;
+      if (pauseCode) pauseCode.textContent = this.currentInviteCode || (this.currentInviteToken.slice(0, 8) + '...');
     } else {
       invBtn.classList.add('hidden');
       pauseShare?.classList.add('hidden');
     }
+  }
+
+  setInviteCode(code) {
+    this.setInvite(code, '');
   }
 
   setFloorStatus(floor) {

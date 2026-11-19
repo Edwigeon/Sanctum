@@ -235,4 +235,27 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   console.log('✔ P3.10 GameRoom lifecycle and interval cleanup verified.');
 }
 
+// 11. Diablo 2 Lobby & Cryptographic Invite Tokens
+{
+  const { parseInviteInput } = await import('../client/systems/MenuController.js');
+  const room = new GameRoom('TEST_CRYPTO', GAME_MODES.CLASSIC, 0, {});
+  
+  console.assert(typeof room.inviteToken === 'string' && room.inviteToken.length >= 22, '[P3.11] Cryptographic inviteToken must be >= 22 characters');
+  console.assert(typeof room.inviteCode === 'string' && room.inviteCode.length === 6, '[P3.11] Short inviteCode must be 6 hex characters');
+
+  const parsedUrl = parseInviteInput(`http://localhost:8080/?invite=${room.inviteToken}`);
+  console.assert(parsedUrl.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract ?invite= token');
+
+  const parsedJoin = parseInviteInput('http://localhost:8080/?join=DEMO99');
+  console.assert(parsedJoin.code === 'DEMO99', '[P3.11] parseInviteInput failed to extract ?join= code');
+
+  const summary = room.getSummary();
+  console.assert(summary.inviteToken === room.inviteToken, '[P3.11] Summary must include inviteToken');
+  console.assert(Array.isArray(summary.playerList), '[P3.11] Summary must include playerList for D2 lobby');
+  console.assert(typeof summary.biome === 'string', '[P3.11] Summary must include biome');
+
+  room.destroy();
+  console.log('✔ P3.11 Diablo 2 lobby metadata & cryptographic invite links verified.');
+}
+
 console.log('\n=== ALL TECHNICAL PLAN ITEMS VERIFIED SUCCESSFULLY! ===');

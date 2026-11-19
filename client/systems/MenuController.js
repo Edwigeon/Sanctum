@@ -1,15 +1,27 @@
 import { GAME_MODES } from '../../shared/Constants.js';
 
-export function extractInviteCode(raw) {
+export function parseInviteInput(raw) {
   const s = (raw || '').trim();
-  if (!s) return '';
+  if (!s) return { token: '', code: '' };
   try {
-    if (s.includes('join=')) {
-      const u = new URL(s, window.location.origin);
-      return (u.searchParams.get('join') || '').trim().toUpperCase();
+    if (s.includes('invite=') || s.includes('join=')) {
+      const u = new URL(s.startsWith('http') ? s : `http://dummy/${s}`, 'http://dummy');
+      const param = u.searchParams.get('invite') || u.searchParams.get('join') || '';
+      if (param.length > 12) {
+        return { token: param, code: '' };
+      }
+      return { token: '', code: param.toUpperCase() };
     }
   } catch { /* ignore */ }
-  return s.toUpperCase();
+  if (s.length > 12) {
+    return { token: s, code: '' };
+  }
+  return { token: '', code: s.toUpperCase() };
+}
+
+export function extractInviteCode(raw) {
+  const parsed = parseInviteInput(raw);
+  return parsed.token || parsed.code;
 }
 
 export class MenuController {
@@ -32,6 +44,10 @@ export class MenuController {
     this.currentMode = GAME_MODES.CLASSIC;
     this.roomVisibility = 'public';
     this.pendingInvite = null;
+
+    this.selectedLobby = null;
+    this.cachedLobbies = [];
+    this.currentLobbyTab = 'join';
 
     this.bindEvents();
     this.checkAuth();
@@ -99,21 +115,22 @@ export class MenuController {
     banner.classList.remove('hidden');
   }
 
-  async resolvePendingInvite(rawCode) {
-    const code = extractInviteCode(rawCode);
-    if (!code) return null;
+  async resolvePendingInvite(rawInput) {
+    const { token, code } = parseInviteInput(rawInput);
+    if (!token && !code) return null;
+    const query = token ? `token=${encodeURIComponent(token)}` : `code=${encodeURIComponent(code)}`;
     try {
-      const res = await fetch(`/api/invite?code=${encodeURIComponent(code)}`);
+      const res = await fetch(`/api/invite?${query}`);
       if (!res.ok) {
         const banner = document.getElementById('invite-banner');
-        document.getElementById('invite-banner-text').textContent = `Invite "${code}" is invalid or the room has closed.`;
+        document.getElementById('invite-banner-text').textContent = 'Invite is invalid or the game room has closed.';
         banner.classList.remove('hidden');
         sessionStorage.removeItem('sanctum_pending_invite');
         return null;
       }
       const { invite } = await res.json();
       this.pendingInvite = invite;
-      sessionStorage.setItem('sanctum_pending_invite', invite.inviteCode);
+      sessionStorage.setItem('sanctum_pending_invite', invite.inviteToken || invite.inviteCode);
       if (invite.mode === GAME_MODES.HARDCORE) this.btnHardcore.click();
       else this.btnClassic.click();
       this.updateInviteBanner();
@@ -144,14 +161,16 @@ export class MenuController {
       this.updateAuthUI();
     }
 
-    const urlCode = new URLSearchParams(window.location.search).get('join');
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('invite');
+    const urlCode = urlParams.get('join');
     const savedCode = sessionStorage.getItem('sanctum_pending_invite');
-    const codeToResolve = urlCode || savedCode;
-    if (urlCode) {
+    const toResolve = urlToken || urlCode || savedCode;
+    if (urlToken || urlCode) {
       window.history.replaceState({}, '', window.location.pathname);
     }
-    if (codeToResolve) {
-      const inv = await this.resolvePendingInvite(codeToResolve);
+    if (toResolve) {
+      const inv = await this.resolvePendingInvite(toResolve);
       if (inv && this.currentAccount) {
         this.screenMain.classList.add('hidden');
         this.screenAuth.classList.add('hidden');
@@ -311,38 +330,128 @@ export class MenuController {
   async loadLobbies(mode) {
     const list = document.getElementById('lobby-list');
     list.innerHTML = '<div class="text-slate-500 py-4 text-center">Scanning realms...</div>';
+    this.selectedLobby = null;
+    this.renderSelectedLobby();
+
     try {
       const res = await fetch(`/api/lobbies?mode=${encodeURIComponent(mode)}`);
       const { lobbies } = await res.json();
-      list.innerHTML = '';
-      if (!lobbies || lobbies.length === 0) {
-        list.innerHTML = `<div class="text-slate-500 py-6 text-center">No active ${mode} games.<br>Create one on the right →</div>`;
-        return;
-      }
-      const char = this.getSelectedCharacter();
-      for (const l of lobbies) {
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-2 rounded border border-slate-800 bg-slate-900/80 hover:border-indigo-500 transition';
-        row.innerHTML = `
-          <div class="min-w-0">
-            <div class="font-bold text-slate-100 truncate">${l.hasPassword ? '🔒 ' : ''}${l.name}</div>
-            <div class="text-[10px] text-slate-400">Floor ${l.floor} • Players: ${l.players}/${l.maxPlayers}</div>
-          </div>
-          <button type="button" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px]">Join</button>
-        `;
-        row.querySelector('button').addEventListener('click', () => {
-          if (!char) return;
-          let pass = '';
-          if (l.hasPassword) {
-            pass = prompt(`Enter password for "${l.name}":`) || '';
-          }
-          this.onConnect(char.name, l.name, char.mode, char.classId, char.id, 'public', pass);
-          this.screenLobby.classList.add('hidden');
-        });
-        list.appendChild(row);
-      }
+      this.cachedLobbies = lobbies || [];
+      this.filterLobbies();
     } catch {
-      list.innerHTML = '<div class="text-rose-400 py-4 text-center">Failed to load lobbies</div>';
+      list.innerHTML = '<div class="text-rose-400 py-4 text-center">Failed to scan realm lobbies</div>';
+    }
+  }
+
+  filterLobbies() {
+    const list = document.getElementById('lobby-list');
+    const query = (document.getElementById('inp-filter-games')?.value || '').trim().toLowerCase();
+    const mode = this.getSelectedCharacter()?.mode || GAME_MODES.CLASSIC;
+
+    let filtered = this.cachedLobbies;
+    if (query) {
+      filtered = filtered.filter(l => l.name.toLowerCase().includes(query) || (l.biome && l.biome.toLowerCase().includes(query)));
+    }
+
+    list.innerHTML = '';
+    if (!filtered || filtered.length === 0) {
+      list.innerHTML = `<div class="text-slate-500 py-8 text-center text-xs">No active ${mode} games matching filter.<br>Forge a new realm under [Create Game]!</div>`;
+      this.selectedLobby = null;
+      this.renderSelectedLobby();
+      return;
+    }
+
+    for (const l of filtered) {
+      const row = document.createElement('div');
+      const isSelected = this.selectedLobby && this.selectedLobby.roomId === l.roomId;
+      row.className = `grid grid-cols-12 items-center p-2 rounded cursor-pointer border transition text-xs font-mono ${
+        isSelected
+          ? 'border-amber-500 bg-amber-950/40 text-amber-200 shadow-md ring-1 ring-amber-500/50'
+          : 'border-slate-800 bg-slate-900/70 hover:border-slate-600 text-slate-200'
+      }`;
+      row.innerHTML = `
+        <div class="col-span-6 flex items-center gap-1.5 truncate font-bold">
+          ${l.hasPassword ? '<span class="text-amber-400 text-[10px]">🔒</span>' : ''}
+          <span class="truncate">${l.name}</span>
+        </div>
+        <div class="col-span-3 text-center text-[11px] ${l.players >= l.maxPlayers ? 'text-rose-400' : 'text-emerald-400'}">
+          ${l.players}/${l.maxPlayers}
+        </div>
+        <div class="col-span-3 text-right text-[10px] text-slate-400 truncate">
+          F${l.floor} • ${l.biome || 'Crypts'}
+        </div>
+      `;
+
+      row.addEventListener('click', () => {
+        this.selectedLobby = l;
+        this.filterLobbies();
+        this.renderSelectedLobby();
+      });
+
+      list.appendChild(row);
+    }
+
+    // Default select first lobby if none currently selected
+    if (!this.selectedLobby && filtered.length > 0) {
+      this.selectedLobby = filtered[0];
+      this.renderSelectedLobby();
+    }
+  }
+
+  renderSelectedLobby() {
+    const l = this.selectedLobby;
+    const nameEl = document.getElementById('detail-game-name');
+    const metaEl = document.getElementById('detail-game-meta');
+    const lockEl = document.getElementById('detail-game-lock');
+    const countEl = document.getElementById('detail-player-count');
+    const rosterEl = document.getElementById('detail-player-list');
+    const passBox = document.getElementById('detail-password-box');
+    const joinBtn = document.getElementById('btn-detail-join');
+
+    if (!l) {
+      nameEl.textContent = 'Select a Game';
+      metaEl.textContent = 'No game selected';
+      lockEl.classList.add('hidden');
+      countEl.textContent = '0/4';
+      rosterEl.innerHTML = '<div class="text-slate-500 text-center py-4 text-[11px]">Click a game on the left to inspect</div>';
+      passBox.classList.add('hidden');
+      joinBtn.disabled = true;
+      return;
+    }
+
+    nameEl.textContent = l.name;
+    metaEl.textContent = `${l.mode} Mode • Floor ${l.floor} (${l.biome || 'Depths'})`;
+    if (l.hasPassword) lockEl.classList.remove('hidden');
+    else lockEl.classList.add('hidden');
+
+    countEl.textContent = `${l.players}/${l.maxPlayers}`;
+    const isFull = l.players >= l.maxPlayers;
+    joinBtn.disabled = isFull;
+    joinBtn.textContent = isFull ? 'Game Full' : 'Join Game';
+
+    if (l.hasPassword && !isFull) {
+      passBox.classList.remove('hidden');
+    } else {
+      passBox.classList.add('hidden');
+    }
+
+    rosterEl.innerHTML = '';
+    const players = l.playerList || [];
+    if (players.length === 0) {
+      rosterEl.innerHTML = '<div class="text-slate-500 text-center py-2 text-[11px]">No active players inside</div>';
+    } else {
+      for (const p of players) {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between py-1 px-2 rounded bg-slate-950/70 border border-slate-800 text-[11px]';
+        const classIcon = p.classId === 'VANGUARD' ? '🛡️' : (p.classId === 'ARCANIST' ? '⚡' : '🗡️');
+        item.innerHTML = `
+          <span class="font-bold text-slate-200 truncate flex items-center gap-1.5">
+            <span>${classIcon}</span> ${p.name}
+          </span>
+          <span class="text-[10px] text-amber-300 font-mono">Lvl ${p.level} ${p.className || p.classId}</span>
+        `;
+        rosterEl.appendChild(item);
+      }
     }
   }
 
@@ -428,11 +537,55 @@ export class MenuController {
       this.screenChar.classList.add('hidden');
       this.screenLobby.classList.remove('hidden');
       document.getElementById('lobby-error').classList.add('hidden');
-      document.getElementById('lobby-hero-subtitle').textContent = `Hero: ${char.name} (${char.mode} Mode — strict partition)`;
-      if (this.pendingInvite?.inviteCode) {
-        document.getElementById('inp-invite-code').value = this.pendingInvite.inviteCode;
+      document.getElementById('lobby-hero-subtitle').textContent = `Hero: ${char.name} (${char.mode} Mode)`;
+      const badgeEl = document.getElementById('lobby-mode-badge');
+      if (badgeEl) {
+        badgeEl.textContent = `${char.mode} Realm`;
+        badgeEl.className = char.mode === GAME_MODES.HARDCORE
+          ? 'px-2 py-0.5 rounded text-[10px] font-mono border border-rose-700/60 bg-rose-950/70 text-rose-300'
+          : 'px-2 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50 bg-indigo-950/60 text-indigo-300';
+      }
+      if (this.pendingInvite?.inviteToken || this.pendingInvite?.inviteCode) {
+        document.getElementById('inp-invite-code').value = this.pendingInvite.inviteToken || this.pendingInvite.inviteCode;
       }
       this.loadLobbies(char.mode);
+    });
+
+    // Diablo 2 Tab Switching
+    const tabJoin = document.getElementById('tab-btn-join');
+    const tabCreate = document.getElementById('tab-btn-create');
+    const contentJoin = document.getElementById('tab-join-content');
+    const contentCreate = document.getElementById('tab-create-content');
+
+    if (tabJoin && tabCreate) {
+      tabJoin.addEventListener('click', () => {
+        this.currentLobbyTab = 'join';
+        tabJoin.className = 'flex-1 py-2.5 border-b-2 border-amber-500 text-amber-300 bg-slate-900/90 transition text-center flex items-center justify-center gap-1.5';
+        tabCreate.className = 'flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 bg-transparent transition text-center flex items-center justify-center gap-1.5';
+        contentJoin?.classList.remove('hidden');
+        contentCreate?.classList.add('hidden');
+      });
+
+      tabCreate.addEventListener('click', () => {
+        this.currentLobbyTab = 'create';
+        tabCreate.className = 'flex-1 py-2.5 border-b-2 border-amber-500 text-amber-300 bg-slate-900/90 transition text-center flex items-center justify-center gap-1.5';
+        tabJoin.className = 'flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 bg-transparent transition text-center flex items-center justify-center gap-1.5';
+        contentCreate?.classList.remove('hidden');
+        contentJoin?.classList.add('hidden');
+      });
+    }
+
+    document.getElementById('inp-filter-games')?.addEventListener('input', () => {
+      this.filterLobbies();
+    });
+
+    document.getElementById('btn-detail-join')?.addEventListener('click', () => {
+      const char = this.getSelectedCharacter();
+      const l = this.selectedLobby;
+      if (!char || !l) return;
+      const pass = document.getElementById('detail-inp-pass')?.value || '';
+      this.onConnect(char.name, l.name, char.mode, char.classId, char.id, 'public', pass);
+      this.screenLobby.classList.add('hidden');
     });
 
     document.getElementById('btn-lobby-back').addEventListener('click', () => {
@@ -449,35 +602,37 @@ export class MenuController {
     const btnVisPriv = document.getElementById('btn-vis-private');
     btnVisPub.addEventListener('click', () => {
       this.roomVisibility = 'public';
-      btnVisPub.className = 'border border-emerald-500 bg-emerald-950/30 text-emerald-200 py-1.5 rounded font-bold';
-      btnVisPriv.className = 'border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded font-bold';
+      btnVisPub.className = 'border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center';
+      btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center';
     });
     btnVisPriv.addEventListener('click', () => {
       this.roomVisibility = 'private';
-      btnVisPriv.className = 'border border-amber-500 bg-amber-950/30 text-amber-200 py-1.5 rounded font-bold';
-      btnVisPub.className = 'border border-slate-800 bg-slate-950/40 text-slate-400 py-1.5 rounded font-bold';
+      btnVisPriv.className = 'border border-amber-500 bg-amber-950/40 text-amber-200 py-1.5 rounded font-bold text-center';
+      btnVisPub.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center';
     });
 
     document.getElementById('btn-accept-invite').addEventListener('click', () => {
       const char = this.getSelectedCharacter();
       if (!char || !this.pendingInvite || char.mode !== this.pendingInvite.mode) return;
-      const code = this.pendingInvite.inviteCode;
-      this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code);
+      const code = this.pendingInvite.inviteCode || '';
+      const token = this.pendingInvite.inviteToken || '';
+      this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
       this.screenChar.classList.add('hidden');
     });
 
     document.getElementById('btn-join-invite').addEventListener('click', () => {
       const char = this.getSelectedCharacter();
-      const code = extractInviteCode(document.getElementById('inp-invite-code').value);
-      if (!char || !code) return;
-      this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code);
+      const raw = document.getElementById('inp-invite-code').value;
+      const { token, code } = parseInviteInput(raw);
+      if (!char || (!token && !code)) return;
+      this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
       this.screenLobby.classList.add('hidden');
     });
 
     document.getElementById('btn-enter-multi').addEventListener('click', () => {
       const char = this.getSelectedCharacter();
       if (!char) return;
-      const room = document.getElementById('inp-room').value.trim() || 'crypt_01';
+      const room = document.getElementById('inp-room').value.trim() || 'cathedral_01';
       const pass = document.getElementById('inp-room-pass').value;
       this.onConnect(char.name, room, char.mode, char.classId, char.id, this.roomVisibility, pass);
       this.screenLobby.classList.add('hidden');
@@ -486,16 +641,13 @@ export class MenuController {
     document.getElementById('btn-pause-invite').addEventListener('click', async () => {
       const errEl = document.getElementById('pause-invite-err');
       errEl.classList.add('hidden');
-      const code = extractInviteCode(document.getElementById('inp-pause-invite').value);
-      if (!code) return;
-      if (code === this.getCurrentInviteCode()) {
-        errEl.textContent = 'You are already in this room.';
-        errEl.classList.remove('hidden');
-        return;
-      }
-      const res = await fetch(`/api/invite?code=${encodeURIComponent(code)}`);
+      const raw = document.getElementById('inp-pause-invite').value;
+      const { token, code } = parseInviteInput(raw);
+      if (!token && !code) return;
+      const query = token ? `token=${encodeURIComponent(token)}` : `code=${encodeURIComponent(code)}`;
+      const res = await fetch(`/api/invite?${query}`);
       if (!res.ok) {
-        errEl.textContent = `Invite "${code}" not found or room closed.`;
+        errEl.textContent = 'Invite is invalid or the game room has closed.';
         errEl.classList.remove('hidden');
         return;
       }
@@ -513,7 +665,7 @@ export class MenuController {
       }
       document.getElementById('panel-pause').classList.add('hidden');
       document.getElementById('inp-pause-invite').value = '';
-      this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', invite.inviteCode);
+      this.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', invite.inviteCode, invite.inviteToken);
     });
   }
 }
