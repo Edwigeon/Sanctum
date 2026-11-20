@@ -641,23 +641,22 @@ export class PotionRenderer {
           }
         }
 
-        // 3D Crystalline Specular Shimmer Sweep across full mana phial
+        // Sharp Geometric Faceted Crystal Shimmer Sweep across full mana phial
         if (isFullShimmer && py >= 14 && py <= 44) {
-          const dy = py - 30.0;
-          const nx = dx / Math.max(1, hw - 1.2);
-          const ny = dy / 16.0;
-          const cz = Math.max(0, Math.cos(Math.max(-1, Math.min(1, nx)) * Math.PI * 0.5));
-          const lx = -0.65;
-          const ly = -0.65;
-          const lz = 0.25;
-          const dist3D = Math.hypot(nx - lx, ny - ly, cz - lz);
-          const targetDist = 0.30 + sweepProgress * 1.60;
-          const diff = Math.abs(dist3D - targetDist);
-          if (diff <= 0.055) {
-            oCtx.fillStyle = '#fff1e8'; // Brilliant diamond glint crest
+          let z = 1.0;
+          if (dx < -6.0) z -= (-6.0 - dx) * 0.07;
+          else if (dx > 6.0) z -= (dx - 6.0) * 0.07;
+          if (py < 21) z -= (21 - py) * 0.06;
+          else if (py > 32) z -= (py - 32) * 0.05;
+
+          const val = (py * 0.85 + dx * 0.70) - z * 8.0;
+          const targetPos = 4.0 + sweepProgress * 34.0;
+          const diff = Math.abs(val - targetPos);
+          if (diff <= 0.65) {
+            oCtx.fillStyle = '#fff1e8'; // Brilliant sharp diamond facet crest
             oCtx.fillRect(px, py, 1, 1);
-          } else if (diff <= 0.095) {
-            oCtx.fillStyle = '#67e8f9'; // Electric cyan facet sheen
+          } else if (diff <= 1.25) {
+            oCtx.fillStyle = '#67e8f9'; // Crisp electric cyan facet sheen
             oCtx.fillRect(px, py, 1, 1);
           }
         }
