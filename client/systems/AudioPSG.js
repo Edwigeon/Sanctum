@@ -52,6 +52,7 @@ export class AudioPSG {
     this.listenerY = 0;
 
     this.patches = {};
+    this.pcmCache = new Map(); // name -> Float32Array (pre-synthesized PCM)
     this.bufferCache = new Map(); // name -> AudioBuffer
     this.lastPlayedAt = new Map(); // name -> ms timestamp (anti-spam throttle)
     this.listeners = new Set(); // Change event listeners
@@ -133,8 +134,10 @@ export class AudioPSG {
     this.patchRenderer.setSampleRate(this.sampleRate, this.osc, this.mod);
 
     // Discard old sample-rate buffers
+    this.pcmCache.clear();
     this.bufferCache.clear();
     this.saveSettings();
+    this.prewarmCommonPatches();
   }
 
   ensureContext() {
@@ -330,13 +333,23 @@ export class AudioPSG {
     return { gain, pan, audible: true };
   }
 
+  prewarmCommonPatches(names = ['spark', 'hit', 'crit', 'player_hurt', 'potion']) {
+    for (const name of names) {
+      const patch = this.patches[name];
+      if (!patch || this.pcmCache.has(name)) continue;
+      this.pcmCache.set(name, this.renderPatchToFloat32(patch));
+    }
+  }
+
   async loadManifest(url = '/data/sfx.json') {
     try {
       const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
       this.patches = data || {};
+      this.pcmCache.clear();
       this.bufferCache.clear();
+      this.prewarmCommonPatches();
     } catch (err) {
       console.warn('[AudioPSG] Failed to load SFX manifest:', err.message);
     }
@@ -397,7 +410,11 @@ export class AudioPSG {
 
     let buffer = this.bufferCache.get(name);
     if (!buffer) {
-      const samples = this.renderPatchToFloat32(patch);
+      let samples = this.pcmCache.get(name);
+      if (!samples) {
+        samples = this.renderPatchToFloat32(patch);
+        this.pcmCache.set(name, samples);
+      }
       buffer = this.float32ToAudioBuffer(ctx, samples);
       this.bufferCache.set(name, buffer);
     }

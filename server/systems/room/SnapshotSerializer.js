@@ -2,7 +2,7 @@
  * Room Summary & 15 Hz Authoritative World Snapshot Serializer
  */
 
-import { PACKET_TYPES } from '../../../shared/Constants.js';
+import { LOBBY_RETENTION, PACKET_TYPES } from '../../../shared/Constants.js';
 
 export function buildRoomSummary(room) {
   const biome = room.floor <= 1 ? 'Crypts' : (room.floor <= 2 ? 'Caverns' : (room.floor <= 4 ? 'Cathedral' : 'Sanctum'));
@@ -30,42 +30,62 @@ export function buildRoomSummary(room) {
 
 export function broadcastRoomSnapshot(room) {
   if (room.players.size === 0) return;
+
+  const lootVersion = room.lootVersion ?? 1;
+  let anyNeedsLoot = false;
+  for (const p of room.players.values()) {
+    if (p._lastLootVersion !== lootVersion) {
+      anyNeedsLoot = true;
+      break;
+    }
+  }
+
+  const now = Date.now();
+  const snapshotData = {
+    tick: room.tick,
+    players: Array.from(room.players.values()).map(p => ({
+      id: p.id,
+      name: p.name,
+      classId: p.classId,
+      x: Math.round(p.x * 100) / 100,
+      y: Math.round(p.y * 100) / 100,
+      hp: p.hp,
+      maxHp: p.maxHp,
+      mp: Math.floor(p.mp),
+      maxMp: p.maxMp,
+      isDead: p.isDead,
+      isDisconnected: !p.socket,
+      inCombatMs: Math.max(0, (p.lastCombatAt || 0) + LOBBY_RETENTION.COMBAT_COOLDOWN_MS - now)
+    })),
+    monsters: Array.from(room.monsters.values()).map(m => ({
+      id: m.id,
+      type: m.type,
+      x: Math.round(m.x * 100) / 100,
+      y: Math.round(m.y * 100) / 100,
+      hp: m.hp,
+      maxHp: m.maxHp
+    })),
+    projectiles: room.projectiles.map(p => ({
+      id: p.id,
+      x: Math.round(p.x * 100) / 100,
+      y: Math.round(p.y * 100) / 100,
+      vx: Math.round(p.vx * 100) / 100,
+      vy: Math.round(p.vy * 100) / 100
+    })),
+    events: room.events
+  };
+  if (anyNeedsLoot) {
+    snapshotData.loot = room.groundLoot;
+  }
+
   const payload = JSON.stringify({
     type: PACKET_TYPES.WORLD_SNAPSHOT,
-    data: {
-      tick: room.tick,
-      players: Array.from(room.players.values()).map(p => ({
-        id: p.id,
-        name: p.name,
-        classId: p.classId,
-        x: Math.round(p.x * 100) / 100,
-        y: Math.round(p.y * 100) / 100,
-        hp: p.hp,
-        maxHp: p.maxHp,
-        mp: Math.floor(p.mp),
-        maxMp: p.maxMp,
-        isDead: p.isDead
-      })),
-      monsters: Array.from(room.monsters.values()).map(m => ({
-        id: m.id,
-        type: m.type,
-        x: Math.round(m.x * 100) / 100,
-        y: Math.round(m.y * 100) / 100,
-        hp: m.hp,
-        maxHp: m.maxHp
-      })),
-      projectiles: room.projectiles.map(p => ({
-        id: p.id,
-        x: Math.round(p.x * 100) / 100,
-        y: Math.round(p.y * 100) / 100
-      })),
-      loot: room.groundLoot,
-      events: room.events
-    }
+    data: snapshotData
   });
 
   for (const p of room.players.values()) {
-    if (p.socket.readyState !== 1) continue;
+    if (!p.socket || p.socket.readyState !== 1) continue;
+    if (anyNeedsLoot) p._lastLootVersion = lootVersion;
     p.socket.send(payload);
     if (p.dirtyState) {
       p.dirtyState = false;

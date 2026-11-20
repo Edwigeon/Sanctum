@@ -3,7 +3,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { PACKET_TYPES, GAME_MODES } from '../shared/Constants.js';
+import { PACKET_TYPES, GAME_MODES, LOBBY_RETENTION } from '../shared/Constants.js';
 import { GameRoom } from './systems/GameRoom.js';
 import { authService } from './systems/AuthService.js';
 import { saveManager } from './systems/SaveManager.js';
@@ -251,6 +251,7 @@ const server = http.createServer(async (req, res) => {
 const wss = new WebSocketServer({ server });
 const rooms = new Map();
 const activeCharacters = new Map(); // characterId -> ws
+const lingeringCharacters = new Map(); // characterId -> { room, playerId }
 let nextSocketId = 1;
 
 function sendLobbyError(ws, message) {
@@ -260,13 +261,34 @@ function sendLobbyError(ws, message) {
   ws.close();
 }
 
+function handlePlayerExpired(characterId, room) {
+  const entry = lingeringCharacters.get(characterId);
+  if (entry && entry.room === room) {
+    lingeringCharacters.delete(characterId);
+  }
+}
+
 function getOrCreateRoom(roomId, mode, options = {}) {
   if (!rooms.has(roomId)) {
     console.log(`[Lobby] Creating new ${mode} room: ${roomId} (public=${options.isPublic !== false}, max=${options.maxPlayers || 4})`);
-    rooms.set(roomId, new GameRoom(roomId, mode, 0, options));
+    rooms.set(roomId, new GameRoom(roomId, mode, 0, {
+      ...options,
+      onPlayerExpired: handlePlayerExpired
+    }));
   }
   return rooms.get(roomId);
 }
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [roomId, room] of rooms.entries()) {
+    if (room.players.size === 0 && room.emptySince && (now - room.emptySince >= LOBBY_RETENTION.EMPTY_ROOM_MS)) {
+      console.log(`[Lobby] Room ${roomId} retention expired, cleaning up`);
+      room.destroy();
+      rooms.delete(roomId);
+    }
+  }
+}, 15000);
 
 wss.on('connection', (ws) => {
   ws.id = nextSocketId++;
@@ -286,6 +308,12 @@ wss.on('connection', (ws) => {
 
     try {
       const packet = JSON.parse(message);
+      if (packet.type === PACKET_TYPES.PING) {
+        if (ws.readyState === 1) {
+          ws.send(JSON.stringify({ type: PACKET_TYPES.PONG, t: packet.t }));
+        }
+        return;
+      }
       if (packet.type === PACKET_TYPES.JOIN_LOBBY) {
         const { roomName, joinType, password, inviteCode, characterId, token } = packet.data || {};
         const account = authService.validateSession(token);
@@ -305,10 +333,12 @@ wss.on('connection', (ws) => {
         }
 
         const targetMode = savedChar.mode === GAME_MODES.HARDCORE ? GAME_MODES.HARDCORE : GAME_MODES.CLASSIC;
+        const linger = lingeringCharacters.get(savedChar.id);
+        let targetRoom = null;
 
         if (joinType === 'solo') {
           const soloId = `${targetMode}_SOLO_${savedChar.id}`;
-          currentRoom = getOrCreateRoom(soloId, targetMode, {
+          targetRoom = getOrCreateRoom(soloId, targetMode, {
             displayName: `${savedChar.name}'s Realm`,
             isPublic: false,
             maxPlayers: 4
@@ -338,26 +368,28 @@ wss.on('connection', (ws) => {
           if (target.mode !== targetMode) {
             return sendLobbyError(ws, `Mode mismatch: invite is for ${target.mode} mode, but your hero is ${targetMode}.`);
           }
-          if (target.players.size >= target.maxPlayers) {
+          const isReattaching = linger && linger.room === target && target.players.has(linger.playerId);
+          if (!isReattaching && target.players.size >= target.maxPlayers) {
             return sendLobbyError(ws, `Game room "${target.displayName}" is full (${target.maxPlayers}/${target.maxPlayers}).`);
           }
-          currentRoom = target;
+          targetRoom = target;
         } else {
           const cleanRoom = (roomName || 'crypt_01').trim().slice(0, 24) || 'crypt_01';
           const roomId = `${targetMode}_${cleanRoom}`;
           const existing = rooms.get(roomId);
           if (existing) {
-            if (existing.players.size >= existing.maxPlayers) {
+            const isReattaching = linger && linger.room === existing && existing.players.has(linger.playerId);
+            if (!isReattaching && existing.players.size >= existing.maxPlayers) {
               return sendLobbyError(ws, `Room "${cleanRoom}" is full (${existing.maxPlayers}/${existing.maxPlayers}).`);
             }
             if (existing.password && existing.password !== (password || '')) {
               return sendLobbyError(ws, `Incorrect password for "${cleanRoom}".`);
             }
-            currentRoom = existing;
+            targetRoom = existing;
           } else {
             const isPublic = joinType !== 'private' && joinType !== 'unlisted';
             const maxPlayers = Math.max(2, Math.min(4, Number(packet.data?.maxPlayers) || 4));
-            currentRoom = getOrCreateRoom(roomId, targetMode, {
+            targetRoom = getOrCreateRoom(roomId, targetMode, {
               displayName: cleanRoom,
               isPublic,
               maxPlayers,
@@ -366,11 +398,34 @@ wss.on('connection', (ws) => {
           }
         }
 
+        if (linger) {
+          const lingerPlayer = linger.room.players.get(linger.playerId);
+          if (linger.room !== targetRoom) {
+            if (lingerPlayer && lingerPlayer.lingerUntil && lingerPlayer.lingerUntil > Date.now()) {
+              const remSec = Math.max(1, Math.ceil((lingerPlayer.lingerUntil - Date.now()) / 1000));
+              return sendLobbyError(ws, `"${savedChar.name}" is still disconnecting from "${linger.room.displayName}". Wait ${remSec}s or rejoin that room.`);
+            }
+            lingeringCharacters.delete(savedChar.id);
+          }
+        }
+
+        currentRoom = targetRoom;
         ws.characterId = savedChar.id;
         activeCharacters.set(savedChar.id, ws);
-        currentRoom.addPlayer(ws, savedChar.name, savedChar.classId, savedChar);
+
+        const activeLinger = lingeringCharacters.get(savedChar.id);
+        if (activeLinger && activeLinger.room === currentRoom && currentRoom.players.has(activeLinger.playerId)) {
+          const existingPlayer = currentRoom.players.get(activeLinger.playerId);
+          lingeringCharacters.delete(savedChar.id);
+          currentRoom.reattachPlayer(ws, existingPlayer);
+        } else {
+          currentRoom.addPlayer(ws, savedChar.name, savedChar.classId, savedChar);
+        }
+      } else if (packet.type === PACKET_TYPES.LEAVE_LOBBY) {
+        ws.cleanLeave = true;
+        ws.close();
       } else if (currentRoom) {
-        currentRoom.handlePlayerInput(ws.id, packet);
+        currentRoom.handlePlayerInput(ws.playerId || ws.id, packet);
       }
     } catch (e) {
       console.error('[Server] Malformed packet:', e);
@@ -383,11 +438,16 @@ wss.on('connection', (ws) => {
       activeCharacters.delete(ws.characterId);
     }
     if (currentRoom) {
-      currentRoom.removePlayer(ws.id);
-      if (currentRoom.players.size === 0) {
-        console.log(`[Lobby] Room ${currentRoom.roomId} empty, cleaning up`);
-        currentRoom.destroy();
-        rooms.delete(currentRoom.roomId);
+      const pid = ws.playerId || ws.id;
+      const p = currentRoom.players.get(pid);
+      const inCombat = p && (Date.now() - (p.lastCombatAt || 0) < LOBBY_RETENTION.COMBAT_COOLDOWN_MS);
+      if (p && !p.isDead && (!ws.cleanLeave || inCombat)) {
+        const lingered = currentRoom.lingerPlayer(pid, LOBBY_RETENTION.LINGER_MS);
+        if (lingered && ws.characterId) {
+          lingeringCharacters.set(ws.characterId, { room: currentRoom, playerId: lingered.id });
+        }
+      } else {
+        currentRoom.removePlayer(pid);
       }
     }
   });

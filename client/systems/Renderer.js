@@ -233,6 +233,7 @@ export class Renderer {
     }
 
     // 1. Evaluate analytical ray-segment lighting against merged continuous walls + render lit floor tiles on pixelCanvas
+    const tLight0 = performance.now();
     this.lighting.updateLightGrid({
       dt,
       dungeon,
@@ -246,6 +247,7 @@ export class Renderer {
       camIntX,
       camIntY
     });
+    this.lastLightMs = performance.now() - tLight0;
 
     // 2. High-DPI Entity & UI layer (highResCanvas)
     const hCtx = this.hCtx;

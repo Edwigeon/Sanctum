@@ -14,7 +14,7 @@ export class LootGenerator {
 
     const stats = {};
     for (const [k, v] of Object.entries(base.baseStats || {})) {
-      if (k === 'crit') {
+      if (k === 'crit' || k === 'speed') {
         stats[k] = Number((v * (1 + rarity * 0.25)).toFixed(2));
       } else {
         stats[k] = Math.max(1, Math.round(v * scale));

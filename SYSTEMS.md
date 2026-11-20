@@ -165,19 +165,26 @@ Sanctum embeds a sample-accurate, zero-dependency procedural audio engine ported
    * Switching quality modes in the Pause Menu automatically re-instantiates DSP math, flushes cached buffers, updates the background worker, and persists settings.
 
 5. **Client-Side 16-Bit Packed Audio Database & Idle Pre-Warming (`MusicDatabase.js`)**:
-   * Uses browser IndexedDB (`sanctum_audio_db`, v2) to persist pre-rendered audio as **16-bit signed integer PCM (`Int16Array`)**, cutting client storage footprint by **50%** (from ~1.05 MB to ~520 KB per pattern) while preserving full 96 dB CD-quality signal-to-noise ratio.
-   * On subsequent loads, pattern audio is retrieved and decoded in $\le 2\text{ ms}$, bypassing runtime DSP math.
+   * Uses browser IndexedDB (`sanctum_audio_db`, v3) to persist pre-rendered stereo audio as **16-bit signed integer PCM (`Int16Array`)**, cutting client storage footprint by **50%** while preserving full 96 dB CD-quality signal-to-noise ratio.
+   * On subsequent loads, stereo pattern audio is retrieved and decoded in $\le 2\text{ ms}$, bypassing runtime DSP math.
    * Background pre-warming (`requestIdleCallback`) renders upcoming intensity patterns during idle frames between 60 FPS animation ticks, eliminating any main-thread CPU stutters during gameplay.
 
-6. **Interactive Tracker Music Player (`MusicPlayer.js`)**:
+6. **Interactive Tracker Music Player (`MusicPlayer.js`, `PatternBufferCompiler.js`, `PatchRenderer.js`)**:
    * **Area & Natural Tonal Flow**: Music suites are anchored to distinct major areas (`town` for Sanctum lobby/menus, `cathedral` for the dungeon descent). Artificial floor-change crossfades and mid-phrase track cuts have been removed: the soundtrack plays continuously across floor descents, changing mood organically through the real-time tonal system.
+   * **Stereo Equal-Power Panning & Macro FX (`PatternBufferCompiler.js`)**:
+     * Synthesizes 2-channel stereo `AudioBuffer` instances applying equal-power panning ($panAngle = panNorm \times \pi / 2$) from tracker `PAN` automation (`PAN 0`..`PAN 255`), restoring full spatial ping-pong width to instruments like `BoneShaker` and `CryptBell`.
+     * Translates `SDN <semitones>` tracker commands into downward dynamic pitch sweeps ($freq \to freq \times 2^{-semi / 12}$) and forwards `PRT`, `ARP`, and `ECH` macro overrides, restoring punchy pitch drops to `WarDrum` and custom FX.
+     * Preserves dry attack transients by removing internal echo peak normalization and applying a master `Math.tanh` soft-limiter across the final pattern mix.
+   * **Relative Portamento & Ring Mod Carrier Tuning (`PatchRenderer.js`)**:
+     * `portamento`: Supports relative slides when `start_freq` is omitted (defaulting to $baseFreq \times 1.5$ over `slide_time`), allowing drum sweeps and expressive portamentos without hardcoded absolute frequencies.
+     * `ring_mod`: Reads `carrier_freq` directly, ensuring instruments like `CryptBell` vibrate at their tuned carrier frequency (e.g. 415.0 Hz) rather than the default 500 Hz fallback.
    * **Natural Tonal Shift System (Beat-Quantized on Pattern Boundaries)**:
      * `explore`: Atmospheric ambient exploration patterns (e.g. `A`, `B`, `C`, `H`) when roaming safe or cleared halls.
      * `tension`: Heightened suspense patterns (`E`, `F`) when hostile mobs are lurking in shadow radius (95–155 px) or local player HP $\le 25\%$.
      * `combat`: Driving combat patterns (`F`, `G`) engaging smoothly during close-quarters combat (< 95 px or locked target) with a 3.5s hysteresis cooldown.
      * **Zero Crossfade Interruption**: Tone shifts are queued on pattern loop boundaries (`pendingSection`), transitioning sample-accurately on measure starts without dipping volume, ducking, or DC pops.
    * **Binary Audio Database & Sub-Millisecond Startup (`MusicDatabase.js`)**:
-     * **IndexedDB 16-Bit Packed Storage (`sanctum_audio_db`, v2)**: Persists rendered samples as compact 16-bit Int16 binary buffers directly into client-side IndexedDB (`rendered_pcm_16bit`), cutting storage by 50%. On subsequent sessions or page reloads, pattern buffers are retrieved and converted in $\le 2\text{ ms}$, bypassing runtime waveform synthesis entirely.
+     * **IndexedDB 16-Bit Packed Stereo Storage (`sanctum_audio_db`, v3)**: Persists rendered stereo samples as compact 16-bit Int16 binary buffers directly into client-side IndexedDB (`rendered_pcm_stereo_16bit`), cutting storage by 50%. On subsequent sessions or page reloads, pattern buffers are retrieved and converted in $\le 2\text{ ms}$, bypassing runtime waveform synthesis entirely.
      * **Pre-Compiled Soundtrack Bundle (`/data/music/soundtrack.json`)**: Packed via `npm run pack:music` (`scripts/pack_soundtrack.js`), bundling all 6 project ASTs into a single fast-loading JSON payload and caching parsed suites in IndexedDB to avoid line-by-line CSV parsing on page boot.
      * **Instant User-Gesture Audio Unlock**: Captures `pointerdown`, `keydown`, `touchstart`, and `click` on the window during the capture phase, instantly resuming the browser's `AudioContext` without waiting for UI event bubbling.
      * **Immediate Startup Attack (50 ms)**: Initial boot applies a snappy 50 ms de-click attack ramp (`now + 0.05s`) rather than a slow 1.5s volume fade, ensuring the opening bell chime and 12-string guitar chord strike immediately.

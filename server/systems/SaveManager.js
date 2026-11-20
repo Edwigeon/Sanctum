@@ -90,7 +90,44 @@ class SaveManager {
     return this.getCharacter(id);
   }
 
-  saveFromPlayer(p, floor = 1) {
+  saveFromPlayer(p, floor = 1, { immediate = false } = {}) {
+    if (!p.characterId) return;
+    if (!immediate) {
+      if (!this._pendingSaves) this._pendingSaves = new Map();
+      const existingTimer = this._pendingSaves.get(p.characterId);
+      if (existingTimer) clearTimeout(existingTimer);
+      // Snapshot mutable state immediately, coalesce rapid calls onto next event-loop turn
+      const snapshot = {
+        characterId: p.characterId,
+        mode: p.mode,
+        isDead: p.isDead,
+        name: p.name,
+        classId: p.classId,
+        level: p.level,
+        xp: p.xp,
+        nextXp: p.nextXp,
+        statPoints: p.statPoints,
+        potions: p.potions,
+        stats: { ...p.stats },
+        equipment: { ...p.equipment },
+        inventory: [...p.inventory],
+        gold: p.gold || 0
+      };
+      const timer = setTimeout(() => {
+        this._pendingSaves.delete(snapshot.characterId);
+        this._flushPlayerSave(snapshot, floor);
+      }, 0);
+      this._pendingSaves.set(p.characterId, timer);
+      return;
+    }
+    if (this._pendingSaves?.has(p.characterId)) {
+      clearTimeout(this._pendingSaves.get(p.characterId));
+      this._pendingSaves.delete(p.characterId);
+    }
+    this._flushPlayerSave(p, floor);
+  }
+
+  _flushPlayerSave(p, floor = 1) {
     if (!p.characterId) return;
     const existing = db.prepare('SELECT highest_floor, is_dead, account_id FROM characters WHERE id = ?').get(p.characterId);
     if (!existing) return;

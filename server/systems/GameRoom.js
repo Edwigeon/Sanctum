@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { ENGINE, GAME_MODES, PACKET_TYPES, TILES } from '../../shared/Constants.js';
+import { ENGINE, GAME_MODES, LOBBY_RETENTION, PACKET_TYPES, TILES } from '../../shared/Constants.js';
 import { DungeonGen } from '../../shared/DungeonGen.js';
 import { PRNG, dist } from '../../shared/MathUtils.js';
 import { saveManager } from './SaveManager.js';
@@ -51,12 +51,15 @@ export class GameRoom {
     this.monsters = new Map();
     this.projectiles = [];
     this.groundLoot = [];
+    this.lootVersion = 1;
     this.events = [];
 
     this.nextEntityId = 1;
     this.tick = 0;
     this.spawnInitialMonsters();
     this.tickInterval = null;
+    this.emptySince = null;
+    this.onPlayerExpired = options.onPlayerExpired || null;
   }
 
   destroy() {
@@ -68,6 +71,7 @@ export class GameRoom {
     this.monsters.clear();
     this.projectiles = [];
     this.groundLoot = [];
+    this.lootVersion = 1;
     this.events = [];
   }
 
@@ -100,12 +104,7 @@ export class GameRoom {
     spawnInitialMonsters(this);
   }
 
-  addPlayer(socket, name = 'Wanderer', classId = 'VANGUARD', savedChar = null) {
-    const player = createPlayerEntity(this, socket, name, classId, savedChar);
-    this.players.set(player.id, player);
-    if (!this.tickInterval) {
-      this.tickInterval = setInterval(() => this.update(), ENGINE.TICK_INTERVAL_MS);
-    }
+  _sendRoomInit(socket, playerId) {
     socket.send(JSON.stringify({
       type: PACKET_TYPES.ROOM_INIT,
       data: {
@@ -114,13 +113,58 @@ export class GameRoom {
         seed: this.seed,
         ngCycle: this.ngCycle,
         floor: this.floor,
-        playerId: player.id,
+        playerId,
         inviteCode: this.inviteCode,
         inviteToken: this.inviteToken,
         maxPlayers: this.maxPlayers
       }
     }));
+  }
+
+  addPlayer(socket, name = 'Wanderer', classId = 'VANGUARD', savedChar = null) {
+    this.emptySince = null;
+    const player = createPlayerEntity(this, socket, name, classId, savedChar);
+    socket.playerId = player.id;
+    this.players.set(player.id, player);
+    if (!this.tickInterval) {
+      this.tickInterval = setInterval(() => this.update(), ENGINE.TICK_INTERVAL_MS);
+    }
+    this._sendRoomInit(socket, player.id);
     this.broadcastSnapshot();
+  }
+
+  reattachPlayer(socket, existingPlayer) {
+    this.emptySince = null;
+    existingPlayer.socket = socket;
+    existingPlayer.lingerUntil = null;
+    existingPlayer.disconnectedAt = null;
+    existingPlayer.dirtyState = true;
+    existingPlayer._lastLootVersion = -1;
+    socket.playerId = existingPlayer.id;
+    if (!this.tickInterval) {
+      this.tickInterval = setInterval(() => this.update(), ENGINE.TICK_INTERVAL_MS);
+    }
+    this._sendRoomInit(socket, existingPlayer.id);
+    this.broadcastSnapshot();
+  }
+
+  lingerPlayer(playerId, durationMs = LOBBY_RETENTION.LINGER_MS) {
+    const p = this.players.get(playerId);
+    if (!p || p.isDead) {
+      this.removePlayer(playerId);
+      return null;
+    }
+    const now = Date.now();
+    p.socket = null;
+    p.disconnectedAt = now;
+    p.lingerUntil = now + durationMs;
+    p.targetMonsterId = null;
+    p.targetLootId = null;
+    p.holdAttack = false;
+    p.targetX = p.x;
+    p.targetY = p.y;
+    saveManager.saveFromPlayer(p, this.floor, { immediate: true });
+    return p;
   }
 
   recalculateStats(p, fullRestore = false) {
@@ -129,11 +173,19 @@ export class GameRoom {
 
   removePlayer(playerId) {
     const p = this.players.get(playerId);
-    if (p) saveManager.saveFromPlayer(p, this.floor);
-    this.players.delete(playerId);
-    if (this.players.size === 0 && this.tickInterval) {
-      clearInterval(this.tickInterval);
-      this.tickInterval = null;
+    if (p) {
+      saveManager.saveFromPlayer(p, this.floor, { immediate: true });
+      this.players.delete(playerId);
+      if (this.onPlayerExpired && p.characterId) {
+        this.onPlayerExpired(p.characterId, this);
+      }
+    }
+    if (this.players.size === 0) {
+      this.emptySince = Date.now();
+      if (this.tickInterval) {
+        clearInterval(this.tickInterval);
+        this.tickInterval = null;
+      }
     }
   }
 
@@ -238,6 +290,14 @@ export class GameRoom {
 
   update() {
     this.tick++;
+    const now = Date.now();
+    for (const p of Array.from(this.players.values())) {
+      if (p.lingerUntil && now >= p.lingerUntil) {
+        this.removePlayer(p.id);
+      }
+    }
+    if (this.players.size === 0) return;
+
     for (const p of this.players.values()) {
       if (p.isDead) continue;
 
@@ -315,6 +375,7 @@ export class GameRoom {
     this.monsters.clear();
     this.projectiles = [];
     this.groundLoot = [];
+    this.lootVersion = (this.lootVersion || 0) + 1;
     this.spawnInitialMonsters();
 
     const sx = this.dungeon.spawnPoint.x * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
@@ -326,21 +387,8 @@ export class GameRoom {
       p.targetX = sx;
       p.targetY = sy;
       saveManager.saveFromPlayer(p, this.floor);
-      if (p.socket.readyState === 1) {
-        p.socket.send(JSON.stringify({
-          type: PACKET_TYPES.ROOM_INIT,
-          data: {
-            roomId: this.roomId,
-            mode: this.mode,
-            seed: this.seed,
-            ngCycle: this.ngCycle,
-            floor: this.floor,
-            playerId: p.id,
-            inviteCode: this.inviteCode,
-            inviteToken: this.inviteToken,
-            maxPlayers: this.maxPlayers
-          }
-        }));
+      if (p.socket && p.socket.readyState === 1) {
+        this._sendRoomInit(p.socket, p.id);
       }
     }
     this.events.push({ type: 'FLOOR_DESCENT', floor: this.floor });

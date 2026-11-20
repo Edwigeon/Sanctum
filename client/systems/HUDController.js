@@ -44,6 +44,8 @@ export class HUDController {
     this.currentInviteCode = '';
     this.currentInviteToken = '';
     this.isInviteCodeRevealed = false;
+    this.combatRemainingMs = 0;
+    this.isDead = false;
 
     this.bindEvents();
     this.initAudioSettings();
@@ -78,10 +80,24 @@ export class HUDController {
     });
     document.getElementById('btn-toggle-menu')?.addEventListener('click', () => this.togglePause());
     document.getElementById('btn-pause-resume')?.addEventListener('click', () => {
+      this.hideCombatExitWarning();
       this.panelPause.classList.add('hidden');
       this.updateHUDButtonStates();
     });
-    document.getElementById('btn-pause-quit')?.addEventListener('click', () => this.onExitToMenu());
+    document.getElementById('btn-pause-quit')?.addEventListener('click', () => {
+      if (this.combatRemainingMs > 0 && !this.isDead) {
+        this.showCombatExitWarning();
+      } else {
+        this.onExitToMenu();
+      }
+    });
+    document.getElementById('btn-pause-quit-force')?.addEventListener('click', () => {
+      this.hideCombatExitWarning();
+      this.onExitToMenu();
+    });
+    document.getElementById('btn-pause-quit-cancel')?.addEventListener('click', () => {
+      this.hideCombatExitWarning();
+    });
     document.getElementById('btn-death-quit')?.addEventListener('click', () => this.onExitToMenu());
     document.getElementById('btn-respawn')?.addEventListener('click', () => {
       this.sendPacket({ type: PACKET_TYPES.INPUT_RESPAWN });
@@ -102,6 +118,40 @@ export class HUDController {
 
   isPaused() {
     return !this.panelPause.classList.contains('hidden');
+  }
+
+  setCombatState(combatMs, isDead) {
+    this.combatRemainingMs = combatMs || 0;
+    this.isDead = !!isDead;
+    const warn = document.getElementById('pause-combat-warn');
+    if (warn && !warn.classList.contains('hidden')) {
+      if (this.combatRemainingMs <= 0 || this.isDead) {
+        this.hideCombatExitWarning();
+      } else {
+        const sec = Math.max(1, Math.ceil(this.combatRemainingMs / 1000));
+        const txt = document.getElementById('pause-combat-warn-text');
+        if (txt) {
+          txt.textContent = `In combat! Safe exit in ${sec}s, or Leave Anyway (character remains vulnerable for 12s).`;
+        }
+      }
+    }
+  }
+
+  showCombatExitWarning() {
+    const warn = document.getElementById('pause-combat-warn');
+    const quitBtn = document.getElementById('btn-pause-quit');
+    const txt = document.getElementById('pause-combat-warn-text');
+    const sec = Math.max(1, Math.ceil(this.combatRemainingMs / 1000));
+    if (txt) {
+      txt.textContent = `In combat! Safe exit in ${sec}s, or Leave Anyway (character remains vulnerable for 12s).`;
+    }
+    warn?.classList.remove('hidden');
+    quitBtn?.classList.add('hidden');
+  }
+
+  hideCombatExitWarning() {
+    document.getElementById('pause-combat-warn')?.classList.add('hidden');
+    document.getElementById('btn-pause-quit')?.classList.remove('hidden');
   }
 
   updateHUDButtonStates() {

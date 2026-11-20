@@ -34,10 +34,17 @@ export function createPlayerEntity(room, socket, name = 'Wanderer', classId = 'V
           );
           if (eq.ring && !eq.ring1) eq.ring1 = eq.ring;
           delete eq.ring;
+          for (const slot of Object.keys(eq)) {
+            if (eq[slot] && typeof eq[slot] === 'object') {
+              eq[slot] = { ...eq[slot], id: room.nextEntityId++ };
+            }
+          }
           return eq;
         })()
       : { ring1: null, helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring2: null },
-    inventory: savedChar?.inventory ? [...savedChar.inventory] : [],
+    inventory: savedChar?.inventory
+      ? savedChar.inventory.map(item => (item && typeof item === 'object' ? { ...item, id: room.nextEntityId++ } : item)).filter(Boolean)
+      : [],
     x: sx, y: sy, targetX: sx, targetY: sy,
     targetMonsterId: null, targetLootId: null, holdAttack: false,
     hp: 100, maxHp: 100, mp: 50, maxMp: 50,
@@ -45,6 +52,7 @@ export function createPlayerEntity(room, socket, name = 'Wanderer', classId = 'V
     primaryStat: cls.stats.might, baseDmgMin: cls.baseDmgMin, baseDmgMax: cls.baseDmgMax,
     armor: cls.baseArmor, critChance: cls.baseCrit, spellDmg: 18,
     carryWeight: 0, maxWeight: 60, attackCooldown: 0,
+    lastCombatAt: 0, lingerUntil: null, disconnectedAt: null,
     dirtyState: true
   };
 
@@ -83,7 +91,7 @@ export function createPlayerEntity(room, socket, name = 'Wanderer', classId = 'V
 export function recalculateStats(p, fullRestore = false) {
   const cls = dataRegistry.getClass(p.classId);
   const eq = Object.values(p.equipment).filter(Boolean);
-  const bonus = { might: 0, focus: 0, agility: 0, vitality: 0, dmg: 0, armor: 0, hp: 0, crit: 0 };
+  const bonus = { might: 0, focus: 0, agility: 0, vitality: 0, dmg: 0, armor: 0, hp: 0, mp: 0, crit: 0, speed: 0, spellDmg: 0 };
   let weightSum = 0;
   for (const item of eq) {
     weightSum += item.weight || 0;
@@ -107,14 +115,14 @@ export function recalculateStats(p, fullRestore = false) {
   const totalVitality = p.stats.vitality + bonus.vitality;
 
   p.maxHp = 50 + totalVitality * 5 + (p.level - 1) * 10 + bonus.hp;
-  p.maxMp = 20 + totalFocus * 3 + (p.level - 1) * 5;
+  p.maxMp = 20 + totalFocus * 3 + (p.level - 1) * 5 + bonus.mp;
   p.baseDmgMin = cls.baseDmgMin + bonus.dmg;
   p.baseDmgMax = cls.baseDmgMax + bonus.dmg;
   p.primaryStat = p.classId === 'ARCANIST' ? totalFocus : (p.classId === 'SHADOW' ? totalAgility : totalMight);
   p.armor = cls.baseArmor + Math.floor(totalVitality * 0.25) + bonus.armor;
   p.critChance = Math.min(0.65, cls.baseCrit + totalAgility * 0.004 + bonus.crit);
-  p.speed = Math.min(2.2, cls.baseSpeed + totalAgility * 0.01);
-  p.spellDmg = Math.round(14 + totalFocus * 0.8 + bonus.dmg * 0.6);
+  p.speed = Math.min(2.2, cls.baseSpeed + totalAgility * 0.01 + bonus.speed);
+  p.spellDmg = Math.round(14 + totalFocus * 0.8 + bonus.dmg * 0.6 + bonus.spellDmg);
   p.maxWeight = 30 + totalMight * 2;
   p.carryWeight = Math.round(weightSum * 10) / 10;
 
@@ -183,7 +191,19 @@ export function handlePlayerRespawn(room, player) {
   player.hp = player.maxHp;
   player.mp = player.maxMp;
   player.xp = Math.max(0, player.xp - Math.round(player.nextXp * 0.1));
-  if (player.potions < 1) player.potions = 1;
+  if (player.potions < 1 && player.inventory.length < 40) {
+    player.inventory.push({
+      id: room.nextEntityId++,
+      type: 'potion',
+      subType: 'hp',
+      name: 'Health Potion',
+      rarity: 1,
+      count: 1,
+      maxStack: 20,
+      weight: 0.2
+    });
+    room.recalculateStats(player, false);
+  }
   player.dirtyState = true;
   saveManager.saveFromPlayer(player, room.floor);
   room.events.push({ type: 'PLAYER_RESPAWN', id: player.id, x: sx, y: sy });

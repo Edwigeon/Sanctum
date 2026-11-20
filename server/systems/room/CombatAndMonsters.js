@@ -52,6 +52,7 @@ export function handlePlayerAttack(room, p, monsterId) {
     });
     m.hp -= hit.damage;
     p.attackCooldown = 8;
+    p.lastCombatAt = Date.now();
     room.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: p.id, x: m.x, y: m.y, damage: hit.damage, isCrit: hit.isCrit });
     if (m.hp <= 0) room.killMonster(m);
     return true;
@@ -111,29 +112,65 @@ export function killMonster(room, m) {
   } else {
     room.groundLoot.push(room.generateGearDrop(m.x, m.y));
   }
+  room.lootVersion = (room.lootVersion || 0) + 1;
 }
 
 export function stepProjectiles(room) {
-  for (let i = room.projectiles.length - 1; i >= 0; i--) {
-    const proj = room.projectiles[i];
+  const projs = room.projectiles;
+  if (projs.length === 0) return;
+
+  // Lightweight per-tick spatial hash for monster collision (24px cells = 2 tiles)
+  const cellSize = 24;
+  const grid = new Map();
+  for (const m of room.monsters.values()) {
+    const cx = (m.x / cellSize) | 0;
+    const cy = (m.y / cellSize) | 0;
+    const key = (cx << 16) ^ cy;
+    let bucket = grid.get(key);
+    if (!bucket) {
+      bucket = [];
+      grid.set(key, bucket);
+    }
+    bucket.push(m);
+  }
+
+  const hitRadSq = 10 * 10;
+  for (let i = projs.length - 1; i >= 0; i--) {
+    const proj = projs[i];
     proj.x += proj.vx;
     proj.y += proj.vy;
     proj.life--;
 
     if (!room.isWalkable(proj.x, proj.y, 1)) {
       proj.life = 0;
-    }
-
-    for (const m of room.monsters.values()) {
-      if (dist(proj.x, proj.y, m.x, m.y) < 10) {
-        m.hp -= proj.damage;
-        room.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: proj.ownerId, x: m.x, y: m.y, damage: proj.damage, isCrit: true });
-        if (m.hp <= 0) room.killMonster(m);
-        proj.life = 0;
-        break;
+    } else {
+      const pcx = (proj.x / cellSize) | 0;
+      const pcy = (proj.y / cellSize) | 0;
+      let hit = false;
+      for (let oy = -1; oy <= 1 && !hit; oy++) {
+        for (let ox = -1; ox <= 1 && !hit; ox++) {
+          const bucket = grid.get(((pcx + ox) << 16) ^ (pcy + oy));
+          if (!bucket) continue;
+          for (let bi = 0; bi < bucket.length; bi++) {
+            const m = bucket[bi];
+            if (m.hp <= 0) continue;
+            const dx = proj.x - m.x;
+            const dy = proj.y - m.y;
+            if (dx * dx + dy * dy < hitRadSq) {
+              m.hp -= proj.damage;
+              const owner = room.players.get(proj.ownerId);
+              if (owner) owner.lastCombatAt = Date.now();
+              room.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: proj.ownerId, x: m.x, y: m.y, damage: proj.damage, isCrit: true });
+              if (m.hp <= 0) room.killMonster(m);
+              proj.life = 0;
+              hit = true;
+              break;
+            }
+          }
+        }
       }
     }
-    if (proj.life <= 0) room.projectiles.splice(i, 1);
+    if (proj.life <= 0) projs.splice(i, 1);
   }
 }
 
@@ -141,16 +178,20 @@ export function stepMonsters(room) {
   for (const m of room.monsters.values()) {
     let closestP = null;
     const maxAggro = typeof m.aggroRange === 'number' ? m.aggroRange : 90;
-    let closestDist = maxAggro;
+    let closestDistSq = maxAggro * maxAggro;
     for (const p of room.players.values()) {
       if (p.isDead) continue;
-      const d = dist(m.x, m.y, p.x, p.y);
-      if (d < closestDist) {
-        closestDist = d;
+      const dx = m.x - p.x;
+      const dy = m.y - p.y;
+      const dSq = dx * dx + dy * dy;
+      if (dSq < closestDistSq) {
+        closestDistSq = dSq;
         closestP = p;
       }
     }
     if (closestP) {
+      closestP.lastCombatAt = Date.now();
+      const closestDist = Math.sqrt(closestDistSq);
       if (closestDist > 10) {
         const step = Math.min(m.speed, closestDist);
         const dx = ((closestP.x - m.x) / closestDist) * step;

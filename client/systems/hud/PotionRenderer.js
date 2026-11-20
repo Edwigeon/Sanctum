@@ -2,6 +2,101 @@ export class PotionRenderer {
   constructor() {
     this.hpPotCanvas = null;
     this.mpPotCanvas = null;
+    this.hpFx = { prev: null, ghost: null, ghostHold: 0, display: null, slosh: 0, regen: 0, surgeT: 0, shake: 0, shakeAmp: 0, lift: 0, bubblePhase: 0, lastT: null };
+    this.mpFx = { prev: null, ghost: null, ghostHold: 0, display: null, slosh: 0, regen: 0, surgeT: 0, shake: 0, shakeAmp: 0, lift: 0, bubblePhase: 0, lastT: null };
+  }
+
+  updateFx(fx, current, max, animTime) {
+    if (fx.lastT === null || fx.prev === null) {
+      fx.prev = current;
+      fx.ghost = current;
+      fx.display = current;
+      fx.lastT = animTime;
+      return;
+    }
+
+    const dt = Math.max(0, Math.min(0.1, animTime - fx.lastT));
+    fx.lastT = animTime;
+
+    const prev = fx.prev;
+    const delta = current - prev;
+    fx.prev = current;
+
+    if (delta < 0) {
+      // Active consumption: hold ghost briefly on initial hit; avoid stutter-freezing on rapid multi-hits
+      const wasSettled = fx.ghost === null || Math.abs(fx.ghost - prev) < 0.5;
+      fx.ghost = Math.max(fx.ghost ?? prev, prev);
+      fx.ghostHold = wasSettled ? 0.16 : Math.min(fx.ghostHold, 0.06);
+      fx.display = current;
+      const dropFrac = Math.abs(delta) / max;
+      if (Math.abs(delta) >= Math.max(2, max * 0.02)) {
+        fx.slosh = Math.min(1, Math.max(0.38, fx.slosh + dropFrac * 4.5));
+        fx.shake = Math.max(fx.shake, Math.min(0.22, 0.1 + dropFrac * 0.35));
+        fx.shakeAmp = Math.max(fx.shakeAmp, Math.min(4.0, 1.0 + dropFrac * 8.0));
+      }
+    } else if (delta > 0) {
+      const gainFrac = delta / max;
+      if (delta < Math.max(4, max * 0.04)) {
+        // Passive regen: calm center bubble brighten without disturbing meniscus
+        fx.regen = Math.max(fx.regen, 0.18);
+        fx.display = current;
+        if (fx.ghost !== null && fx.ghost < fx.display) fx.ghost = fx.display;
+      } else {
+        // Active replenishment: smooth rising fill + upward energy sweep + buoyant lift proportional to gain
+        fx.regen = 1.0;
+        fx.surgeT = 0.001;
+        fx.slosh = Math.min(1, fx.slosh + 0.45);
+        fx.lift = Math.max(fx.lift, Math.min(3.5, 1.0 + gainFrac * 6.0));
+        fx.ghostHold = 0;
+      }
+    }
+
+    if (dt > 0) {
+      fx.bubblePhase += dt * (1 + (fx.regen > 0.35 ? fx.regen * 1.2 : 0));
+
+      if (fx.display === null) fx.display = current;
+      if (fx.display < current) {
+        const fillAlpha = 1 - Math.exp(-dt * 10);
+        fx.display = Math.min(current, fx.display + (current - fx.display) * fillAlpha + max * dt * 0.12);
+      } else {
+        fx.display = current;
+      }
+
+      if (fx.ghost === null) fx.ghost = fx.display;
+      if (fx.ghost < fx.display) {
+        fx.ghost = fx.display;
+      } else if (fx.ghost > fx.display) {
+        if (fx.ghostHold > 0) {
+          fx.ghostHold = Math.max(0, fx.ghostHold - dt);
+        } else {
+          const ghostAlpha = 1 - Math.exp(-dt * 5.5);
+          fx.ghost += (fx.display - fx.ghost) * ghostAlpha;
+          if (Math.abs(fx.ghost - fx.display) < 0.05) {
+            fx.ghost = fx.display;
+          }
+        }
+      }
+
+      if (fx.surgeT > 0) {
+        fx.surgeT += dt * 2.2;
+        if (fx.surgeT >= 1) {
+          fx.surgeT = 0;
+          fx.lift = 0;
+        }
+      }
+
+      fx.slosh = Math.max(0, fx.slosh - dt * 1.4);
+      if (fx.slosh < 0.005) fx.slosh = 0;
+
+      fx.regen = Math.max(0, fx.regen - dt * 1.1);
+      if (fx.regen < 0.005) fx.regen = 0;
+
+      fx.shake = Math.max(0, fx.shake - dt);
+      if (fx.shake < 0.005) {
+        fx.shake = 0;
+        fx.shakeAmp = 0;
+      }
+    }
   }
 
   ensureHpCanvas() {
@@ -31,9 +126,21 @@ export class PotionRenderer {
     const oCtx = canvas.getContext('2d');
     oCtx.clearRect(0, 0, PW, PH);
 
-    const ratio = Math.max(0, Math.min(1, state.hp / (state.maxHp || 100)));
+    const hpMax = state.maxHp || 100;
+    this.updateFx(this.hpFx, state.hp, hpMax, animTime);
+    const fx = this.hpFx;
+
+    const ratio = Math.max(0, Math.min(1, (fx.display ?? state.hp) / hpMax));
     const fillH = Math.round(34 * ratio);
     const liquidTop = 46 - fillH;
+    const ghostRatio = Math.max(0, Math.min(1, (fx.ghost ?? state.hp) / hpMax));
+    const ghostTop = 46 - Math.round(34 * ghostRatio);
+
+    const waveAmp = 0.85 + fx.slosh * 2.2;
+    const isActiveRegen = fx.regen > 0.35;
+    const sweepCycle = animTime % 4.0;
+    const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < 0.45;
+    const sweepPos = 22 + (sweepCycle / 0.45) * 20;
 
     const bcx = 17.5;
     const bcy = 30.0;
@@ -141,7 +248,7 @@ export class PotionRenderer {
         if (isWaist) {
           if (Math.abs(dx) <= 2.5) {
             if (Math.abs(dx) <= 1 && py === 46) {
-              oCtx.fillStyle = '#ff004d'; // Inset ruby jewel
+              oCtx.fillStyle = (isActiveRegen && Math.sin(animTime * 22) > -0.2) ? '#fff1e8' : '#ff004d'; // Inset ruby jewel
             } else if (Math.abs(dx) <= 1 && py === 47) {
               oCtx.fillStyle = '#7e2553'; // Jewel shadow
             } else {
@@ -187,26 +294,40 @@ export class PotionRenderer {
         }
 
         // Liquid Interior
-        const wave = Math.round(Math.sin((px + animTime * 14) * 0.45) * 0.85);
+        const wave = Math.round(Math.sin((px + animTime * 14) * 0.45) * waveAmp);
         const surfY = liquidTop + wave;
 
         if (py >= surfY) {
           if (py <= surfY + 1) {
-            oCtx.fillStyle = (px % 2 === 0) ? '#ff77a8' : '#fff1e8';
+            if (isActiveRegen) {
+              oCtx.fillStyle = (px % 2 === 0) ? '#fff1e8' : '#ffa300';
+            } else {
+              oCtx.fillStyle = (px % 2 === 0) ? '#ff77a8' : '#fff1e8';
+            }
           } else {
             const bayer = (px % 2) ^ (py % 2);
             const depth = (py - surfY) / Math.max(1, 46 - surfY);
             let col = depth < 0.4 ? '#ff004d' : (bayer ? '#ff004d' : '#7e2553');
 
-            const b1 = Math.round((animTime * 18) % 24);
+            const b1 = Math.round((fx.bubblePhase * 18) % 24);
             if (px === 13 && py === 44 - b1) col = '#fff1e8';
-            const b2 = Math.round((animTime * 14 + 10) % 22);
+            const b2 = Math.round((fx.bubblePhase * 14 + 10) % 22);
             if (px === 22 && py === 43 - b2) col = '#ff77a8';
-            const b3 = Math.round((animTime * 20 + 5) % 25);
-            if (px === 17 && py === 44 - b3) col = '#ffa300';
+            const b3 = Math.round((fx.bubblePhase * 20 + 5) % 25);
+            if (px === 17 && py === 44 - b3) col = (fx.regen > 0) ? '#fff1e8' : '#ffa300';
+
+            if (fx.surgeT > 0) {
+              const surgeY = 46 - fx.surgeT * Math.max(1, 46 - surfY);
+              if (Math.abs(py - surgeY) <= 1.2) {
+                col = (py <= surgeY) ? '#fff1e8' : '#ffa300';
+              }
+            }
 
             oCtx.fillStyle = col;
           }
+          oCtx.fillRect(px, py, 1, 1);
+        } else if (py >= ghostTop && py < surfY) {
+          oCtx.fillStyle = '#fff1e8';
           oCtx.fillRect(px, py, 1, 1);
         }
 
@@ -225,13 +346,21 @@ export class PotionRenderer {
             oCtx.fillRect(px, py, 1, 1);
           }
         }
+
+        // Full-globe diagonal shimmer sweep every 4s
+        if (isFullShimmer && dx < 0 && py >= 14 && py <= 32 && Math.abs((px + py) - sweepPos) <= 0.8) {
+          oCtx.fillStyle = '#fff1e8';
+          oCtx.fillRect(px, py, 1, 1);
+        }
       }
     }
 
-    // Stamp pixelated flask to stage canvas
+    // Stamp pixelated flask to stage canvas (shakeX scales with loss, liftY scales with gain)
+    const shakeX = fx.shake > 0 ? Math.round(Math.sin(animTime * 90) * fx.shakeAmp * Math.min(1, fx.shake / 0.12)) : 0;
+    const liftY = fx.surgeT > 0 ? -Math.round(Math.sin(fx.surgeT * Math.PI) * fx.lift) : 0;
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(canvas, x, y, w, h);
+    ctx.drawImage(canvas, x + shakeX, y + liftY, w, h);
 
     // Text Overlays
     const cx = x + w / 2;
@@ -271,9 +400,21 @@ export class PotionRenderer {
     const oCtx = canvas.getContext('2d');
     oCtx.clearRect(0, 0, PW, PH);
 
-    const ratio = Math.max(0, Math.min(1, state.mp / (state.maxMp || 50)));
+    const mpMax = state.maxMp || 50;
+    this.updateFx(this.mpFx, state.mp, mpMax, animTime);
+    const fx = this.mpFx;
+
+    const ratio = Math.max(0, Math.min(1, (fx.display ?? state.mp) / mpMax));
     const fillH = Math.round(32 * ratio);
     const liquidTop = 46 - fillH;
+    const ghostRatio = Math.max(0, Math.min(1, (fx.ghost ?? state.mp) / mpMax));
+    const ghostTop = 46 - Math.round(32 * ghostRatio);
+
+    const waveAmp = 0.85 + fx.slosh * 2.2;
+    const isActiveRegen = fx.regen > 0.35;
+    const sweepCycle = animTime % 4.0;
+    const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < 0.45;
+    const sweepPos = 22 + (sweepCycle / 0.45) * 20;
 
     const bcx = 17.5;
 
@@ -312,6 +453,9 @@ export class PotionRenderer {
               oCtx.fillRect(px, py, 1, 1);
             } else if (py >= liquidTop) {
               oCtx.fillStyle = '#29adff';
+              oCtx.fillRect(px, py, 1, 1);
+            } else if (py >= ghostTop && py < liquidTop) {
+              oCtx.fillStyle = '#67e8f9';
               oCtx.fillRect(px, py, 1, 1);
             }
           }
@@ -379,7 +523,7 @@ export class PotionRenderer {
         if (isWaist) {
           if (Math.abs(dx) <= 2.5) {
             if (Math.abs(dx) <= 1 && py === 46) {
-              oCtx.fillStyle = '#22d3ee'; // Glowing cyan mana rune
+              oCtx.fillStyle = (isActiveRegen && Math.sin(animTime * 22) > -0.2) ? '#fff1e8' : '#22d3ee'; // Glowing cyan mana rune
             } else if (Math.abs(dx) <= 1 && py === 47) {
               oCtx.fillStyle = '#0284c7'; // Gem shadow
             } else {
@@ -428,12 +572,12 @@ export class PotionRenderer {
         const isFacetRidge = (Math.abs(dx) >= 5.5 && Math.abs(dx) <= 6.5);
 
         // Liquid Interior
-        const wave = Math.round(Math.sin((px + animTime * 14) * 0.45) * 0.85);
+        const wave = Math.round(Math.sin((px + animTime * 14) * 0.45) * waveAmp);
         const surfY = liquidTop + wave;
 
         if (py >= surfY) {
           if (py <= surfY + 1) {
-            oCtx.fillStyle = (px % 2 === 0) ? '#67e8f9' : '#fff1e8';
+            oCtx.fillStyle = isActiveRegen ? '#fff1e8' : ((px % 2 === 0) ? '#67e8f9' : '#fff1e8');
           } else {
             const bayer = (px % 2) ^ (py % 2);
             const depth = (py - surfY) / Math.max(1, 46 - surfY);
@@ -443,15 +587,25 @@ export class PotionRenderer {
               col = dx < 0 ? '#67e8f9' : '#10172a';
             }
 
-            const b1 = Math.round((animTime * 18) % 24);
+            const b1 = Math.round((fx.bubblePhase * 18) % 24);
             if (px === 13 && py === 44 - b1) col = '#fff1e8';
-            const b2 = Math.round((animTime * 14 + 10) % 22);
+            const b2 = Math.round((fx.bubblePhase * 14 + 10) % 22);
             if (px === 22 && py === 43 - b2) col = '#67e8f9';
-            const b3 = Math.round((animTime * 20 + 5) % 25);
-            if (px === 17 && py === 44 - b3) col = '#a5f3fc';
+            const b3 = Math.round((fx.bubblePhase * 20 + 5) % 25);
+            if (px === 17 && py === 44 - b3) col = (fx.regen > 0) ? '#fff1e8' : '#a5f3fc';
+
+            if (fx.surgeT > 0) {
+              const surgeY = 46 - fx.surgeT * Math.max(1, 46 - surfY);
+              if (Math.abs(py - surgeY) <= 1.2) {
+                col = (py <= surgeY) ? '#fff1e8' : '#67e8f9';
+              }
+            }
 
             oCtx.fillStyle = col;
           }
+          oCtx.fillRect(px, py, 1, 1);
+        } else if (py >= ghostTop && py < surfY) {
+          oCtx.fillStyle = '#67e8f9';
           oCtx.fillRect(px, py, 1, 1);
         } else if (isFacetRidge) {
           oCtx.fillStyle = 'rgba(103, 232, 249, 0.25)';
@@ -465,13 +619,21 @@ export class PotionRenderer {
             oCtx.fillRect(px, py, 1, 1);
           }
         }
+
+        // Full-globe diagonal shimmer sweep every 4s
+        if (isFullShimmer && dx < 0 && py >= 14 && py <= 32 && Math.abs((px + py) - sweepPos) <= 0.8) {
+          oCtx.fillStyle = '#fff1e8';
+          oCtx.fillRect(px, py, 1, 1);
+        }
       }
     }
 
-    // Stamp pixelated phial to stage canvas
+    // Stamp pixelated phial to stage canvas (shakeX scales with loss, liftY scales with gain)
+    const shakeX = fx.shake > 0 ? Math.round(Math.sin(animTime * 90) * fx.shakeAmp * Math.min(1, fx.shake / 0.12)) : 0;
+    const liftY = fx.surgeT > 0 ? -Math.round(Math.sin(fx.surgeT * Math.PI) * fx.lift) : 0;
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(canvas, x, y, w, h);
+    ctx.drawImage(canvas, x + shakeX, y + liftY, w, h);
 
     // Text Overlays
     const cx = x + w / 2;

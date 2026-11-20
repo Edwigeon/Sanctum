@@ -8,8 +8,14 @@ import { MenuController } from './systems/MenuController.js';
 import { AudioPSG } from './systems/AudioPSG.js';
 import { MusicPlayer } from './systems/MusicPlayer.js';
 import { SpriteRegistry } from './systems/SpriteRegistry.js';
+import { PerfOSD } from './systems/PerfOSD.js';
 
 let ws = null;
+let pingTimer = null;
+let reconnectTimer = null;
+let reconnectAttempt = 0;
+let intentionalExit = false;
+let lastJoinParams = null;
 let myPlayerId = null;
 let dungeon = null;
 let activeRoomMode = GAME_MODES.CLASSIC;
@@ -23,6 +29,8 @@ const interpolator = new Interpolator();
 const sprites = new SpriteRegistry();
 const renderer = new Renderer({ sprites });
 const audio = new AudioPSG();
+const perfOSD = new PerfOSD();
+window.__perfOSD = perfOSD;
 audio.loadManifest('/data/sfx.json');
 const music = new MusicPlayer({ audio });
 music.setBiome('cathedral', { immediate: false });
@@ -44,7 +52,12 @@ sprites.load('/data/sprites.json').then((ok) => {
 
 function sendPacket(payload) {
   if (ws && ws.readyState === 1) {
-    ws.send(JSON.stringify(payload));
+    if (payload?.type === PACKET_TYPES.INPUT_SKILL) {
+      perfOSD.log('CAST', `Spark sent (active proj=${lastInterp.projectiles?.length ?? 0})`);
+    }
+    const raw = JSON.stringify(payload);
+    perfOSD.recordTxBytes(raw.length);
+    ws.send(raw);
   }
 }
 
@@ -75,8 +88,23 @@ function syncHUD() {
 }
 
 function exitToMainMenu() {
+  intentionalExit = true;
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+  reconnectAttempt = 0;
+  lastJoinParams = null;
+  sessionStorage.removeItem('sanctum_active_session');
+  if (pingTimer) {
+    clearInterval(pingTimer);
+    pingTimer = null;
+  }
   if (ws) {
     ws.onclose = null;
+    if (ws.readyState === 1) {
+      ws.send(JSON.stringify({ type: PACKET_TYPES.LEAVE_LOBBY }));
+    }
     ws.close();
     ws = null;
   }
@@ -99,6 +127,13 @@ function exitToMainMenu() {
 }
 
 function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteCode = '', inviteToken = '', maxPlayers = 4) {
+  intentionalExit = false;
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+  lastJoinParams = { playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode, inviteToken, maxPlayers };
+
   if (ws) {
     const oldWs = ws;
     ws = null;
@@ -136,15 +171,33 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
         token: menus.getAuthToken()
       }
     });
+    if (pingTimer) clearInterval(pingTimer);
+    pingTimer = setInterval(() => {
+      if (ws && ws.readyState === 1) {
+        sendPacket({ type: PACKET_TYPES.PING, t: performance.now() });
+      }
+    }, 1500);
   };
 
   ws.onmessage = (msg) => {
+    if (typeof msg.data === 'string') perfOSD.recordRxBytes(msg.data.length);
     const packet = JSON.parse(msg.data);
+    if (packet.type === PACKET_TYPES.PONG) {
+      perfOSD.recordPong(packet.t);
+      return;
+    }
     if (packet.type === PACKET_TYPES.LOBBY_ERROR) {
+      intentionalExit = true;
+      sessionStorage.removeItem('sanctum_active_session');
       menus.showLobbyError(packet.data?.message, mode);
       return;
     }
     if (packet.type === PACKET_TYPES.ROOM_INIT) {
+      perfOSD.log('ROOM', `Joined ${packet.data.roomId} (Fl ${packet.data.floor || 1})`);
+      reconnectAttempt = 0;
+      if (lastJoinParams) {
+        sessionStorage.setItem('sanctum_active_session', JSON.stringify(lastJoinParams));
+      }
       menus.clearPendingInvite();
       myPlayerId = packet.data.playerId;
       activeRoomMode = packet.data.mode || mode;
@@ -165,7 +218,15 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       }
     } else if (packet.type === PACKET_TYPES.WORLD_SNAPSHOT) {
       const snap = packet.data;
+      perfOSD.recordSnapshot(snap, typeof msg.data === 'string' ? msg.data.length : 0);
       latestSnapshot = snap;
+      const me = snap.players?.find(p => p.id === myPlayerId);
+      if (me) {
+        hud.setCombatState(me.inCombatMs || 0, !!me.isDead);
+        if (me.isDead && activeRoomMode === GAME_MODES.HARDCORE) {
+          sessionStorage.removeItem('sanctum_active_session');
+        }
+      }
       interpolator.pushSnapshot(snap);
       processEvents(snap.events);
       syncHUD();
@@ -176,7 +237,39 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
   };
 
   ws.onclose = () => {
+    ws = null;
+    if (pingTimer) {
+      clearInterval(pingTimer);
+      pingTimer = null;
+    }
     const netBadge = document.getElementById('badge-net');
+    if (!intentionalExit && lastJoinParams && reconnectAttempt < 5) {
+      const delay = Math.min(8000, 1000 * Math.pow(2, reconnectAttempt));
+      reconnectAttempt++;
+      if (netBadge) {
+        netBadge.textContent = `Reconnecting (${reconnectAttempt}/5)...`;
+        netBadge.className = 'text-amber-400 font-mono text-[10px]';
+      }
+      const params = lastJoinParams;
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        if (!intentionalExit) {
+          connect(
+            params.playerName,
+            params.roomName,
+            params.mode,
+            params.playerClass,
+            params.characterId,
+            params.joinType,
+            params.password,
+            params.inviteCode,
+            params.inviteToken,
+            params.maxPlayers
+          );
+        }
+      }, delay);
+      return;
+    }
     if (netBadge) {
       netBadge.textContent = 'Disconnected';
       netBadge.className = 'text-rose-400 font-mono text-[10px]';
@@ -203,6 +296,7 @@ function processEvents(events) {
       renderer.addFloatingText(text, ev.x, ev.y, col);
       audio.play('potion', { x: ev.x, y: ev.y, pitchJitter: 0.03 });
     } else if (ev.type === 'LEVEL_UP') {
+      perfOSD.log('LEVEL', `Level up -> ${ev.level}`);
       renderer.addFloatingText(`LEVEL ${ev.level}!`, ev.x, ev.y - 6, '#FACC15', true);
       audio.play('level_up', { pitchJitter: 0 });
     } else if (ev.type === 'OVERBURDENED' && ev.id === myPlayerId) {
@@ -218,6 +312,7 @@ function processEvents(events) {
     } else if (ev.type === 'PLAYER_RESPAWN') {
       renderer.addFloatingText('RESPAWNED', ev.x, ev.y - 6, '#38BDF8', true);
     } else if (ev.type === 'FLOOR_DESCENT') {
+      perfOSD.log('FLOOR', `Descended to floor ${ev.floor}`);
       hud.setFloorStatus(ev.floor);
       audio.play('floor_descent', { pitchJitter: 0 });
     }
@@ -225,10 +320,13 @@ function processEvents(events) {
 }
 
 function render(now) {
+  perfOSD.beginFrame();
   const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000));
   lastFrameTime = now;
 
+  const tInterp0 = performance.now();
   const interp = interpolator.getInterpolatedEntities(dt);
+  const interpMs = performance.now() - tInterp0;
   lastInterp = interp;
 
   // Continuously track player position as the listener for spatial audio
@@ -244,8 +342,27 @@ function render(now) {
 
     // Adaptive Tonal System: Seamless transitions across Explore, Tension, and Combat
     if (!music.isLocked()) {
-      const closeMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 95);
-      const sensingMob = (interp.monsters || []).some(m => Math.hypot(m.rx - myP.rx, m.ry - myP.ry) < 155);
+      let closeMob = false;
+      let sensingMob = false;
+      const monsters = interp.monsters;
+      if (monsters) {
+        const px = myP.rx;
+        const py = myP.ry;
+        for (let i = 0; i < monsters.length; i++) {
+          const m = monsters[i];
+          const dx = m.rx - px;
+          const dy = m.ry - py;
+          const dSq = dx * dx + dy * dy;
+          if (dSq < 95 * 95) {
+            closeMob = true;
+            sensingMob = true;
+            break;
+          }
+          if (dSq < 155 * 155) {
+            sensingMob = true;
+          }
+        }
+      }
 
       if (input.lockedMonsterId !== null || closeMob) {
         lastCombatAt = now;
@@ -266,6 +383,7 @@ function render(now) {
   input.updateHoldMove(now);
   const { hoveredLoot, hoveredMob } = input.getHoverTargets(interp);
 
+  const tDraw0 = performance.now();
   renderer.drawFrame({
     dt,
     dungeon,
@@ -274,6 +392,16 @@ function render(now) {
     hoveredLoot,
     hoveredMob,
     lockedMonsterId: input.lockedMonsterId
+  });
+  const drawMs = performance.now() - tDraw0;
+
+  perfOSD.endFrame({
+    interpMs,
+    lightMs: renderer.lastLightMs || 0,
+    drawMs,
+    interpolator,
+    interp,
+    audio
   });
 
   requestAnimationFrame(render);

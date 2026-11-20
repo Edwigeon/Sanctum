@@ -691,6 +691,22 @@
             </div>
             <div id="pause-invite-err" class="hidden text-[10px] font-mono text-rose-400"></div>
           </div>
+          <div id="pause-combat-warn"
+            class="hidden bg-rose-950/80 border border-rose-700/80 rounded-lg p-3 space-y-2 text-center">
+            <div id="pause-combat-warn-text" class="text-[11px] font-mono text-rose-200 leading-snug">
+              In combat! Safe exit in 10s, or Leave Anyway (character remains vulnerable for 12s).
+            </div>
+            <div class="flex gap-2">
+              <button id="btn-pause-quit-force" type="button"
+                class="flex-1 bg-rose-700 hover:bg-rose-600 text-white font-bold py-1.5 rounded text-[11px] transition cursor-pointer">
+                Leave Anyway
+              </button>
+              <button id="btn-pause-quit-cancel" type="button"
+                class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-semibold py-1.5 rounded text-[11px] transition cursor-pointer">
+                Cancel
+              </button>
+            </div>
+          </div>
           <button id="btn-pause-quit"
             class="w-full bg-slate-800 hover:bg-rose-900/70 border border-slate-700 hover:border-rose-700 text-slate-200 font-semibold py-2 rounded text-xs transition cursor-pointer mt-1">Exit
             to Main Menu</button>

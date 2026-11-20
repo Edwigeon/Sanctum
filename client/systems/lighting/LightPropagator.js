@@ -7,6 +7,13 @@ import { PALETTE_INDEX } from '../../../shared/Constants.js';
 import { MAX_LIGHT_BAND, CELL_PX, INV_CELL_PX, resolveColorRGB } from './LightingTables.js';
 import { computeVisibility } from './VisibilityOcclusion.js';
 
+const FALLOFF_LUT_SIZE = 256;
+const FALLOFF_LUT = new Float32Array(FALLOFF_LUT_SIZE + 1);
+for (let i = 0; i <= FALLOFF_LUT_SIZE; i++) {
+  FALLOFF_LUT[i] = Math.pow(i / FALLOFF_LUT_SIZE, 1.32);
+}
+const _nearbySegs = [];
+
 export function collectDynamicLights(state, { interp, myPlayerId }) {
   const lights = [];
   const ft = state.flickerTime;
@@ -161,6 +168,24 @@ export function updateLightGrid(state, { dt, dungeon, camIntX, camIntY, interp, 
     const lMaxR = Math.min(state.activeMaxR, (((L.y + rad) * INV_CELL_PX) | 0) + 1);
     if (lMinC > lMaxC || lMinR > lMaxR) continue;
 
+    // Pre-filter wall segments to only those overlapping this light's radius
+    let activeSegs = state.wallSegments;
+    if (L.los && activeSegs.length > 0) {
+      _nearbySegs.length = 0;
+      const bMinX = L.x - rad;
+      const bMaxX = L.x + rad;
+      const bMinY = L.y - rad;
+      const bMaxY = L.y + rad;
+      for (let si = 0; si < activeSegs.length; si++) {
+        const s = activeSegs[si];
+        if (s.maxX >= bMinX && s.minX <= bMaxX && s.maxY >= bMinY && s.minY <= bMaxY) {
+          _nearbySegs.push(s);
+        }
+      }
+      activeSegs = _nearbySegs;
+    }
+
+    const invRad = 1.0 / rad;
     for (let r = lMinR; r <= lMaxR; r++) {
       const wy = r * CELL_PX;
       const dy = wy - L.y;
@@ -173,12 +198,13 @@ export function updateLightGrid(state, { dt, dungeon, camIntX, camIntY, interp, 
         const distSq = dx * dx + dySq;
         if (distSq >= rSq) continue;
 
-        const norm = 1.0 - Math.sqrt(distSq) / rad;
-        const rawContrib = L.intensity * Math.pow(norm, 1.32);
+        const norm = 1.0 - Math.sqrt(distSq) * invRad;
+        const lutIdx = (norm * FALLOFF_LUT_SIZE) | 0;
+        const rawContrib = L.intensity * FALLOFF_LUT[lutIdx];
         const idx = rowOffset + c;
         if (rawContrib <= 0.05) continue;
 
-        const vis = L.los ? computeVisibility(state, L.x, L.y, wx, wy) : 1.0;
+        const vis = L.los ? computeVisibility(state, L.x, L.y, wx, wy, activeSegs) : 1.0;
         if (vis <= 0.0) continue;
 
         const contrib = rawContrib * vis;

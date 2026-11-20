@@ -221,9 +221,11 @@ export function updateInventoryAndPaperdollDOM(hud, priv) {
         if (isConsumable) {
           hud.showConsumableTooltip(item, row);
         } else {
-          const eq = item.slot === 'ring'
-            ? (priv.equipment?.ring1 || priv.equipment?.ring2 || null)
-            : (priv.equipment?.[item.slot] || null);
+          const eqMap = hud.lastPrivRef?.equipment;
+          const targetSlot = item.slot === 'ring'
+            ? (!eqMap?.ring1 ? 'ring1' : (!eqMap?.ring2 ? 'ring2' : 'ring1'))
+            : item.slot;
+          const eq = eqMap?.[targetSlot] || null;
           hud.showComparisonTooltip(item, eq, row);
         }
       });

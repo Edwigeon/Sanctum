@@ -1,51 +1,108 @@
 import { ENGINE } from '../../shared/Constants.js';
 
-function interpolateList(prevList, currList, alpha) {
-  const prevMap = new Map((prevList || []).map(e => [e.id, e]));
-  return (currList || []).map(curr => {
-    const prev = prevMap.get(curr.id);
-    if (!prev || Math.hypot(curr.x - prev.x, curr.y - prev.y) > 36) {
-      return { ...curr, rx: curr.x, ry: curr.y };
+function interpolateList(prevList, currList, alpha, prevMap, outList) {
+  prevMap.clear();
+  if (prevList) {
+    for (let i = 0; i < prevList.length; i++) {
+      prevMap.set(prevList[i].id, prevList[i]);
     }
-    return {
-      ...curr,
-      rx: prev.x + (curr.x - prev.x) * alpha,
-      ry: prev.y + (curr.y - prev.y) * alpha
-    };
-  });
+  }
+
+  outList.length = 0;
+  if (!currList) return outList;
+
+  const maxSnapDistSq = 36 * 36;
+  for (let i = 0; i < currList.length; i++) {
+    const curr = currList[i];
+    const prev = prevMap.get(curr.id);
+
+    if (!prev) {
+      // Back-extrapolate newly spawned projectiles using server velocity so they don't freeze for 1 tick
+      if (typeof curr.vx === 'number' && typeof curr.vy === 'number') {
+        const px = curr.x - curr.vx;
+        const py = curr.y - curr.vy;
+        outList.push({
+          ...curr,
+          rx: px + curr.vx * alpha,
+          ry: py + curr.vy * alpha
+        });
+      } else {
+        outList.push({ ...curr, rx: curr.x, ry: curr.y });
+      }
+      continue;
+    }
+
+    const dx = curr.x - prev.x;
+    const dy = curr.y - prev.y;
+    if (dx * dx + dy * dy > maxSnapDistSq) {
+      outList.push({ ...curr, rx: curr.x, ry: curr.y });
+    } else {
+      outList.push({
+        ...curr,
+        rx: prev.x + dx * alpha,
+        ry: prev.y + dy * alpha
+      });
+    }
+  }
+  return outList;
 }
 
 export class Interpolator {
   constructor() {
     this.snapshotBuffer = [];
     this.renderTick = null;
+    this._prevMap = new Map();
+    this._outPlayers = [];
+    this._outMonsters = [];
+    this._outProjectiles = [];
+    this._lastLoot = [];
+    this.stats = { skipped: 0, ooo: 0, stale: 0, dup: 0 };
   }
 
   reset() {
     this.snapshotBuffer = [];
     this.renderTick = null;
+    this._lastLoot = [];
+    this.stats.skipped = 0;
+    this.stats.ooo = 0;
+    this.stats.stale = 0;
+    this.stats.dup = 0;
   }
 
   pushSnapshot(snap) {
     if (!snap || typeof snap.tick !== 'number') return;
+    if (Array.isArray(snap.loot)) {
+      this._lastLoot = snap.loot;
+    }
 
     const buf = this.snapshotBuffer;
     const len = buf.length;
 
     // Fast path: incoming tick is strictly greater than latest
     if (len === 0 || snap.tick > buf[len - 1].tick) {
+      if (len > 0) {
+        const gap = snap.tick - buf[len - 1].tick;
+        if (gap > 1) this.stats.skipped += gap - 1;
+      }
       buf.push(snap);
       if (buf.length > 6) buf.shift();
     } else {
       // Discard stale packets older than the oldest tracked in buffer
-      if (snap.tick < buf[0].tick) return;
+      if (snap.tick < buf[0].tick) {
+        this.stats.stale++;
+        return;
+      }
 
       // Discard duplicate ticks
       for (let i = 0; i < len; i++) {
-        if (buf[i].tick === snap.tick) return;
+        if (buf[i].tick === snap.tick) {
+          this.stats.dup++;
+          return;
+        }
       }
 
       // Out-of-order arrival: insert in sorted ascending order
+      this.stats.ooo++;
       let insertIdx = 0;
       while (insertIdx < len && buf[insertIdx].tick < snap.tick) {
         insertIdx++;
@@ -70,7 +127,7 @@ export class Interpolator {
         players: latest.players.map(p => ({ ...p, rx: p.x, ry: p.y })),
         monsters: latest.monsters.map(m => ({ ...m, rx: m.x, ry: m.y })),
         projectiles: (latest.projectiles || []).map(pr => ({ ...pr, rx: pr.x, ry: pr.y })),
-        loot: latest.loot || []
+        loot: Array.isArray(latest.loot) ? latest.loot : this._lastLoot
       };
     }
 
@@ -104,10 +161,10 @@ export class Interpolator {
     const alpha = Math.max(0, Math.min(1.15, (this.renderTick - snapA.tick) / span));
 
     return {
-      players: interpolateList(snapA.players, snapB.players, alpha),
-      monsters: interpolateList(snapA.monsters, snapB.monsters, alpha),
-      projectiles: interpolateList(snapA.projectiles, snapB.projectiles, alpha),
-      loot: snapB.loot || []
+      players: interpolateList(snapA.players, snapB.players, alpha, this._prevMap, this._outPlayers),
+      monsters: interpolateList(snapA.monsters, snapB.monsters, alpha, this._prevMap, this._outMonsters),
+      projectiles: interpolateList(snapA.projectiles, snapB.projectiles, alpha, this._prevMap, this._outProjectiles),
+      loot: Array.isArray(snapB.loot) ? snapB.loot : this._lastLoot
     };
   }
 }

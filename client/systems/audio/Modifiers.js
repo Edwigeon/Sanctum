@@ -179,15 +179,6 @@ export class Modifiers {
       }
     }
 
-    let peak = 0;
-    for (let i = 0; i < out.length; i++) {
-      const a = Math.abs(out[i]);
-      if (a > peak) peak = a;
-    }
-    if (peak > 1.0) {
-      const inv = 1.0 / peak;
-      for (let i = 0; i < out.length; i++) out[i] *= inv;
-    }
     return out;
   }
 }

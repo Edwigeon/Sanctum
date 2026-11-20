@@ -63,15 +63,30 @@ export function handleUseItem(room, p, itemId) {
 
 export function handleDropItem(room, p, itemId) {
   const idx = p.inventory.findIndex(i => i.id === itemId);
-  if (idx === -1) return;
+  if (idx === -1) {
+    // Also allow dropping directly from equipped paperdoll slots
+    for (const [slot, eqItem] of Object.entries(p.equipment)) {
+      if (eqItem && eqItem.id === itemId) {
+        p.equipment[slot] = null;
+        room.groundLoot.push({ ...eqItem, id: room.nextEntityId++, x: p.x, y: p.y });
+        room.lootVersion = (room.lootVersion || 0) + 1;
+        room.recalculateStats(p, false);
+        p.dirtyState = true;
+        saveManager.saveFromPlayer(p, room.floor);
+        return;
+      }
+    }
+    return;
+  }
   const item = p.inventory[idx];
   if (item.count && item.count > 1) {
     item.count--;
     room.groundLoot.push({ ...item, id: room.nextEntityId++, count: 1, x: p.x, y: p.y });
   } else {
     p.inventory.splice(idx, 1);
-    room.groundLoot.push({ ...item, x: p.x, y: p.y });
+    room.groundLoot.push({ ...item, id: room.nextEntityId++, x: p.x, y: p.y });
   }
+  room.lootVersion = (room.lootVersion || 0) + 1;
   room.recalculateStats(p, false);
   p.dirtyState = true;
   saveManager.saveFromPlayer(p, room.floor);
@@ -122,6 +137,7 @@ export function handlePickupLoot(room, p, lootId) {
   if (dist(p.x, p.y, item.x, item.y) < 18) {
     if (item.type === 'gold') {
       room.groundLoot.splice(idx, 1);
+      room.lootVersion = (room.lootVersion || 0) + 1;
       p.gold = (p.gold || 0) + (item.amount || 10);
       room.events.push({ type: 'GOLD_PICKUP', id: p.id, x: p.x, y: p.y, amount: item.amount || 10 });
       p.targetLootId = null;
@@ -136,26 +152,52 @@ export function handlePickupLoot(room, p, lootId) {
       room.events.push({ type: 'OVERBURDENED', id: p.id, x: p.x, y: p.y });
       return false;
     }
-    room.groundLoot.splice(idx, 1);
+
     if (item.type === 'potion' || item.stackable) {
+      const maxStack = item.maxStack || 20;
       const existing = p.inventory.find(i => i.type === 'potion' && i.name === item.name && (i.count || 1) < (i.maxStack || 20));
-      if (existing) {
-        existing.count = Math.min(existing.maxStack || 20, (existing.count || 1) + (item.count || 1));
-      } else {
-        p.inventory.push({
-          id: item.id || room.nextEntityId++,
-          type: item.type,
-          subType: item.subType || (item.name?.includes('Mana') ? 'mp' : 'hp'),
-          name: item.name || 'Health Potion',
-          count: item.count || 1,
-          maxStack: 20,
-          weight: 0.2,
-          rarity: item.rarity ?? 1
-        });
+      let remaining = item.count || 1;
+      if (!existing && p.inventory.length >= 40) {
+        p.targetLootId = null;
+        return false;
       }
+      if (existing) {
+        const space = (existing.maxStack || 20) - (existing.count || 1);
+        const add = Math.min(space, remaining);
+        existing.count = (existing.count || 1) + add;
+        remaining -= add;
+      }
+      if (remaining > 0) {
+        if (p.inventory.length < 40) {
+          p.inventory.push({
+            id: room.nextEntityId++,
+            type: item.type,
+            subType: item.subType || (item.name?.includes('Mana') ? 'mp' : 'hp'),
+            name: item.name || 'Health Potion',
+            count: Math.min(maxStack, remaining),
+            maxStack,
+            weight: 0.2,
+            rarity: item.rarity ?? 1
+          });
+          remaining = Math.max(0, remaining - maxStack);
+        }
+      }
+      if (remaining > 0) {
+        item.count = remaining;
+      } else {
+        room.groundLoot.splice(idx, 1);
+      }
+      room.lootVersion = (room.lootVersion || 0) + 1;
       room.recalculateStats(p, false);
     } else if (item.type === 'gear') {
-      p.inventory.push(item);
+      if (p.inventory.length >= 40) {
+        p.targetLootId = null;
+        return false;
+      }
+      room.groundLoot.splice(idx, 1);
+      room.lootVersion = (room.lootVersion || 0) + 1;
+      const { x: _x, y: _y, ...gearItem } = item;
+      p.inventory.push({ ...gearItem, id: gearItem.id || room.nextEntityId++ });
       room.recalculateStats(p, false);
     }
     p.targetLootId = null;

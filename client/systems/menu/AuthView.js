@@ -54,6 +54,37 @@ export async function checkAuth(menu) {
       menu.screenChar.classList.remove('hidden');
       menu.loadCharacterRoster();
     }
+  } else if (menu.currentAccount) {
+    const rawSession = sessionStorage.getItem('sanctum_active_session');
+    if (rawSession) {
+      try {
+        const s = JSON.parse(rawSession);
+        if (s && s.characterId) {
+          await menu.loadCharacterRoster();
+          const char = menu.savedCharacters.find(c => c.id === s.characterId);
+          if (char && !(char.mode === 'HARDCORE' && char.isDead)) {
+            menu.screenMain.classList.add('hidden');
+            menu.screenAuth.classList.add('hidden');
+            menu.screenChar.classList.add('hidden');
+            menu.screenLobby.classList.add('hidden');
+            menu.onConnect(
+              s.playerName,
+              s.roomName,
+              s.mode,
+              s.playerClass,
+              s.characterId,
+              s.joinType,
+              s.password,
+              s.inviteCode,
+              s.inviteToken,
+              s.maxPlayers
+            );
+            return;
+          }
+        }
+      } catch {}
+      sessionStorage.removeItem('sanctum_active_session');
+    }
   }
 }
 

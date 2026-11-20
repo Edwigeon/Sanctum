@@ -132,11 +132,12 @@ export function checkStaticObjectOcclusion(state, sx, sy, tx, ty, dist) {
 /**
  * Exact Analytical Ray-Segment Visibility against Merged Continuous Wall Segments.
  */
-export function computeVisibility(state, sx, sy, tx, ty) {
+export function computeVisibility(state, sx, sy, tx, ty, segs = state.wallSegments) {
   const dx = tx - sx;
   const dy = ty - sy;
-  const dist = Math.hypot(dx, dy);
-  if (dist < 1.5) return 1.0;
+  const distSq = dx * dx + dy * dy;
+  if (distSq < 2.25) return 1.0;
+  const dist = Math.sqrt(distSq);
 
   const targetCol = (tx * INV_TILE_SIZE) | 0;
   const targetRow = (ty * INV_TILE_SIZE) | 0;
@@ -159,7 +160,6 @@ export function computeVisibility(state, sx, sy, tx, ty) {
   const rayMaxY = sy > ty ? sy : ty;
 
   const selfWallMinT = targetIsWall ? Math.max(0, 1.0 - 15.0 / dist) : 1.0;
-  const segs = state.wallSegments;
 
   for (let i = 0; i < segs.length; i++) {
     const seg = segs[i];

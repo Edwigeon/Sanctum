@@ -27,21 +27,57 @@ export class PatchRenderer {
     const duration = durationOverride ?? patch.duration ?? 0.2;
     const baseFreq = freqOverride ?? patch.freq ?? (patch.midi ? midiToFreq(patch.midi) : 220);
 
+    // Parse macroOverrides for frequency modifiers (SDN, PRT, ARP)
+    let sdnSemitones = null;
+    let prtTime = null;
+    let arpSemitones = null;
+
+    if (Array.isArray(macroOverrides)) {
+      for (const ov of macroOverrides) {
+        if (!ov || typeof ov !== 'string') continue;
+        const clean = ov.trim().replace(/^!/, '');
+        const parts = clean.split(/\s+/);
+        const cmd = parts[0]?.toUpperCase();
+        if (cmd === 'SDN') {
+          sdnSemitones = parseFloat(parts[1]) || 12;
+        } else if (cmd === 'PRT') {
+          prtTime = parseFloat(parts[1]) || 40;
+        } else if (cmd === 'ARP') {
+          arpSemitones = parseFloat(parts[1]) || 4;
+        }
+      }
+    }
+
     // 1. Frequency profile (Pitch Sweep / Portamento / Vibrato)
     let freqProfile = baseFreq;
-    if (patch.pitch_sweep && patch.pitch_sweep.end_freq) {
+    if (sdnSemitones !== null) {
+      const endFreq = baseFreq * Math.pow(2.0, -sdnSemitones / 12.0);
+      freqProfile = this.mod.generatePitchSweep(baseFreq, endFreq, duration);
+    } else if (prtTime !== null) {
+      const slideSec = prtTime > 1 ? prtTime / 1000 : prtTime;
+      const sf = patch.portamento?.start_freq ?? (baseFreq * (patch.portamento?.start_mult ?? 1.5));
+      freqProfile = this.mod.generateSlideProfile(sf, baseFreq, duration, slideSec);
+    } else if (patch.pitch_sweep && patch.pitch_sweep.end_freq) {
       const sf = freqOverride ?? patch.pitch_sweep.start_freq ?? baseFreq;
       freqProfile = this.mod.generatePitchSweep(sf, patch.pitch_sweep.end_freq, duration);
-    } else if (patch.portamento && patch.portamento.slide_time > 0 && patch.portamento.start_freq) {
+    } else if (patch.portamento && patch.portamento.slide_time > 0) {
+      const sf = patch.portamento.start_freq ?? (baseFreq * (patch.portamento.start_mult ?? 1.5));
       freqProfile = this.mod.generateSlideProfile(
-        patch.portamento.start_freq,
+        sf,
         baseFreq,
         duration,
         patch.portamento.slide_time
       );
     }
 
-    if (patch.lfo && patch.lfo.vibrato_depth > 0 && patch.lfo.vibrato_speed > 0) {
+    if (arpSemitones !== null) {
+      freqProfile = this.mod.generateVibratoProfile(
+        freqProfile,
+        duration,
+        16.0,
+        arpSemitones
+      );
+    } else if (patch.lfo && patch.lfo.vibrato_depth > 0 && patch.lfo.vibrato_speed > 0) {
       freqProfile = this.mod.generateVibratoProfile(
         freqProfile,
         duration,
@@ -107,7 +143,7 @@ export class PatchRenderer {
         }
       }
     } else {
-      wave = this.applyLegacyModifiers(wave, patch);
+      wave = this.applyLegacyModifiers(wave, patch, macroOverrides);
     }
 
     return wave;
@@ -260,10 +296,35 @@ export class PatchRenderer {
     return this.normalizePeak(mixed);
   }
 
-  applyLegacyModifiers(wave, patch) {
+  applyLegacyModifiers(wave, patch, macroOverrides = []) {
     let out = wave;
+    let echoDelay = patch.echo?.delay_time ?? 0;
+    let echoFeedback = patch.echo?.feedback ?? 0;
+    let echoTaps = patch.echo?.num_taps ?? 3;
+
+    if (Array.isArray(macroOverrides)) {
+      for (const ov of macroOverrides) {
+        if (!ov || typeof ov !== 'string') continue;
+        const clean = ov.trim().replace(/^!/, '');
+        const parts = clean.split(/\s+/);
+        const cmd = parts[0]?.toUpperCase();
+        if (cmd === 'ECH') {
+          const val1 = parseFloat(parts[1]);
+          const val2 = parseFloat(parts[2]);
+          if (!isNaN(val2)) {
+            echoDelay = val1 || 0.25;
+            echoFeedback = val2 > 1 ? val2 / 100 : val2;
+          } else if (!isNaN(val1)) {
+            if (echoDelay === 0) echoDelay = 0.25;
+            echoFeedback = val1 > 1 ? val1 / 100 : val1;
+          }
+        }
+      }
+    }
+
     if (patch.ring_mod && patch.ring_mod.mix > 0) {
-      out = this.mod.applyRingMod(out, patch.ring_mod.freq || 500, patch.ring_mod.mix);
+      const carrier = patch.ring_mod.carrier_freq ?? patch.ring_mod.freq ?? 500;
+      out = this.mod.applyRingMod(out, carrier, patch.ring_mod.mix);
     }
     if (patch.retrigger && patch.retrigger.rate_hz > 0) {
       out = this.mod.applyRetrigger(out, patch.retrigger.rate_hz);
@@ -277,8 +338,8 @@ export class PatchRenderer {
     if (patch.bit_depth && patch.bit_depth < 16) {
       out = this.mod.applyBitcrush(out, patch.bit_depth);
     }
-    if (patch.echo && patch.echo.feedback > 0 && patch.echo.delay_time > 0) {
-      out = this.mod.applyEcho(out, patch.echo.delay_time, patch.echo.feedback, patch.echo.num_taps || 3);
+    if (echoFeedback > 0 && echoDelay > 0) {
+      out = this.mod.applyEcho(out, echoDelay, echoFeedback, echoTaps);
     }
     return out;
   }

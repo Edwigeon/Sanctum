@@ -5,8 +5,8 @@
  */
 
 const DB_NAME = 'sanctum_audio_db';
-const DB_VERSION = 2; // Bumped to 2 for 16-bit packed PCM format
-const STORE_PCM = 'rendered_pcm_16bit';
+const DB_VERSION = 3; // Bumped to 3 for stereo 16-bit packed PCM format
+const STORE_PCM = 'rendered_pcm_stereo_16bit';
 const STORE_SUITES = 'suite_data';
 
 export class MusicDatabase {
@@ -26,9 +26,12 @@ export class MusicDatabase {
         const req = indexedDB.open(DB_NAME, DB_VERSION);
         req.onupgradeneeded = (e) => {
           const db = e.target.result;
-          // Clean up legacy 32-bit store if upgrading from v1
+          // Clean up legacy mono stores if upgrading from v1 or v2
           if (db.objectStoreNames.contains('rendered_pcm')) {
             db.deleteObjectStore('rendered_pcm');
+          }
+          if (db.objectStoreNames.contains('rendered_pcm_16bit')) {
+            db.deleteObjectStore('rendered_pcm_16bit');
           }
           if (!db.objectStoreNames.contains(STORE_PCM)) {
             db.createObjectStore(STORE_PCM);
