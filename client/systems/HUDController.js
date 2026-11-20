@@ -123,6 +123,15 @@ export class HUDController {
   setCombatState(combatMs, isDead) {
     this.combatRemainingMs = combatMs || 0;
     this.isDead = !!isDead;
+    const quitBtn = document.getElementById('btn-pause-quit');
+    if (quitBtn) {
+      if (this.combatRemainingMs > 0 && !this.isDead) {
+        const sec = Math.max(1, Math.ceil(this.combatRemainingMs / 1000));
+        quitBtn.textContent = `Exit to Main Menu (In Combat: ${sec}s)`;
+      } else {
+        quitBtn.textContent = 'Exit to Main Menu';
+      }
+    }
     const warn = document.getElementById('pause-combat-warn');
     if (warn && !warn.classList.contains('hidden')) {
       if (this.combatRemainingMs <= 0 || this.isDead) {

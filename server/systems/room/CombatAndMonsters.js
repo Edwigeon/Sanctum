@@ -175,6 +175,8 @@ export function stepProjectiles(room) {
 }
 
 export function stepMonsters(room) {
+  const now = Date.now();
+  const combatProxSq = 150 * 150;
   for (const m of room.monsters.values()) {
     let closestP = null;
     const maxAggro = typeof m.aggroRange === 'number' ? m.aggroRange : 90;
@@ -184,13 +186,16 @@ export function stepMonsters(room) {
       const dx = m.x - p.x;
       const dy = m.y - p.y;
       const dSq = dx * dx + dy * dy;
+      if (dSq < combatProxSq) {
+        p.lastCombatAt = now;
+      }
       if (dSq < closestDistSq) {
         closestDistSq = dSq;
         closestP = p;
       }
     }
     if (closestP) {
-      closestP.lastCombatAt = Date.now();
+      closestP.lastCombatAt = now;
       const closestDist = Math.sqrt(closestDistSq);
       if (closestDist > 10) {
         const step = Math.min(m.speed, closestDist);

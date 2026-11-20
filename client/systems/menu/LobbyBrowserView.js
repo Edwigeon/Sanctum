@@ -187,8 +187,8 @@ export function bindLobbyBrowserEvents(menu) {
     const btnVisPub = document.getElementById('btn-vis-public');
     const btnVisPriv = document.getElementById('btn-vis-private');
     if (btnVisPub && btnVisPriv) {
-      btnVisPub.className = 'border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center';
-      btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center';
+      btnVisPub.className = 'btn-locked-pressed border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-2 rounded font-bold text-center';
+      btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-2 rounded font-bold text-center';
     }
 
     menu.loadLobbies(char.mode);
@@ -249,13 +249,13 @@ export function bindLobbyBrowserEvents(menu) {
   const btnVisPriv = document.getElementById('btn-vis-private');
   btnVisPub.addEventListener('click', () => {
     menu.roomVisibility = 'public';
-    btnVisPub.className = 'border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-1.5 rounded font-bold text-center';
-    btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center';
+    btnVisPub.className = 'btn-locked-pressed border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-2 rounded font-bold text-center';
+    btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-2 rounded font-bold text-center';
   });
   btnVisPriv.addEventListener('click', () => {
     menu.roomVisibility = 'private';
-    btnVisPriv.className = 'border border-amber-500 bg-amber-950/40 text-amber-200 py-1.5 rounded font-bold text-center';
-    btnVisPub.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-1.5 rounded font-bold text-center';
+    btnVisPriv.className = 'btn-locked-pressed border border-amber-500 bg-amber-950/40 text-amber-200 py-2 rounded font-bold text-center';
+    btnVisPub.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-2 rounded font-bold text-center';
   });
 
   document.getElementById('btn-enter-multi').addEventListener('click', () => {
