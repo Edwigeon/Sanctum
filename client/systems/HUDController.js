@@ -1,62 +1,30 @@
-import { GAME_MODES, PACKET_TYPES, RARITY_COLORS } from '../../shared/Constants.js';
-import { getBitSpriteDataUrl, getItemSpriteKey } from './BitSprites.js';
+import { PACKET_TYPES } from '../../shared/Constants.js';
+import {
+  PAPERDOLL_SLOTS,
+  STAT_LABELS,
+  formatItemStats,
+  renderStatRow,
+  showConsumableTooltip,
+  showComparisonTooltip,
+  showEquippedTooltip,
+  positionTooltip,
+  hideComparisonTooltip
+} from './hud/ItemTooltipDOM.js';
+import {
+  syncAudioUI,
+  updatePauseCodeDisplay,
+  setInvite,
+  bindPauseAndAudioEvents
+} from './hud/PauseAudioDOM.js';
+import {
+  initBitSpriteIcons,
+  bindPaperdollEvents,
+  updateVitalsAndDeathDOM,
+  updateCharacterSheetDOM,
+  updateInventoryAndPaperdollDOM
+} from './hud/CharacterInventoryDOM.js';
 
-export const PAPERDOLL_SLOTS = ['ring1', 'helm', 'amulet', 'weapon', 'armor', 'offhand', 'gloves', 'boots', 'ring2'];
-
-const STAT_LABELS = {
-  dmg: 'Damage',
-  armor: 'Armor',
-  might: 'Might',
-  focus: 'Focus',
-  agility: 'Agility',
-  vitality: 'Vitality',
-  crit: 'Crit Chance',
-  speed: 'Move Speed',
-  spellDmg: 'Spell Power',
-  hp: 'Health',
-  mp: 'Mana'
-};
-
-function formatItemStats(stats) {
-  if (!stats) return '';
-  return Object.entries(stats).map(([k, v]) => {
-    if (k === 'crit') return `+${Math.round(v * 100)}% Crit`;
-    return `+${v} ${k.charAt(0).toUpperCase() + k.slice(1)}`;
-  }).join(' • ');
-}
-
-function renderStatRow(statKey, hoverVal, eqVal) {
-  const label = STAT_LABELS[statKey] || (statKey.charAt(0).toUpperCase() + statKey.slice(1));
-  const isPercent = statKey === 'crit';
-  const formatVal = (v) => isPercent ? `${Math.round(v * 100)}%` : `${v}`;
-
-  if (hoverVal !== undefined && eqVal !== undefined) {
-    const diff = isPercent ? Math.round((hoverVal - eqVal) * 100) : (hoverVal - eqVal);
-    let deltaHtml = '';
-    if (diff > 0) {
-      deltaHtml = `<span class="stat-delta-pos ml-1.5">(+${diff}${isPercent ? '%' : ''})</span>`;
-    } else if (diff < 0) {
-      deltaHtml = `<span class="stat-delta-neg ml-1.5">(${diff}${isPercent ? '%' : ''})</span>`;
-    } else {
-      deltaHtml = `<span class="stat-delta-neu ml-1.5">(0)</span>`;
-    }
-    return `<div class="flex items-center justify-between text-[11px]">
-      <span class="text-slate-300">+${formatVal(hoverVal)} ${label}</span>
-      ${deltaHtml}
-    </div>`;
-  } else if (hoverVal !== undefined) {
-    return `<div class="flex items-center justify-between text-[11px]">
-      <span class="text-slate-300">+${formatVal(hoverVal)} ${label}</span>
-      <span class="stat-delta-pos ml-1.5">(+${formatVal(hoverVal)})</span>
-    </div>`;
-  } else if (eqVal !== undefined) {
-    return `<div class="flex items-center justify-between text-[11px] text-slate-500">
-      <span>+0 ${label}</span>
-      <span class="stat-delta-neg ml-1.5">(-${formatVal(eqVal)})</span>
-    </div>`;
-  }
-  return '';
-}
+export { PAPERDOLL_SLOTS, STAT_LABELS, formatItemStats, renderStatRow };
 
 export class HUDController {
   constructor({ renderer, audio, sendPacket, onExitToMenu }) {
@@ -83,23 +51,7 @@ export class HUDController {
   }
 
   initBitSpriteIcons() {
-    const mightEl = document.getElementById('icon-stat-might');
-    if (mightEl) mightEl.src = getBitSpriteDataUrl('might', 2);
-    const focusEl = document.getElementById('icon-stat-focus');
-    if (focusEl) focusEl.src = getBitSpriteDataUrl('focus', 2);
-    const agiEl = document.getElementById('icon-stat-agility');
-    if (agiEl) agiEl.src = getBitSpriteDataUrl('agility', 2);
-    const vitEl = document.getElementById('icon-stat-vitality');
-    if (vitEl) vitEl.src = getBitSpriteDataUrl('vitality', 2);
-
-    for (const slot of PAPERDOLL_SLOTS) {
-      const el = document.getElementById(`slot-${slot}`);
-      const iconEl = el?.querySelector('.slot-icon');
-      if (iconEl) iconEl.src = getBitSpriteDataUrl('slot_' + slot, 2);
-    }
-
-    const goldEl = document.getElementById('icon-inv-gold');
-    if (goldEl) goldEl.src = getBitSpriteDataUrl('coin', 2);
+    initBitSpriteIcons();
   }
 
   initAudioSettings() {
@@ -109,59 +61,7 @@ export class HUDController {
   }
 
   syncAudioUI(settings) {
-    if (!settings) return;
-    const isMuted = settings.muted;
-    const iconQuick = document.getElementById('icon-quick-mute');
-    const labelQuick = document.getElementById('label-quick-mute');
-    if (iconQuick) iconQuick.textContent = isMuted ? '🔇' : '🔊';
-    if (labelQuick) labelQuick.textContent = isMuted ? 'Muted' : 'Sound';
-
-    const btnPauseMute = document.getElementById('btn-pause-mute-toggle');
-    if (btnPauseMute) {
-      btnPauseMute.textContent = isMuted ? '🔇 Muted (Click to Unmute)' : '🔊 Sound On';
-      btnPauseMute.className = isMuted
-        ? 'text-[11px] text-rose-400 hover:text-rose-300 font-semibold transition cursor-pointer'
-        : 'text-[11px] text-amber-400 hover:text-amber-300 font-semibold transition cursor-pointer';
-    }
-
-    const sliderMaster = document.getElementById('slider-vol-master');
-    const labelMaster = document.getElementById('label-vol-master');
-    const masterVal = Math.round((settings.master ?? 0.8) * 100);
-    if (sliderMaster && document.activeElement !== sliderMaster) sliderMaster.value = masterVal;
-    if (labelMaster) labelMaster.textContent = `${masterVal}%`;
-
-    const sliderSfx = document.getElementById('slider-vol-sfx');
-    const labelSfx = document.getElementById('label-vol-sfx');
-    const sfxVal = Math.round((settings.sfx ?? 0.8) * 100);
-    if (sliderSfx && document.activeElement !== sliderSfx) sliderSfx.value = sfxVal;
-    if (labelSfx) labelSfx.textContent = `${sfxVal}%`;
-
-    const sliderMusic = document.getElementById('slider-vol-music');
-    const labelMusic = document.getElementById('label-vol-music');
-    const musicVal = Math.round((settings.music ?? 0.6) * 100);
-    if (sliderMusic && document.activeElement !== sliderMusic) sliderMusic.value = musicVal;
-    if (labelMusic) labelMusic.textContent = `${musicVal}%`;
-
-    const chkSpatial = document.getElementById('chk-spatial-audio');
-    if (chkSpatial) chkSpatial.checked = !!settings.spatial;
-
-    const curQuality = settings.quality || 'standard';
-    const qualityLabels = {
-      lofi: 'Lo-Fi',
-      standard: 'Standard',
-      hifi: 'Hi-Fi'
-    };
-    const labelQuality = document.getElementById('label-audio-quality');
-    if (labelQuality) labelQuality.textContent = qualityLabels[curQuality] || 'Standard';
-
-    document.querySelectorAll('.btn-audio-quality').forEach(btn => {
-      const q = btn.dataset.quality;
-      if (q === curQuality) {
-        btn.className = 'btn-audio-quality py-1 rounded bg-indigo-950/80 border border-indigo-700 text-indigo-300 font-bold transition cursor-pointer';
-      } else {
-        btn.className = 'btn-audio-quality py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer';
-      }
-    });
+    syncAudioUI(settings);
   }
 
   bindEvents() {
@@ -196,112 +96,8 @@ export class HUDController {
       });
     });
 
-    // Paperdoll Slot Interactions (LMB: Unequip, RMB: Drop, Hover: Tooltip)
-    for (const slot of PAPERDOLL_SLOTS) {
-      const el = document.getElementById(`slot-${slot}`);
-      if (!el) continue;
-      el.addEventListener('click', () => {
-        const item = this.lastPrivRef?.equipment?.[slot];
-        if (item) {
-          this.sendPacket({ type: PACKET_TYPES.UNEQUIP_ITEM, slot });
-          this.hideComparisonTooltip();
-        }
-      });
-      el.addEventListener('contextmenu', (ev) => {
-        ev.preventDefault();
-        const item = this.lastPrivRef?.equipment?.[slot];
-        if (item) {
-          this.sendPacket({ type: PACKET_TYPES.DROP_ITEM, itemId: item.id });
-          this.hideComparisonTooltip();
-        }
-      });
-      el.addEventListener('mouseenter', () => {
-        const item = this.lastPrivRef?.equipment?.[slot];
-        if (item) {
-          this.showEquippedTooltip(item, el);
-        }
-      });
-      el.addEventListener('mouseleave', () => {
-        this.hideComparisonTooltip();
-      });
-    }
-
-    // Reveal / Hide Realm Invite Code on Pause Menu
-    const btnReveal = document.getElementById('btn-pause-reveal-code');
-    btnReveal?.addEventListener('click', () => {
-      this.isInviteCodeRevealed = !this.isInviteCodeRevealed;
-      this.updatePauseCodeDisplay();
-    });
-
-    // Copy Invite Code Only
-    const btnCopyCode = document.getElementById('btn-pause-copy-code');
-    btnCopyCode?.addEventListener('click', async () => {
-      const code = this.currentInviteCode || this.currentInviteToken;
-      if (!code) return;
-      await navigator.clipboard?.writeText(code).catch(() => {});
-      if (btnCopyCode) btnCopyCode.textContent = 'Copied!';
-      setTimeout(() => {
-        if (btnCopyCode) btnCopyCode.textContent = 'Copy Code';
-      }, 1500);
-    });
-
-    // Copy Full Invite Link (Top status bar & Pause menu)
-    const copyInvite = async () => {
-      const token = this.currentInviteToken;
-      const code = this.currentInviteCode;
-      if (!token && !code) return;
-      const link = token ? `${window.location.origin}/?invite=${token}` : `${window.location.origin}/?join=${code}`;
-      await navigator.clipboard?.writeText(link).catch(() => {});
-      const btnTop = document.getElementById('btn-copy-invite');
-      const btnPause = document.getElementById('btn-pause-copy-invite');
-      if (btnTop) btnTop.textContent = 'Copied Link!';
-      if (btnPause) btnPause.textContent = 'Copied Link!';
-      setTimeout(() => {
-        if (btnTop) btnTop.textContent = 'Invite Link';
-        if (btnPause) btnPause.textContent = 'Copy Link';
-      }, 1500);
-    };
-
-    document.getElementById('btn-copy-invite')?.addEventListener('click', copyInvite);
-    document.getElementById('btn-pause-copy-invite')?.addEventListener('click', copyInvite);
-
-    // Audio Controls & Volume Sliders
-    const toggleMute = () => {
-      if (this.audio) this.audio.toggleMute();
-    };
-    document.getElementById('btn-quick-mute')?.addEventListener('click', toggleMute);
-    document.getElementById('btn-pause-mute-toggle')?.addEventListener('click', toggleMute);
-
-    document.getElementById('slider-vol-master')?.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value) / 100;
-      if (this.audio) this.audio.setMasterVolume(val);
-      const lbl = document.getElementById('label-vol-master');
-      if (lbl) lbl.textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById('slider-vol-sfx')?.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value) / 100;
-      if (this.audio) this.audio.setSfxVolume(val);
-      const lbl = document.getElementById('label-vol-sfx');
-      if (lbl) lbl.textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById('slider-vol-music')?.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value) / 100;
-      if (this.audio) this.audio.setMusicVolume(val);
-      const lbl = document.getElementById('label-vol-music');
-      if (lbl) lbl.textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById('chk-spatial-audio')?.addEventListener('change', (e) => {
-      if (this.audio) this.audio.setSpatialEnabled(e.target.checked);
-    });
-
-    document.querySelectorAll('.btn-audio-quality').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (this.audio) this.audio.setQuality(btn.dataset.quality);
-      });
-    });
+    bindPaperdollEvents(this);
+    bindPauseAndAudioEvents(this);
   }
 
   isPaused() {
@@ -362,35 +158,11 @@ export class HUDController {
   }
 
   updatePauseCodeDisplay() {
-    const pauseCode = document.getElementById('pause-my-code');
-    const btnReveal = document.getElementById('btn-pause-reveal-code');
-    if (!pauseCode) return;
-    if (this.isInviteCodeRevealed) {
-      pauseCode.textContent = this.currentInviteCode || (this.currentInviteToken ? this.currentInviteToken.slice(0, 8) + '...' : '—');
-      if (btnReveal) btnReveal.textContent = 'Hide';
-    } else {
-      pauseCode.textContent = '••••••';
-      if (btnReveal) btnReveal.textContent = 'Reveal';
-    }
+    updatePauseCodeDisplay(this);
   }
 
   setInvite(code, token = '') {
-    this.currentInviteCode = code || '';
-    this.currentInviteToken = token || '';
-    this.isInviteCodeRevealed = false;
-    const invBtn = document.getElementById('btn-copy-invite');
-    const pauseShare = document.getElementById('pause-share-box');
-    if (this.currentInviteCode || this.currentInviteToken) {
-      if (invBtn) {
-        invBtn.textContent = 'Invite Link';
-        invBtn.classList.remove('hidden');
-      }
-      pauseShare?.classList.remove('hidden');
-      this.updatePauseCodeDisplay();
-    } else {
-      invBtn?.classList.add('hidden');
-      pauseShare?.classList.add('hidden');
-    }
+    setInvite(this, code, token);
   }
 
   setInviteCode(code) {
@@ -443,6 +215,7 @@ export class HUDController {
       maxMp: myP.maxMp,
       isDead: !!myP.isDead,
       potions: priv?.potions ?? 3,
+      manaPotions: priv?.manaPotions ?? 0,
       xp: priv?.xp || 0,
       nextXp: priv?.nextXp || 100,
       level: priv?.level || 1,
@@ -452,399 +225,32 @@ export class HUDController {
       isPauseOpen: this.panelPause && !this.panelPause.classList.contains('hidden')
     });
 
-    const vitalsKey = `${myP.hp}|${myP.maxHp}|${myP.mp}|${myP.maxMp}|${myP.isDead}|${activeRoomMode}`;
-    if (vitalsKey !== this.lastVitalsKey) {
-      this.lastVitalsKey = vitalsKey;
-      const elHp = document.getElementById('hud-hp');
-      if (elHp) elHp.textContent = `${myP.hp} / ${myP.maxHp}`;
-      const elMp = document.getElementById('hud-mp');
-      if (elMp) elMp.textContent = `${myP.mp} / ${myP.maxMp}`;
-
-      if (myP.isDead) {
-        const isHC = activeRoomMode === GAME_MODES.HARDCORE;
-        const statusEl = document.getElementById('status-line');
-        if (statusEl) {
-          statusEl.textContent = isHC ? 'YOU HAVE FALLEN (Permadeath)' : 'You were slain!';
-          statusEl.className = 'text-[10px] font-mono text-rose-400 bg-slate-900 px-2 py-0.5 rounded border border-rose-900';
-        }
-        document.getElementById('death-title').textContent = isHC ? 'YOU HAVE FALLEN' : 'YOU WERE SLAIN';
-        document.getElementById('death-subtitle').textContent = isHC
-          ? 'Permadeath — Your deeds are etched in the Hall of Fallen Heroes.'
-          : '10% XP penalty • Respawn at floor entrance';
-        const btnRespawn = document.getElementById('btn-respawn');
-        if (isHC) btnRespawn.classList.add('hidden');
-        else btnRespawn.classList.remove('hidden');
-        this.panelDeath.classList.remove('hidden');
-      } else {
-        this.panelDeath.classList.add('hidden');
-      }
-    }
+    updateVitalsAndDeathDOM(this, myP, activeRoomMode);
 
     if (!priv || priv === this.lastPrivRef) return;
     this.lastPrivRef = priv;
 
-    const elPot = document.getElementById('hud-pot');
-    if (elPot) elPot.textContent = `x${priv.potions ?? 3}`;
-    const xpPct = Math.min(100, Math.round(((priv.xp || 0) / (priv.nextXp || 100)) * 100));
-    const elXpBar = document.getElementById('hud-xp-bar');
-    if (elXpBar) elXpBar.style.width = `${xpPct}%`;
-
-    const statBadge = document.getElementById('badge-stat-pts');
-    if (priv.statPoints > 0) statBadge.classList.remove('hidden');
-    else statBadge.classList.add('hidden');
-
-    document.getElementById('char-name').textContent = myP.name;
-    document.getElementById('char-sub').textContent = `Lv ${priv.level || 1} ${priv.className || 'Hero'}`;
-    document.getElementById('char-xp-text').textContent = `${priv.xp || 0} / ${priv.nextXp || 100}`;
-    document.getElementById('char-xp-bar').style.width = `${xpPct}%`;
-
-    if (priv.stats) {
-      document.getElementById('stat-might').textContent = priv.stats.might;
-      document.getElementById('stat-focus').textContent = priv.stats.focus;
-      document.getElementById('stat-agility').textContent = priv.stats.agility;
-      document.getElementById('stat-vitality').textContent = priv.stats.vitality;
-    }
-    const ptsEl = document.getElementById('char-stat-pts');
-    if (priv.statPoints > 0) {
-      ptsEl.textContent = `${priv.statPoints} pts`;
-      ptsEl.classList.remove('hidden');
-    } else {
-      ptsEl.classList.add('hidden');
-    }
-    document.querySelectorAll('.btn-alloc-stat').forEach(b => {
-      if (priv.statPoints > 0) b.classList.remove('hidden');
-      else b.classList.add('hidden');
-    });
-
-    if (priv.derived) {
-      document.getElementById('der-dmg').textContent = `${priv.derived.dmgMin}–${priv.derived.dmgMax}`;
-      document.getElementById('der-spell').textContent = priv.derived.spellDmg;
-      document.getElementById('der-armor').textContent = priv.derived.armor;
-      document.getElementById('der-crit').textContent = `${priv.derived.crit}%`;
-      document.getElementById('der-speed').textContent = priv.derived.speed;
-    }
-
-    // Update Paperdoll Crest (Hero class & Level)
-    const crestClass = document.getElementById('crest-class');
-    if (crestClass) crestClass.textContent = (priv.className || priv.classId || 'HERO').toUpperCase();
-    const crestLvl = document.getElementById('crest-level');
-    if (crestLvl) crestLvl.textContent = `LVL ${priv.level || 1}`;
-
-    if (priv.equipment) {
-      for (const slot of PAPERDOLL_SLOTS) {
-        const el = document.getElementById(`slot-${slot}`);
-        if (!el) continue;
-        const item = priv.equipment[slot];
-        const iconEl = el.querySelector('.slot-icon');
-        if (item) {
-          const col = RARITY_COLORS[item.rarity] || '#FFFFFF';
-          el.style.borderColor = col;
-          el.classList.add('socket-occupied');
-          if (iconEl) {
-            iconEl.src = getBitSpriteDataUrl(getItemSpriteKey(item), 2);
-          }
-        } else {
-          el.style.borderColor = '';
-          el.classList.remove('socket-occupied');
-          if (iconEl) {
-            iconEl.src = getBitSpriteDataUrl('slot_' + slot, 2);
-          }
-        }
-      }
-    }
-
-    const goldTextEl = document.getElementById('inv-gold-text');
-    if (goldTextEl) goldTextEl.textContent = (priv.gold ?? 0).toLocaleString();
-
-    const curW = priv.carryWeight ?? 0;
-    const maxW = priv.maxWeight ?? 60;
-    const wPct = Math.min(100, Math.round((curW / maxW) * 100));
-    document.getElementById('inv-weight-text').textContent = `${curW.toFixed(1)} / ${maxW.toFixed(1)} lb`;
-    const wBar = document.getElementById('inv-weight-bar');
-    wBar.style.width = `${wPct}%`;
-    wBar.className = `h-full transition-all ${wPct >= 90 ? 'bg-rose-500' : (wPct >= 70 ? 'bg-amber-400' : 'bg-indigo-400')}`;
-
-    const inv = priv.inventory || [];
-    const invKey = JSON.stringify(inv);
-    if (invKey === this.lastInvKey) return;
-    this.lastInvKey = invKey;
-
-    const list = document.getElementById('inv-list');
-    list.innerHTML = '';
-    if (inv.length === 0) {
-      list.innerHTML = '<div class="text-[10px] font-mono text-slate-500 py-4 text-center">Pack is empty</div>';
-    } else {
-      for (const item of inv) {
-        const isConsumable = item.type === 'potion' || item.type === 'consumable';
-        const col = RARITY_COLORS[item.rarity] || (isConsumable ? '#38bdf8' : '#FFFFFF');
-        const sprKey = getItemSpriteKey(item);
-        const sprUrl = getBitSpriteDataUrl(sprKey, 2);
-
-        const countBadge = (item.count && item.count > 1) || isConsumable
-          ? `<span class="bg-amber-950/90 border border-amber-600/70 text-amber-300 font-bold px-1.5 py-0.2 rounded text-[10px] shrink-0 font-mono">x${item.count || 1}</span>`
-          : '';
-
-        const subtitleText = isConsumable
-          ? (item.subType === 'mp' || item.name?.includes('Mana') ? 'Restores 30 Mana' : 'Restores 40 Health')
-          : formatItemStats(item.stats);
-
-        const typeLabel = isConsumable ? 'CONSUMABLE' : (item.slot || 'GEAR');
-
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'w-full text-left rounded bg-slate-900/90 border border-slate-800 p-1.5 hover:bg-slate-800 transition flex items-center gap-2 cursor-pointer';
-        row.style.borderLeftWidth = '3px';
-        row.style.borderLeftColor = col;
-        row.innerHTML = `
-          <img src="${sprUrl}" class="w-6 h-6 pixelated shrink-0 bg-slate-950/80 p-0.5 rounded border border-slate-800" alt="${item.name}">
-          <div class="min-w-0 flex-1 space-y-0.5">
-            <div class="flex items-center justify-between gap-1 text-[11px] font-mono">
-              <span class="font-bold truncate" style="color:${col}">${item.name}</span>
-              <div class="flex items-center gap-1.5 shrink-0">
-                ${countBadge}
-                <span class="text-[9px] text-slate-400">${((item.weight || 0.2) * (item.count || 1)).toFixed(1)} lb</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between text-[9px] font-mono">
-              <span class="text-emerald-300 truncate">${subtitleText}</span>
-              <span class="text-slate-500 uppercase ml-1 shrink-0">${typeLabel}</span>
-            </div>
-          </div>
-        `;
-        row.addEventListener('mouseenter', () => {
-          if (isConsumable) {
-            this.showConsumableTooltip(item, row);
-          } else {
-            const eq = item.slot === 'ring'
-              ? (priv.equipment?.ring1 || priv.equipment?.ring2 || null)
-              : (priv.equipment?.[item.slot] || null);
-            this.showComparisonTooltip(item, eq, row);
-          }
-        });
-        row.addEventListener('mouseleave', () => {
-          this.hideComparisonTooltip();
-        });
-        row.addEventListener('click', () => {
-          if (isConsumable) {
-            this.sendPacket({ type: PACKET_TYPES.USE_ITEM, itemId: item.id });
-          } else {
-            this.sendPacket({ type: PACKET_TYPES.EQUIP_ITEM, itemId: item.id });
-          }
-          this.hideComparisonTooltip();
-        });
-        row.addEventListener('contextmenu', (ev) => {
-          ev.preventDefault();
-          this.sendPacket({ type: PACKET_TYPES.DROP_ITEM, itemId: item.id });
-          this.hideComparisonTooltip();
-        });
-        list.appendChild(row);
-      }
-    }
+    updateCharacterSheetDOM(myP, priv);
+    updateInventoryAndPaperdollDOM(this, priv);
   }
 
   showConsumableTooltip(item, targetEl) {
-    const tooltip = document.getElementById('tooltip-item-compare');
-    if (!tooltip || !item) return;
-
-    const eqCard = document.getElementById('compare-equipped-card');
-    const hoverCard = document.getElementById('compare-hover-card');
-
-    if (eqCard) eqCard.classList.add('hidden');
-    if (hoverCard) {
-      hoverCard.classList.remove('hidden');
-      const col = RARITY_COLORS[item.rarity] || '#38bdf8';
-      const badgeEl = document.getElementById('compare-hover-badge');
-      if (badgeEl) badgeEl.textContent = 'CONSUMABLE';
-      const slotEl = document.getElementById('compare-hover-slot');
-      if (slotEl) slotEl.textContent = `STACK: ${item.count || 1} / ${item.maxStack || 20}`;
-      const nameEl = document.getElementById('compare-hover-name');
-      if (nameEl) {
-        nameEl.textContent = item.name;
-        nameEl.style.color = col;
-      }
-      hoverCard.style.borderColor = col;
-
-      const typeEl = document.getElementById('compare-hover-type');
-      const totalW = ((item.weight || 0.2) * (item.count || 1)).toFixed(1);
-      if (typeEl) typeEl.textContent = `Consumable • ${totalW} lb total`;
-
-      const statsEl = document.getElementById('compare-hover-stats');
-      if (statsEl) {
-        if (item.subType === 'mp' || item.name?.includes('Mana')) {
-          statsEl.innerHTML = '<div class="text-sky-300 font-bold">+30 Mana Restored</div><div class="text-[10px] text-slate-400">Instantly restores spiritual energy</div>';
-        } else {
-          statsEl.innerHTML = '<div class="text-rose-400 font-bold">+40 Health Restored</div><div class="text-[10px] text-slate-400">Instantly restores life wounds</div>';
-        }
-      }
-
-      const actionsEl = document.getElementById('compare-hover-actions');
-      if (actionsEl) {
-        actionsEl.innerHTML = `<span class="text-emerald-300 font-bold">[LMB] Consume</span><span class="text-slate-400">[RMB] Drop 1</span>`;
-      }
-    }
-
-    tooltip.classList.remove('hidden');
-    this.positionTooltip(tooltip, targetEl);
+    showConsumableTooltip(item, targetEl, this.panelInv);
   }
 
   showComparisonTooltip(hoverItem, equippedItem, targetEl) {
-    const tooltip = document.getElementById('tooltip-item-compare');
-    if (!tooltip || !hoverItem) return;
-
-    const eqCard = document.getElementById('compare-equipped-card');
-    const hoverCard = document.getElementById('compare-hover-card');
-
-    // Fill Hover Card
-    const hoverCol = RARITY_COLORS[hoverItem.rarity] || '#FFFFFF';
-    const badgeEl = document.getElementById('compare-hover-badge');
-    if (badgeEl) badgeEl.textContent = equippedItem ? 'COMPARISON' : 'INSPECTING';
-    const slotEl = document.getElementById('compare-hover-slot');
-    if (slotEl) slotEl.textContent = (hoverItem.slot || '').toUpperCase();
-
-    const hoverNameEl = document.getElementById('compare-hover-name');
-    if (hoverNameEl) {
-      hoverNameEl.textContent = hoverItem.name;
-      hoverNameEl.style.color = hoverCol;
-    }
-    if (hoverCard) hoverCard.style.borderColor = hoverCol;
-
-    const wHover = (hoverItem.weight || 1).toFixed(1);
-    let wSub = `${(hoverItem.name || '').split(' ')[0]} • ${wHover} lb`;
-    if (equippedItem) {
-      const wDiff = Number(((hoverItem.weight || 1) - (equippedItem.weight || 1)).toFixed(1));
-      if (wDiff > 0) wSub += ` <span class="stat-delta-neg">(+${wDiff} lb)</span>`;
-      else if (wDiff < 0) wSub += ` <span class="stat-delta-pos">(${wDiff} lb)</span>`;
-    }
-    const typeEl = document.getElementById('compare-hover-type');
-    if (typeEl) typeEl.innerHTML = wSub;
-
-    // Build Hover Stats with deltas
-    const statKeys = new Set([
-      ...Object.keys(hoverItem.stats || {}),
-      ...(equippedItem ? Object.keys(equippedItem.stats || {}) : [])
-    ]);
-
-    const hoverStatsEl = document.getElementById('compare-hover-stats');
-    if (hoverStatsEl) {
-      if (statKeys.size === 0) {
-        hoverStatsEl.innerHTML = '<div class="text-slate-500 italic">No special properties</div>';
-      } else {
-        let html = '';
-        for (const k of statKeys) {
-          html += renderStatRow(k, hoverItem.stats?.[k], equippedItem?.stats?.[k]);
-        }
-        hoverStatsEl.innerHTML = html;
-      }
-    }
-
-    // Configure Equipped Card
-    if (equippedItem && eqCard) {
-      eqCard.classList.remove('hidden');
-      const eqCol = RARITY_COLORS[equippedItem.rarity] || '#FFFFFF';
-      const eqSlotEl = document.getElementById('compare-eq-slot');
-      if (eqSlotEl) eqSlotEl.textContent = (equippedItem.slot || '').toUpperCase();
-      const eqNameEl = document.getElementById('compare-eq-name');
-      if (eqNameEl) {
-        eqNameEl.textContent = equippedItem.name;
-        eqNameEl.style.color = eqCol;
-      }
-      eqCard.style.borderColor = eqCol;
-
-      const eqTypeEl = document.getElementById('compare-eq-type');
-      if (eqTypeEl) eqTypeEl.textContent = `${(equippedItem.name || '').split(' ')[0]} • ${(equippedItem.weight || 1).toFixed(1)} lb`;
-      const eqStatsEl = document.getElementById('compare-eq-stats');
-      if (eqStatsEl) {
-        const eqEntries = Object.entries(equippedItem.stats || {});
-        if (eqEntries.length === 0) {
-          eqStatsEl.innerHTML = '<div class="text-slate-500 italic">No special properties</div>';
-        } else {
-          eqStatsEl.innerHTML = eqEntries.map(([k, v]) => {
-            const label = STAT_LABELS[k] || (k.charAt(0).toUpperCase() + k.slice(1));
-            const isPercent = k === 'crit';
-            return `<div class="text-slate-300 text-[11px]">+${isPercent ? Math.round(v * 100) + '%' : v} ${label}</div>`;
-          }).join('');
-        }
-      }
-    } else if (eqCard) {
-      eqCard.classList.add('hidden');
-    }
-
-    const actionsEl = document.getElementById('compare-hover-actions');
-    if (actionsEl) {
-      actionsEl.innerHTML = `<span>[LMB] Equip</span><span class="text-slate-400">[RMB] Drop</span>`;
-    }
-
-    tooltip.classList.remove('hidden');
-    this.positionTooltip(tooltip, targetEl);
+    showComparisonTooltip(hoverItem, equippedItem, targetEl, this.panelInv);
   }
 
   showEquippedTooltip(item, targetEl) {
-    const tooltip = document.getElementById('tooltip-item-compare');
-    if (!tooltip || !item) return;
-
-    const eqCard = document.getElementById('compare-equipped-card');
-    const hoverCard = document.getElementById('compare-hover-card');
-
-    if (eqCard) eqCard.classList.add('hidden');
-    if (hoverCard) {
-      hoverCard.classList.remove('hidden');
-      const col = RARITY_COLORS[item.rarity] || '#FFFFFF';
-      const badgeEl = document.getElementById('compare-hover-badge');
-      if (badgeEl) badgeEl.textContent = 'EQUIPPED';
-      const slotEl = document.getElementById('compare-hover-slot');
-      if (slotEl) slotEl.textContent = (item.slot || '').toUpperCase();
-      const nameEl = document.getElementById('compare-hover-name');
-      if (nameEl) {
-        nameEl.textContent = item.name;
-        nameEl.style.color = col;
-      }
-      hoverCard.style.borderColor = col;
-
-      const typeEl = document.getElementById('compare-hover-type');
-      if (typeEl) typeEl.textContent = `${(item.name || '').split(' ')[0]} • ${(item.weight || 1).toFixed(1)} lb`;
-
-      const statsEl = document.getElementById('compare-hover-stats');
-      if (statsEl) {
-        const entries = Object.entries(item.stats || {});
-        if (entries.length === 0) {
-          statsEl.innerHTML = '<div class="text-slate-500 italic">No special properties</div>';
-        } else {
-          statsEl.innerHTML = entries.map(([k, v]) => {
-            const label = STAT_LABELS[k] || (k.charAt(0).toUpperCase() + k.slice(1));
-            const isPercent = k === 'crit';
-            return `<div class="text-slate-200 text-[11px]">+${isPercent ? Math.round(v * 100) + '%' : v} ${label}</div>`;
-          }).join('');
-        }
-      }
-
-      const actionsEl = document.getElementById('compare-hover-actions');
-      if (actionsEl) {
-        actionsEl.innerHTML = `<span class="text-amber-300">[LMB] Unequip</span><span class="text-rose-400">[RMB] Drop</span>`;
-      }
-    }
-
-    tooltip.classList.remove('hidden');
-    this.positionTooltip(tooltip, targetEl);
+    showEquippedTooltip(item, targetEl, this.panelInv);
   }
 
   positionTooltip(tooltip, targetEl) {
-    if (!tooltip || !targetEl) return;
-    const targetRect = targetEl.getBoundingClientRect();
-    const tooltipRect = tooltip.getBoundingClientRect();
-    const invRect = this.panelInv ? this.panelInv.getBoundingClientRect() : targetRect;
-
-    let left = invRect.left - tooltipRect.width - 12;
-    if (left < 10) {
-      left = Math.min(window.innerWidth - tooltipRect.width - 10, targetRect.right + 12);
-    }
-    let top = Math.max(10, Math.min(window.innerHeight - tooltipRect.height - 10, targetRect.top));
-
-    tooltip.style.left = `${Math.round(left)}px`;
-    tooltip.style.top = `${Math.round(top)}px`;
+    positionTooltip(tooltip, targetEl, this.panelInv);
   }
 
   hideComparisonTooltip() {
-    const tooltip = document.getElementById('tooltip-item-compare');
-    if (tooltip) tooltip.classList.add('hidden');
+    hideComparisonTooltip();
   }
 }

@@ -15,6 +15,7 @@ const __dirname = path.dirname(__filename);
 const CLIENT_DIR = path.join(__dirname, '../client');
 const SHARED_DIR = path.join(__dirname, '../shared');
 const DATA_DIR = path.join(__dirname, '../data');
+const ROOT_DIR = path.join(__dirname, '..');
 const PORT = process.env.PORT || 8080;
 
 function sendJson(res, status, data) {
@@ -208,9 +209,12 @@ const server = http.createServer(async (req, res) => {
   if (reqPath === '/' || reqPath === '') reqPath = '/index.html';
   if (reqPath === '/mod') reqPath = '/mod.html';
   if (reqPath === '/dev') reqPath = '/dev.html';
+  if (reqPath === '/roadmap') reqPath = '/roadmap.html';
 
   let filePath;
-  if (reqPath.startsWith('/shared/')) {
+  if (reqPath === '/roadmap.md') {
+    filePath = path.join(ROOT_DIR, 'roadmap.md');
+  } else if (reqPath.startsWith('/shared/')) {
     filePath = path.join(SHARED_DIR, reqPath.replace('/shared/', ''));
   } else if (reqPath.startsWith('/data/')) {
     const rel = reqPath.replace('/data/', '');
@@ -229,7 +233,8 @@ const server = http.createServer(async (req, res) => {
     '.js': 'text/javascript',
     '.css': 'text/css',
     '.json': 'application/json',
-    '.csv': 'text/plain'
+    '.csv': 'text/plain',
+    '.md': 'text/markdown; charset=utf-8'
   };
 
   fs.readFile(filePath, (err, content) => {

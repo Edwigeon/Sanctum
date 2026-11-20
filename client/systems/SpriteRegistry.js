@@ -2,11 +2,37 @@
  * Data-Driven 16-Color Micro-Sprite Registry (/data/sprites.json)
  * Decodes compact hex-grid rows ('0'-'f' -> 0..15, '.' -> 255 transparent) into fast Uint8Array frames,
  * supporting both single-strip (`frames`) and multi-state (`states: { idle, move, attack, ... }`) sprites.
+ * Persists decoded Uint8Array sprite banks in IndexedDB via SpriteDatabase.
  */
+import { SpriteDatabase } from './SpriteDatabase.js';
+
+function hashString(str) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `${str.length}:${(hash >>> 0).toString(16)}`;
+}
+
+function attachSpriteHelpers(bank) {
+  for (const cat of ['tiles', 'entities', 'objects', 'items']) {
+    const group = bank[cat] || {};
+    for (const sprite of Object.values(group)) {
+      const firstState = sprite.states?.idle || Object.values(sprite.states || {})[0] || { fps: sprite.fps || 4, pingPong: false, frames: [] };
+      sprite.getState = function getState(stateName = 'idle') {
+        return this.states[stateName] || this.states.idle || firstState;
+      };
+    }
+  }
+  return bank;
+}
+
 export class SpriteRegistry {
   constructor() {
     this.bank = { tiles: {}, entities: {}, objects: {}, items: {} };
     this.loaded = false;
+    this.db = new SpriteDatabase();
   }
 
   decodeFrame(rows, w, h) {
@@ -31,11 +57,34 @@ export class SpriteRegistry {
 
   async load(url = '/data/sprites.json') {
     try {
-      const res = await fetch(url);
-      if (!res.ok) return false;
-      const raw = await res.json();
+      const cached = await this.db.getSpriteBank(url);
+
+      let text = null;
+      try {
+        const res = await fetch(url);
+        if (res.ok) text = await res.text();
+      } catch {}
+
+      if (!text) {
+        if (cached && cached.bank) {
+          this.bank = attachSpriteHelpers(cached.bank);
+          this.loaded = true;
+          return true;
+        }
+        return false;
+      }
+
+      const sig = hashString(text);
+      if (cached && cached.sig === sig && cached.bank) {
+        this.bank = attachSpriteHelpers(cached.bank);
+        this.loaded = true;
+        return true;
+      }
+
+      const raw = JSON.parse(text);
+      const plainBank = { tiles: {}, entities: {}, objects: {}, items: {} };
       for (const cat of ['tiles', 'entities', 'objects', 'items']) {
-        this.bank[cat] = {};
+        plainBank[cat] = {};
         const group = raw[cat] || {};
         for (const [id, def] of Object.entries(group)) {
           const w = def.w || 12;
@@ -72,7 +121,7 @@ export class SpriteRegistry {
           }
 
           const firstState = states.idle || Object.values(states)[0] || { fps: defaultFps, pingPong: false, frames: [] };
-          const sprite = {
+          plainBank[cat][id] = {
             id,
             w,
             h,
@@ -87,14 +136,14 @@ export class SpriteRegistry {
             anchorY: def.anchorY ?? Math.floor(h * 0.75),
             states,
             frames: firstState.frames,
-            variants: firstState.frames,
-            getState(stateName = 'idle') {
-              return this.states[stateName] || this.states.idle || firstState;
-            }
+            variants: firstState.frames
           };
-          this.bank[cat][id] = sprite;
         }
       }
+
+      // Persist structured-cloneable bank (without methods) before attaching getState
+      this.db.saveSpriteBank(url, { sig, bank: plainBank }).catch(() => {});
+      this.bank = attachSpriteHelpers(plainBank);
       this.loaded = true;
       return true;
     } catch (err) {

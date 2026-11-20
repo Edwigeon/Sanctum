@@ -1,11 +1,35 @@
 import crypto from 'crypto';
-import { ENGINE, GAME_MODES, PACKET_TYPES, TILES, RARITY } from '../../shared/Constants.js';
+import { ENGINE, GAME_MODES, PACKET_TYPES, TILES } from '../../shared/Constants.js';
 import { DungeonGen } from '../../shared/DungeonGen.js';
-import { CombatMath } from '../../shared/CombatMath.js';
 import { PRNG, dist } from '../../shared/MathUtils.js';
-import { dataRegistry } from './DataRegistry.js';
-import { LootGenerator } from './LootGenerator.js';
 import { saveManager } from './SaveManager.js';
+
+import {
+  createPlayerEntity,
+  recalculateStats,
+  handleAllocStat,
+  grantXp,
+  handlePlayerDeath,
+  handlePlayerRespawn
+} from './room/PlayerState.js';
+import {
+  handleEquipItem,
+  handleUnequipItem,
+  handleUseItem,
+  handleDropItem,
+  handlePlayerPotion,
+  handlePickupLoot
+} from './room/InventoryActions.js';
+import {
+  spawnInitialMonsters,
+  handlePlayerAttack,
+  handlePlayerSkill,
+  generateGearDrop,
+  killMonster,
+  stepProjectiles,
+  stepMonsters
+} from './room/CombatAndMonsters.js';
+import { buildRoomSummary, broadcastRoomSnapshot } from './room/SnapshotSerializer.js';
 
 export class GameRoom {
   constructor(roomId, mode = GAME_MODES.CLASSIC, ngCycle = 0, options = {}) {
@@ -48,27 +72,7 @@ export class GameRoom {
   }
 
   getSummary() {
-    const biome = this.floor <= 1 ? 'Crypts' : (this.floor <= 2 ? 'Caverns' : (this.floor <= 4 ? 'Cathedral' : 'Sanctum'));
-    return {
-      roomId: this.roomId,
-      name: this.displayName,
-      mode: this.mode,
-      floor: this.floor,
-      biome,
-      ngCycle: this.ngCycle,
-      players: this.players.size,
-      maxPlayers: this.maxPlayers,
-      hasPassword: !!this.password,
-      inviteCode: this.inviteCode,
-      inviteToken: this.inviteToken,
-      playerList: Array.from(this.players.values()).map(p => ({
-        id: p.id,
-        name: p.name,
-        classId: p.classId,
-        className: p.className || p.classId,
-        level: p.level || 1
-      }))
-    };
+    return buildRoomSummary(this);
   }
 
   isWalkable(x, y, radius = 3) {
@@ -93,159 +97,43 @@ export class GameRoom {
   }
 
   spawnInitialMonsters() {
-    const types = dataRegistry.getMonsterTypes();
-    for (let i = 1; i < this.dungeon.rooms.length; i++) {
-      const room = this.dungeon.rooms[i];
-      const count = this.rng.range(2, 4);
-      for (let j = 0; j < count; j++) {
-        const mx = (room.x + 1 + (this.rng.next() % (room.w - 2))) * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
-        const my = (room.y + 1 + (this.rng.next() % (room.h - 2))) * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
-        const id = this.nextEntityId++;
-        const type = types[this.rng.next() % types.length] || 'crawler';
-        const def = dataRegistry.getMonster(type);
-        const baseHp = def.baseHp + (this.floor - 1) * 6;
-        const baseDmg = def.baseDmg + (this.floor - 1) * 2;
-        const baseStats = CombatMath.getMonsterScale(baseHp, baseDmg, this.ngCycle);
-        this.monsters.set(id, {
-          id,
-          type,
-          xp: def.xp || 25,
-          aggroRange: def.aggroRange || 90,
-          x: mx,
-          y: my,
-          hp: baseStats.hp,
-          maxHp: baseStats.hp,
-          dmg: baseStats.dmg,
-          speed: def.speed || 0.6,
-          attackCooldown: 0
-        });
-      }
-    }
+    spawnInitialMonsters(this);
   }
 
   addPlayer(socket, name = 'Wanderer', classId = 'VANGUARD', savedChar = null) {
-    const id = socket.id;
-    const sx = this.dungeon.spawnPoint.x * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
-    const sy = this.dungeon.spawnPoint.y * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
-    const cls = dataRegistry.getClass(savedChar?.classId || classId);
-
-    const player = {
-      id,
-      characterId: savedChar?.id || null,
-      mode: savedChar?.mode || this.mode,
-      name: savedChar?.name || name,
-      socket,
-      classId: cls.id,
-      className: cls.name,
-      level: savedChar?.level || 1,
-      xp: savedChar?.xp || 0,
-      nextXp: savedChar?.nextXp || 100,
-      statPoints: savedChar?.statPoints || 0,
-      gold: savedChar?.gold ?? 50,
-      stats: savedChar?.stats ? { ...savedChar.stats } : { ...cls.stats },
-      equipment: savedChar?.equipment
-        ? (() => {
-            const eq = Object.assign(
-              { ring1: null, helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring2: null },
-              savedChar.equipment
-            );
-            if (eq.ring && !eq.ring1) eq.ring1 = eq.ring;
-            delete eq.ring;
-            return eq;
-          })()
-        : { ring1: null, helm: null, amulet: null, weapon: null, armor: null, offhand: null, gloves: null, boots: null, ring2: null },
-      inventory: savedChar?.inventory ? [...savedChar.inventory] : [],
-      x: sx, y: sy, targetX: sx, targetY: sy,
-      targetMonsterId: null, targetLootId: null, holdAttack: false,
-      hp: 100, maxHp: 100, mp: 50, maxMp: 50,
-      potions: savedChar?.potions ?? 3, speed: cls.baseSpeed, isDead: false,
-      primaryStat: cls.stats.might, baseDmgMin: cls.baseDmgMin, baseDmgMax: cls.baseDmgMax,
-      armor: cls.baseArmor, critChance: cls.baseCrit, spellDmg: 18,
-      carryWeight: 0, maxWeight: 60, attackCooldown: 0,
-      dirtyState: true
-    };
-
-    const hasHpPot = player.inventory.some(i => i.type === 'potion' && (!i.subType || i.subType === 'hp' || i.name?.includes('Health')));
-    if (!hasHpPot && player.potions > 0) {
-      player.inventory.push({
-        id: this.nextEntityId++,
-        type: 'potion',
-        subType: 'hp',
-        name: 'Health Potion',
-        rarity: 1,
-        count: player.potions,
-        maxStack: 20,
-        weight: 0.2
-      });
-    }
-
-    this.recalculateStats(player, true);
-
-    this.players.set(id, player);
+    const player = createPlayerEntity(this, socket, name, classId, savedChar);
+    this.players.set(player.id, player);
     if (!this.tickInterval) {
       this.tickInterval = setInterval(() => this.update(), ENGINE.TICK_INTERVAL_MS);
     }
     socket.send(JSON.stringify({
       type: PACKET_TYPES.ROOM_INIT,
-      data: { roomId: this.roomId, mode: this.mode, seed: this.seed, ngCycle: this.ngCycle, floor: this.floor, playerId: id, inviteCode: this.inviteCode, inviteToken: this.inviteToken, maxPlayers: this.maxPlayers }
+      data: {
+        roomId: this.roomId,
+        mode: this.mode,
+        seed: this.seed,
+        ngCycle: this.ngCycle,
+        floor: this.floor,
+        playerId: player.id,
+        inviteCode: this.inviteCode,
+        inviteToken: this.inviteToken,
+        maxPlayers: this.maxPlayers
+      }
     }));
     this.broadcastSnapshot();
   }
 
   recalculateStats(p, fullRestore = false) {
-    const cls = dataRegistry.getClass(p.classId);
-    const eq = Object.values(p.equipment).filter(Boolean);
-    const bonus = { might: 0, focus: 0, agility: 0, vitality: 0, dmg: 0, armor: 0, hp: 0, crit: 0 };
-    let weightSum = 0;
-    for (const item of eq) {
-      weightSum += item.weight || 0;
-      if (!item.stats) continue;
-      for (const [k, v] of Object.entries(item.stats)) {
-        if (bonus[k] !== undefined) bonus[k] += v;
-      }
-    }
-    for (const item of p.inventory) {
-      weightSum += (item.weight || 0) * (item.count || 1);
-    }
-
-    const hpPotions = p.inventory.filter(i => i.type === 'potion' && (!i.subType || i.subType === 'hp' || i.name?.includes('Health')));
-    p.potions = hpPotions.reduce((acc, curr) => acc + (curr.count || 1), 0);
-
-    const totalMight = p.stats.might + bonus.might;
-    const totalFocus = p.stats.focus + bonus.focus;
-    const totalAgility = p.stats.agility + bonus.agility;
-    const totalVitality = p.stats.vitality + bonus.vitality;
-
-    p.maxHp = 50 + totalVitality * 5 + (p.level - 1) * 10 + bonus.hp;
-    p.maxMp = 20 + totalFocus * 3 + (p.level - 1) * 5;
-    p.baseDmgMin = cls.baseDmgMin + bonus.dmg;
-    p.baseDmgMax = cls.baseDmgMax + bonus.dmg;
-    p.primaryStat = p.classId === 'ARCANIST' ? totalFocus : (p.classId === 'SHADOW' ? totalAgility : totalMight);
-    p.armor = cls.baseArmor + Math.floor(totalVitality * 0.25) + bonus.armor;
-    p.critChance = Math.min(0.65, cls.baseCrit + totalAgility * 0.004 + bonus.crit);
-    p.speed = Math.min(2.2, cls.baseSpeed + totalAgility * 0.01);
-    p.spellDmg = Math.round(14 + totalFocus * 0.8 + bonus.dmg * 0.6);
-    p.maxWeight = 30 + totalMight * 2;
-    p.carryWeight = Math.round(weightSum * 10) / 10;
-
-    if (fullRestore) {
-      p.hp = p.maxHp;
-      p.mp = p.maxMp;
-    } else {
-      p.hp = Math.min(p.hp, p.maxHp);
-      p.mp = Math.min(p.mp, p.maxMp);
-    }
+    recalculateStats(p, fullRestore);
   }
 
   removePlayer(playerId) {
     const p = this.players.get(playerId);
     if (p) saveManager.saveFromPlayer(p, this.floor);
     this.players.delete(playerId);
-    if (this.players.size === 0) {
-      if (this.tickInterval) {
-        clearInterval(this.tickInterval);
-        this.tickInterval = null;
-      }
+    if (this.players.size === 0 && this.tickInterval) {
+      clearInterval(this.tickInterval);
+      this.tickInterval = null;
     }
   }
 
@@ -279,7 +167,7 @@ export class GameRoom {
       if (!Number.isFinite(packet.angle)) return;
       this.handlePlayerSkill(p, packet.angle);
     } else if (packet.type === PACKET_TYPES.INPUT_POTION) {
-      this.handlePlayerPotion(p);
+      this.handlePlayerPotion(p, packet.subType || 'hp');
     } else if (packet.type === PACKET_TYPES.PICKUP_LOOT) {
       if (!Number.isInteger(packet.lootId)) return;
       this.handlePickupLoot(p, packet.lootId);
@@ -301,256 +189,51 @@ export class GameRoom {
   }
 
   handleAllocStat(p, stat) {
-    if (p.statPoints <= 0) return;
-    if (!['might', 'focus', 'agility', 'vitality'].includes(stat)) return;
-    p.stats[stat]++;
-    p.statPoints--;
-    this.recalculateStats(p, false);
-    p.dirtyState = true;
-    saveManager.saveFromPlayer(p, this.floor);
+    handleAllocStat(this, p, stat);
   }
 
   handleEquipItem(p, itemId) {
-    const idx = p.inventory.findIndex(i => i.id === itemId);
-    if (idx === -1) return;
-    const item = p.inventory[idx];
-    let targetSlot = item.slot;
-    if (targetSlot === 'ring') {
-      targetSlot = !p.equipment.ring1 ? 'ring1' : (!p.equipment.ring2 ? 'ring2' : 'ring1');
-    }
-    if (!targetSlot || !(targetSlot in p.equipment)) return;
-    const prev = p.equipment[targetSlot];
-    p.equipment[targetSlot] = item;
-    p.inventory.splice(idx, 1);
-    if (prev) p.inventory.push(prev);
-    this.recalculateStats(p, false);
-    p.dirtyState = true;
-    saveManager.saveFromPlayer(p, this.floor);
+    handleEquipItem(this, p, itemId);
   }
 
   handleUnequipItem(p, slot) {
-    if (!slot || !(slot in p.equipment)) return;
-    const item = p.equipment[slot];
-    if (!item) return;
-    if (p.inventory.length >= 40) return;
-    p.equipment[slot] = null;
-    p.inventory.push(item);
-    this.recalculateStats(p, false);
-    p.dirtyState = true;
-    saveManager.saveFromPlayer(p, this.floor);
+    handleUnequipItem(this, p, slot);
   }
 
   handleUseItem(p, itemId) {
-    const idx = p.inventory.findIndex(i => i.id === itemId);
-    if (idx === -1) return;
-    const item = p.inventory[idx];
-    if (item.type === 'potion' || item.type === 'consumable') {
-      if (item.subType === 'mp' || item.name?.includes('Mana')) {
-        if (p.mp >= p.maxMp) return;
-        item.count = (item.count || 1) - 1;
-        if (item.count <= 0) p.inventory.splice(idx, 1);
-        const restore = Math.min(p.maxMp - p.mp, 30);
-        p.mp += restore;
-        this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: restore });
-      } else {
-        if (p.hp >= p.maxHp) return;
-        item.count = (item.count || 1) - 1;
-        if (item.count <= 0) p.inventory.splice(idx, 1);
-        const heal = Math.min(p.maxHp - p.hp, 40);
-        p.hp += heal;
-        this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: heal });
-      }
-      this.recalculateStats(p, false);
-      p.dirtyState = true;
-      saveManager.saveFromPlayer(p, this.floor);
-    }
+    handleUseItem(this, p, itemId);
   }
 
   handleDropItem(p, itemId) {
-    const idx = p.inventory.findIndex(i => i.id === itemId);
-    if (idx === -1) return;
-    const item = p.inventory[idx];
-    if (item.count && item.count > 1) {
-      item.count--;
-      this.groundLoot.push({ ...item, id: this.nextEntityId++, count: 1, x: p.x, y: p.y });
-    } else {
-      p.inventory.splice(idx, 1);
-      this.groundLoot.push({ ...item, x: p.x, y: p.y });
-    }
-    this.recalculateStats(p, false);
-    p.dirtyState = true;
-    saveManager.saveFromPlayer(p, this.floor);
+    handleDropItem(this, p, itemId);
   }
 
   handlePlayerAttack(p, monsterId) {
-    if (p.attackCooldown > 0) return;
-    const m = this.monsters.get(monsterId);
-    if (!m) return;
-
-    if (dist(p.x, p.y, m.x, m.y) <= 16) {
-      const hit = CombatMath.calculateDamage({
-        baseDmgMin: p.baseDmgMin, baseDmgMax: p.baseDmgMax,
-        primaryStat: p.primaryStat, ngCycle: this.ngCycle,
-        critChance: p.critChance || 0.15, targetArmor: 2, rng: this.rng
-      });
-      m.hp -= hit.damage;
-      p.attackCooldown = 8;
-      this.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: p.id, x: m.x, y: m.y, damage: hit.damage, isCrit: hit.isCrit });
-      if (m.hp <= 0) this.killMonster(m);
-      return true;
-    }
-    return false;
+    return handlePlayerAttack(this, p, monsterId);
   }
 
   handlePlayerSkill(p, angle) {
-    if (p.mp < 10) return;
-    p.mp -= 10;
-    this.projectiles.push({
-      id: this.nextEntityId++, ownerId: p.id,
-      x: p.x, y: p.y, vx: Math.cos(angle) * 3.5, vy: Math.sin(angle) * 3.5,
-      life: 40, damage: p.spellDmg || 18
-    });
+    handlePlayerSkill(this, p, angle);
   }
 
-  handlePlayerPotion(p) {
-    if (p.hp >= p.maxHp) return;
-    const potIdx = p.inventory.findIndex(i => i.type === 'potion' && (!i.subType || i.subType === 'hp' || i.name?.includes('Health')));
-    if (potIdx === -1 && p.potions <= 0) return;
-
-    if (potIdx !== -1) {
-      const pot = p.inventory[potIdx];
-      pot.count = (pot.count || 1) - 1;
-      if (pot.count <= 0) {
-        p.inventory.splice(potIdx, 1);
-      }
-    }
-    const heal = Math.min(p.maxHp - p.hp, 40);
-    p.hp += heal;
-    this.recalculateStats(p, false);
-    p.dirtyState = true;
-    this.events.push({ type: 'HEAL', targetType: 'player', id: p.id, x: p.x, y: p.y, amount: heal });
-    saveManager.saveFromPlayer(p, this.floor);
+  handlePlayerPotion(p, subType = 'hp') {
+    handlePlayerPotion(this, p, subType);
   }
 
   handlePickupLoot(p, lootId) {
-    const idx = this.groundLoot.findIndex(l => l.id === lootId);
-    if (idx === -1) return false;
-    const item = this.groundLoot[idx];
-    if (dist(p.x, p.y, item.x, item.y) < 18) {
-      if (item.type === 'gold') {
-        this.groundLoot.splice(idx, 1);
-        p.gold = (p.gold || 0) + (item.amount || 10);
-        this.events.push({ type: 'GOLD_PICKUP', id: p.id, x: p.x, y: p.y, amount: item.amount || 10 });
-        p.targetLootId = null;
-        p.dirtyState = true;
-        saveManager.saveFromPlayer(p, this.floor);
-        return true;
-      }
-
-      const w = (item.weight || (item.type === 'potion' ? 0.2 : 1)) * (item.count || 1);
-      if (p.carryWeight + w > p.maxWeight) {
-        p.targetLootId = null;
-        this.events.push({ type: 'OVERBURDENED', id: p.id, x: p.x, y: p.y });
-        return false;
-      }
-      this.groundLoot.splice(idx, 1);
-      if (item.type === 'potion' || item.stackable) {
-        const existing = p.inventory.find(i => i.type === 'potion' && i.name === item.name && (i.count || 1) < (i.maxStack || 20));
-        if (existing) {
-          existing.count = Math.min(existing.maxStack || 20, (existing.count || 1) + (item.count || 1));
-        } else {
-          p.inventory.push({
-            id: item.id || this.nextEntityId++,
-            type: item.type,
-            subType: item.subType || (item.name?.includes('Mana') ? 'mp' : 'hp'),
-            name: item.name || 'Health Potion',
-            count: item.count || 1,
-            maxStack: 20,
-            weight: 0.2,
-            rarity: item.rarity ?? 1
-          });
-        }
-        this.recalculateStats(p, false);
-      } else if (item.type === 'gear') {
-        p.inventory.push(item);
-        this.recalculateStats(p, false);
-      }
-      p.targetLootId = null;
-      p.dirtyState = true;
-      saveManager.saveFromPlayer(p, this.floor);
-      return true;
-    }
-    // Walk to loot if out of range
-    p.targetMonsterId = null;
-    p.targetLootId = lootId;
-    p.targetX = item.x;
-    p.targetY = item.y;
-    return false;
+    return handlePickupLoot(this, p, lootId);
   }
 
   grantXp(amount) {
-    for (const p of this.players.values()) {
-      if (p.isDead) continue;
-      p.xp += amount;
-      p.dirtyState = true;
-      let leveled = false;
-      while (p.xp >= p.nextXp) {
-        p.xp -= p.nextXp;
-        p.level++;
-        p.nextXp = Math.round(p.nextXp * 1.45);
-        p.statPoints += 3;
-        this.recalculateStats(p, true);
-        this.events.push({ type: 'LEVEL_UP', id: p.id, level: p.level, x: p.x, y: p.y });
-        leveled = true;
-      }
-      if (leveled) saveManager.saveFromPlayer(p, this.floor);
-    }
+    grantXp(this, amount);
   }
 
   generateGearDrop(x, y) {
-    return LootGenerator.generateDrop({
-      id: this.nextEntityId++,
-      x,
-      y,
-      floor: this.floor,
-      ngCycle: this.ngCycle,
-      rng: this.rng
-    });
+    return generateGearDrop(this, x, y);
   }
 
   killMonster(m) {
-    this.monsters.delete(m.id);
-    this.grantXp(m.xp || (25 + (this.floor - 1) * 10));
-
-    const roll = this.rng.next() % 100;
-    if (roll < 35) {
-      // Gold drop
-      const amt = Math.max(5, Math.round(this.rng.range(5, 20) * (1 + (this.floor - 1) * 0.4)));
-      this.groundLoot.push({
-        id: this.nextEntityId++,
-        type: 'gold',
-        name: `${amt} Gold`,
-        amount: amt,
-        rarity: RARITY.NORMAL,
-        x: m.x, y: m.y
-      });
-    } else if (roll < 60) {
-      // Potion drop (Health or Mana)
-      const isMana = this.rng.next() % 3 === 0;
-      this.groundLoot.push({
-        id: this.nextEntityId++,
-        type: 'potion',
-        subType: isMana ? 'mp' : 'hp',
-        name: isMana ? 'Mana Potion' : 'Health Potion',
-        count: 1,
-        maxStack: 20,
-        weight: 0.2,
-        rarity: RARITY.MAGIC,
-        x: m.x, y: m.y
-      });
-    } else {
-      this.groundLoot.push(this.generateGearDrop(m.x, m.y));
-    }
+    killMonster(this, m);
   }
 
   update() {
@@ -595,7 +278,6 @@ export class GameRoom {
         const dx = ((p.targetX - p.x) / d) * step;
         const dy = ((p.targetY - p.y) / d) * step;
 
-        // Attempt full diagonal move, or slide along X or Y
         if (this.isWalkable(p.x + dx, p.y + dy)) {
           p.x += dx;
           p.y += dy;
@@ -618,66 +300,8 @@ export class GameRoom {
       if (p.mp < p.maxMp) p.mp = Math.min(p.maxMp, p.mp + 0.1);
     }
 
-    for (let i = this.projectiles.length - 1; i >= 0; i--) {
-      const proj = this.projectiles[i];
-      proj.x += proj.vx;
-      proj.y += proj.vy;
-      proj.life--;
-
-      // Projectiles stop at walls
-      if (!this.isWalkable(proj.x, proj.y, 1)) {
-        proj.life = 0;
-      }
-
-      for (const m of this.monsters.values()) {
-        if (dist(proj.x, proj.y, m.x, m.y) < 10) {
-          m.hp -= proj.damage;
-          this.events.push({ type: 'DAMAGE', targetType: 'monster', id: m.id, attackerId: proj.ownerId, x: m.x, y: m.y, damage: proj.damage, isCrit: true });
-          if (m.hp <= 0) this.killMonster(m);
-          proj.life = 0;
-          break;
-        }
-      }
-      if (proj.life <= 0) this.projectiles.splice(i, 1);
-    }
-
-    for (const m of this.monsters.values()) {
-      let closestP = null;
-      const maxAggro = typeof m.aggroRange === 'number' ? m.aggroRange : 90;
-      let closestDist = maxAggro;
-      for (const p of this.players.values()) {
-        if (p.isDead) continue;
-        const d = dist(m.x, m.y, p.x, p.y);
-        if (d < closestDist) { closestDist = d; closestP = p; }
-      }
-      if (closestP) {
-        if (closestDist > 10) {
-          const step = Math.min(m.speed, closestDist);
-          const dx = ((closestP.x - m.x) / closestDist) * step;
-          const dy = ((closestP.y - m.y) / closestDist) * step;
-
-          // Monsters respect walls with sliding
-          if (this.isWalkable(m.x + dx, m.y + dy, 3)) {
-            m.x += dx;
-            m.y += dy;
-          } else if (this.isWalkable(m.x + dx, m.y, 3)) {
-            m.x += dx;
-          } else if (this.isWalkable(m.x, m.y + dy, 3)) {
-            m.y += dy;
-          }
-        } else if (m.attackCooldown <= 0) {
-          const hit = CombatMath.calculateDamage({
-            baseDmgMin: m.dmg - 2, baseDmgMax: m.dmg + 2,
-            primaryStat: 10, targetArmor: closestP.armor, rng: this.rng
-          });
-          closestP.hp = Math.max(0, closestP.hp - hit.damage);
-          m.attackCooldown = 18;
-          this.events.push({ type: 'DAMAGE', targetType: 'player', id: closestP.id, attackerId: m.id, x: closestP.x, y: closestP.y, damage: hit.damage, isCrit: false });
-          if (closestP.hp <= 0) this.handlePlayerDeath(closestP);
-        }
-      }
-      if (m.attackCooldown > 0) m.attackCooldown--;
-    }
+    stepProjectiles(this);
+    stepMonsters(this);
 
     this.broadcastSnapshot();
     this.events = [];
@@ -705,7 +329,17 @@ export class GameRoom {
       if (p.socket.readyState === 1) {
         p.socket.send(JSON.stringify({
           type: PACKET_TYPES.ROOM_INIT,
-          data: { roomId: this.roomId, mode: this.mode, seed: this.seed, ngCycle: this.ngCycle, floor: this.floor, playerId: p.id, inviteCode: this.inviteCode, inviteToken: this.inviteToken, maxPlayers: this.maxPlayers }
+          data: {
+            roomId: this.roomId,
+            mode: this.mode,
+            seed: this.seed,
+            ngCycle: this.ngCycle,
+            floor: this.floor,
+            playerId: p.id,
+            inviteCode: this.inviteCode,
+            inviteToken: this.inviteToken,
+            maxPlayers: this.maxPlayers
+          }
         }));
       }
     }
@@ -714,95 +348,14 @@ export class GameRoom {
   }
 
   handlePlayerDeath(player) {
-    player.isDead = true;
-    player.targetMonsterId = null;
-    player.targetLootId = null;
-    player.holdAttack = false;
-    saveManager.saveFromPlayer(player, this.floor);
-    this.events.push({
-      type: 'PLAYER_DEATH', id: player.id, name: player.name, x: player.x, y: player.y,
-      hardcore: this.mode === GAME_MODES.HARDCORE
-    });
+    handlePlayerDeath(this, player);
   }
 
   handlePlayerRespawn(player) {
-    if (!player.isDead || this.mode === GAME_MODES.HARDCORE) return;
-    const sx = this.dungeon.spawnPoint.x * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
-    const sy = this.dungeon.spawnPoint.y * ENGINE.TILE_SIZE + ENGINE.TILE_SIZE / 2;
-    player.x = sx;
-    player.y = sy;
-    player.targetX = sx;
-    player.targetY = sy;
-    player.targetMonsterId = null;
-    player.targetLootId = null;
-    player.holdAttack = false;
-    player.isDead = false;
-    player.hp = player.maxHp;
-    player.mp = player.maxMp;
-    player.xp = Math.max(0, player.xp - Math.round(player.nextXp * 0.1));
-    if (player.potions < 1) player.potions = 1;
-    player.dirtyState = true;
-    saveManager.saveFromPlayer(player, this.floor);
-    this.events.push({ type: 'PLAYER_RESPAWN', id: player.id, x: sx, y: sy });
+    handlePlayerRespawn(this, player);
   }
 
   broadcastSnapshot() {
-    if (this.players.size === 0) return;
-    const payload = JSON.stringify({
-      type: PACKET_TYPES.WORLD_SNAPSHOT,
-      data: {
-        tick: this.tick,
-        players: Array.from(this.players.values()).map(p => ({
-          id: p.id,
-          name: p.name,
-          classId: p.classId,
-          x: Math.round(p.x * 100) / 100,
-          y: Math.round(p.y * 100) / 100,
-          hp: p.hp,
-          maxHp: p.maxHp,
-          mp: Math.floor(p.mp),
-          maxMp: p.maxMp,
-          isDead: p.isDead
-        })),
-        monsters: Array.from(this.monsters.values()).map(m => ({
-          id: m.id, type: m.type, x: Math.round(m.x * 100) / 100, y: Math.round(m.y * 100) / 100, hp: m.hp, maxHp: m.maxHp
-        })),
-        projectiles: this.projectiles.map(p => ({ id: p.id, x: Math.round(p.x * 100) / 100, y: Math.round(p.y * 100) / 100 })),
-        loot: this.groundLoot,
-        events: this.events
-      }
-    });
-    for (const p of this.players.values()) {
-      if (p.socket.readyState !== 1) continue;
-      p.socket.send(payload);
-      if (p.dirtyState) {
-        p.dirtyState = false;
-        p.socket.send(JSON.stringify({
-          type: PACKET_TYPES.PLAYER_STATE_SYNC,
-          data: {
-            className: p.className,
-            level: p.level,
-            xp: p.xp,
-            nextXp: p.nextXp,
-            statPoints: p.statPoints,
-            potions: p.potions,
-            gold: p.gold || 0,
-            carryWeight: p.carryWeight,
-            maxWeight: p.maxWeight,
-            stats: p.stats,
-            derived: {
-              dmgMin: p.baseDmgMin,
-              dmgMax: p.baseDmgMax,
-              armor: p.armor,
-              crit: Math.round((p.critChance || 0.15) * 100),
-              speed: Math.round(p.speed * 100),
-              spellDmg: p.spellDmg
-            },
-            equipment: p.equipment,
-            inventory: p.inventory
-          }
-        }));
-      }
-    }
+    broadcastRoomSnapshot(this);
   }
 }

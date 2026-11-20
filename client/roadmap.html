@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SANCTUM — Feature Roadmap &amp; Progress</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .badge-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-progress { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-planned { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-suggested { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .card-item { transition: transform 0.1s ease, border-color 0.15s ease; }
+    .card-item:hover { border-color: rgba(245, 158, 11, 0.5); }
+    .progress-track { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(51, 65, 85, 0.8); }
+    .progress-fill { background: linear-gradient(90deg, #10b981, #f59e0b); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased p-4 md:p-6">
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- TOP HEADER -->
+    <header class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-3">
+      <div class="flex items-center gap-3">
+        <span class="font-black text-xl tracking-widest text-amber-400">SANCTUM</span>
+        <span class="text-xs font-mono bg-amber-950/60 text-amber-300 border border-amber-800/60 px-2 py-0.5 rounded">FEATURE ROADMAP</span>
+        <span class="text-[11px] font-mono text-slate-400 hidden sm:inline">Motto: Small. Fast. Efficient. Moddable.</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs font-mono">
+        <button id="btn-toggle-view" class="px-2.5 py-1 rounded bg-slate-800 border border-slate-700 hover:border-slate-500 text-amber-300 transition">📄 View Raw Markdown</button>
+        <a href="/roadmap.md" target="_blank" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-slate-400 hover:text-slate-200">roadmap.md ↗</a>
+        <a href="/dev" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-slate-400 hover:text-slate-200">Dev Studio</a>
+        <a href="/mod" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-slate-400 hover:text-slate-200">Mod Portal</a>
+        <a href="/" class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold transition">← Game</a>
+      </div>
+    </header>
+
+    <!-- METRICS & PROGRESS BAR -->
+    <section class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 md:p-5 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h1 class="text-base font-bold text-amber-300 tracking-wide">Development Progress &amp; Architecture Roadmap</h1>
+          <p class="text-xs font-mono text-slate-400 mt-0.5">15 Hz Server-Authoritative Simulation • Dual-Resolution 60+ FPS Vanilla ES Modules • Zero-Build Distribution</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="px-2.5 py-1 rounded badge-completed font-semibold">18 Completed</span>
+          <span class="px-2.5 py-1 rounded badge-progress font-semibold">3 In Progress</span>
+          <span class="px-2.5 py-1 rounded badge-planned font-semibold">16 Planned</span>
+          <span class="px-2.5 py-1 rounded badge-suggested font-semibold">5 Suggested</span>
+        </div>
+      </div>
+
+      <!-- Overall progress bar -->
+      <div>
+        <div class="flex justify-between text-xs font-mono mb-1.5 text-slate-300">
+          <span>Overall Master Plan Implementation</span>
+          <span class="text-amber-400 font-bold">~52% Complete</span>
+        </div>
+        <div class="w-full h-3 rounded-full progress-track overflow-hidden p-0.5">
+          <div class="h-full rounded-full progress-fill" style="width: 52%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER BAR -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono" id="filter-tabs">
+        <button data-filter="all" class="filter-btn px-3 py-1.5 rounded bg-amber-600 text-slate-950 font-bold">All Items</button>
+        <button data-filter="completed" class="filter-btn px-3 py-1.5 rounded bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700">🟢 Completed</button>
+        <button data-filter="progress" class="filter-btn px-3 py-1.5 rounded bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700">🟡 In Progress</button>
+        <button data-filter="planned" class="filter-btn px-3 py-1.5 rounded bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700">🔵 Planned</button>
+        <button data-filter="suggested" class="filter-btn px-3 py-1.5 rounded bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700">🟣 Suggested Additions</button>
+      </div>
+      <div class="w-full sm:w-auto">
+        <input id="roadmap-search" type="text" placeholder="Search features (e.g., doors, skills, lighting)..." class="w-full sm:w-64 bg-slate-900 border border-slate-800 rounded px-3 py-1.5 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+      </div>
+    </div>
+
+    <!-- RAW MARKDOWN VIEW (HIDDEN BY DEFAULT) -->
+    <div id="raw-markdown-view" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-5 font-mono text-xs text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+      Loading roadmap.md...
+    </div>
+
+    <!-- CARDS VIEW -->
+    <main id="cards-view" class="space-y-6">
+
+      <!-- PHASE 1: CORE ENGINE & SIMULATION -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 1: CORE ENGINE &amp; DETERMINISTIC SIMULATION</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">100% COMPLETE</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Zero-Bloat Foundation</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Deterministic 32-Bit PRNG &amp; DungeonGen</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Seeded Mulberry32 integer generator; verifies 100% room connectivity with BFS flood fill. Sends 32-bit seed over wire instead of tilemaps.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>shared/MathUtils.js</code> • <code>shared/DungeonGen.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Dual-Resolution 60+ FPS Rendering</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">240×144 low-res pixel canvas for chunky retro tiles combined with native devicePixelRatio high-DPI vector overlay for subpixel entities &amp; text.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/Renderer.js</code> • <code>client/systems/Interpolator.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">15 Hz Server-Authoritative Loop</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Server owns monster AI states (IDLE, AGGRO, ATTACK, RETURN), projectile ticks, damage checks, and client snapshot delta broadcasts.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Hyperbolic Combat Math &amp; NG+ Scaling</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Shared formulas for base weapon damage, primary attribute scaling, armor mitigation curve, and Torment NG+ exponential multipliers.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>shared/CombatMath.js</code></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 2A: GAME MODES & PERSISTENCE -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 2A: GAME MODES, PERSISTENCE &amp; MODERATION</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">100% COMPLETE</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Auth &amp; Lobbies</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Classic vs. Hardcore Permadeath Partitioning</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Isolated matchmaking prevents Classic and Hardcore mixing. Server-authoritative death checks stop disconnect dodging; fallen heroes immortalized.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/SaveManager.js</code> • <code>shared/Constants.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Moderator Portal &amp; Account Retention</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Web portal at <code>/mod</code> for account role promotion, bans, session inspection, and character state repair. 180-day rolling TTL auto-pruning.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/mod.html</code> • <code>server/systems/ModService.js</code></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 2B: LIGHTING & STATIC OBJECTS -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 2B: REAL-TIME LIGHTING, ASSET STUDIO &amp; OBJECTS</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-progress">85% IN PROGRESS</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Optics &amp; World Entities</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Analytical 2D Shadowcasting &amp; Bayer 4×4 Dither</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Continuous merged-wall raycasting with zero tile notches; 9-band warm shade ramp + 1×1 world-locked Bayer dither. Modularized into <code>lighting/</code> submodules.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/lighting/*</code> (FloorBaker, LitRasterizer, Occlusion)</div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Additive 16-Color RGB Lights &amp; Subpixel Stamping</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Overlapping light sources add RGB photons cleanly (Orange torch, Blue spark, Yellow stairs, Red elites). Subpixel entity stamps eliminate tile grid seams.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/lighting/LightPropagator.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Developer Asset &amp; PSG Studio (/dev)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Image digitizer with 16-color quantizer; pixel/frame animation editor; Lanthorn-PSG visual sound lab with authenticated live disk save.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/dev.html</code> • <code>dev/SpriteStudio.js</code> • <code>dev/SoundLab.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Interactive Doors (TILES.DOOR)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Click or walk-to-open doors acting as analytical shadowcasters when closed (blocking line-of-sight and sound) and opening smoothly.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code> • <code>client/systems/lighting/VisibilityOcclusion.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Chests, Containers &amp; Breakable Urns/Crates</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Static occluders that clear shadows when unlocked. 1 HP breakable props that shatter on attack/projectile, dropping gold, potions, or rare items.</p>
+            <div class="text-[11px] font-mono text-slate-400">Target: Phase 2B World Objects</div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Buff Shrines &amp; Braziers</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Shrines granting timed combat buffs (Speed, Conduit, Frenzy) with extinguishing beacon gems. Environmental wall torches toggleable on/off.</p>
+            <div class="text-[11px] font-mono text-slate-400">Target: Phase 2B World Objects</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 2C: WORLD GRAPH & BIOMES -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 2C: WORLD GRAPH, CONSTRAINED BIOMES &amp; DAY/NIGHT</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">SCHEDULED</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">World Expansion</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Spatial Cell &amp; Chunk Streaming System</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Deterministic 32×32 or 40×30 cells stitched into an interconnected world graph streamed on demand around players without loading screens.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>shared/DungeonGen.js</code> • <code>server/systems/GameRoom.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Constrained Biome Generators (Overworld, Crypts, Caverns)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Roads and clearings in overworld; BSP rooms in crypts; cellular automata in cavern tunnels; fixed landmarks for Town Camp and boss arenas.</p>
+            <div class="text-[11px] font-mono text-slate-400">Target: <code>data/biomes.json</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Overworld Dynamic Day/Night Cycle</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Time-of-day ambient light curve with outdoor palette shifts (daylight vs. torch-dependent nightfall with aggressive nocturnal spawns).</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/lighting/LightPropagator.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Town Portals (TILES.PORTAL_TOWN) &amp; Waypoints</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Instant two-way portal scrolls back to town camp to stash, identify loot, and restock, returning directly to the active dungeon cell.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code> • <code>shared/Constants.js</code></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 2D: UI & PAPERDOLL -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 2D: UI REFACTOR, PAPERDOLL &amp; CONSUMABLES</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-progress">75% IN PROGRESS</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Interface &amp; Gear</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Handcrafted Dark-Fantasy CSS &amp; Paperdoll</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Purged external Tailwind CDN (<25 KB static CSS). 8-slot paperdoll with sunken stone sockets, dual rings, weight meter, and comparative tooltips.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/style.css</code> • <code>client/systems/HUDController.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Canvas-Native Action HUD (Globes &amp; Belt)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Glass Life &amp; Mana globes with liquid wave shaders, forged-iron belt slots, XP counter. Modularized into <code>hud/</code> submodules.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/CanvasHUD.js</code> • <code>client/systems/hud/*</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="progress">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Consumable Stacks &amp; Mana Potion Integration</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-progress">IN PROGRESS</span>
+            </div>
+            <p class="text-xs text-slate-400">Health &amp; Mana potion drinking on keys 1/2, cyan floating combat text (+30 MP). Bag stackable items architecture underway.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code> • <code>client/systems/hud/PotionRenderer.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Character Sheet (C) Deepening &amp; Derived Stats</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Revamped layout showing core attributes (Might, Focus, Agility, Vitality) with uncommitted +/- points preview and full combat stats panel.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/HUDController.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Socketable Gem &amp; Rune Crafting</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">1–2 sockets on weapons and armor accepting chipped gems (Ruby = flat HP, Sapphire = MP/Spell, Topaz = MF/Crit) for early crafting depth.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/LootGenerator.js</code> • <code>data/items.json</code></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 3A & 3B: AUDIO, SKILLS & COMBAT -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 3: AUDIO PSG, CLASS SKILLS, PHYSICS &amp; ELITES</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-progress">50% PROGRESS</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Tactile ARPG Combat</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="completed">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Lanthorn-PSG Audio Engine &amp; 6 Music Suites</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-completed">COMPLETED</span>
+            </div>
+            <p class="text-xs text-slate-400">Dual-oscillator synth, DSP modifiers, 3-layer SFX painter. 6 interactive tracker suites with loop-quantized explore/combat shifts and IDB caching.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/systems/audio/*</code> • <code>client/systems/MusicPlayer.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Monster Soft Separation &amp; Body-Blocking</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Circle-circle repulsion vectors prevent enemy swarms from collapsing into a single pixel. Player-to-monster body-blocking enables corridor choke points.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Class Active Skills (Beyond Spark)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Vanguard (Cleave, Shield Bash, Whirlwind), Arcanist (Frost Nova, Teleport, Arcane Beam), Shadow (Shadow Step, Fan of Knives, Poison Blade).</p>
+            <div class="text-[11px] font-mono text-slate-400">Target: <code>data/skills.json</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Spatial Hash Broadphase Grid (144×144 px)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Reduces aggro scans, projectile raycasts, and repulsion loops from O(N × M) brute force down to O(1) constant-time neighborhood lookups.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Elite Monster Affixes &amp; Champion Packs</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Prefixes ([Vampiric], [Molten], [Fast], [Stonehide], [Vortex]) with dynamic colored light auras (RED, INDIGO, ORANGE) and floating badges.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>server/systems/GameRoom.js</code> • <code>data/monsters.json</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Client-Side Movement Prediction &amp; Reconciliation</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Predict local player movement on click with input ring buffer; decay discrepancies under 4 px over 3 frames to eliminate latency across high pings.</p>
+            <div class="text-[11px] font-mono text-slate-400">Phase 3C Network Engine</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 4 & 5: PRODUCTION, POLISH & MODDING -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-amber-300 font-mono tracking-wider">PHASE 4 &amp; 5: PRODUCTION HOSTING, POLISH &amp; PWA</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">SCHEDULED</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Deployment &amp; Replayability</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">Single-Command Homelab Docker &amp; Stashes</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Dockerfile and compose stack (< 50 MB RAM) running alongside RomM/Jellyfin. Mode-partitioned shared stashes in SQLite.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>Dockerfile</code> • <code>docker-compose.yml</code></div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-slate-800 rounded-lg p-3.5 space-y-1.5" data-status="planned">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-100">PWA Manifest &amp; Offline Solo Play Mode</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-planned">PLANNED</span>
+            </div>
+            <p class="text-xs text-slate-400">Installable desktop/mobile window with service worker caching; seamless offline fallback running game simulation locally.</p>
+            <div class="text-[11px] font-mono text-slate-400"><code>client/manifest.json</code> • <code>client/sw.js</code></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: SUGGESTED ADDITIONS -->
+      <section class="space-y-3 phase-group">
+        <div class="flex items-center justify-between border-b border-purple-900/60 pb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-purple-300 font-mono tracking-wider">HIGH-VALUE SUGGESTED ADDITIONS</h2>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-suggested">5 PROPOSALS</span>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Ethos-Aligned Enhancements</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="card-item bg-slate-900/90 border border-purple-900/40 rounded-lg p-3.5 space-y-1.5" data-status="suggested">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-purple-200">1. Gamepad &amp; Mobile Touch ARPG Controls</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-suggested">SUGGESTION</span>
+            </div>
+            <p class="text-xs text-slate-400">HTML5 Gamepad twin-stick support (Left Stick = Move, Right Stick = Aim, Bumpers = Potions) plus low-profile virtual thumbstick for phone browsers and Steam Deck.</p>
+            <div class="text-[11px] font-mono text-purple-400">Why: Instant zero-install play across handhelds and tablets.</div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-purple-900/40 rounded-lg p-3.5 space-y-1.5" data-status="suggested">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-purple-200">2. Dedicated Headless Server CLI Flags</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-suggested">SUGGESTION</span>
+            </div>
+            <p class="text-xs text-slate-400">CLI arguments: <code>node server/server.js --port=8080 --db=/data/saves/sanctum.db --headless --benchmark</code> for clean headless systemd or container management.</p>
+            <div class="text-[11px] font-mono text-purple-400">Why: Standardizes homelab DevOps and automated smoke tests.</div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-purple-900/40 rounded-lg p-3.5 space-y-1.5" data-status="suggested">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-purple-200">3. Pluggable Community Mod Packs (/mods)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-suggested">SUGGESTION</span>
+            </div>
+            <p class="text-xs text-slate-400">Subfolder content pack injector (<code>/mods/<pack>/mod.json</code>) allowing creators to add classes, affixes, monsters, or songs without touching core vanilla JSON.</p>
+            <div class="text-[11px] font-mono text-purple-400">Why: True adherence to the "Moddable" motto without merge conflicts.</div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-purple-900/40 rounded-lg p-3.5 space-y-1.5" data-status="suggested">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-purple-200">4. Torment Dungeon Map Mutators (Endgame Affixes)</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-suggested">SUGGESTION</span>
+            </div>
+            <p class="text-xs text-slate-400">Procedural floor mutators on Torment NG+ tiers (e.g. Abyssal Darkness: -35% light radius, Volatile: exploding corpses, Frenzied: +30% mob speed/MF).</p>
+            <div class="text-[11px] font-mono text-purple-400">Why: High endgame replayability with zero asset footprint.</div>
+          </div>
+          <div class="card-item bg-slate-900/90 border border-purple-900/40 rounded-lg p-3.5 space-y-1.5" data-status="suggested">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-purple-200">5. Accessibility &amp; Sensory Control Panel</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-suggested">SUGGESTION</span>
+            </div>
+            <p class="text-xs text-slate-400">User toggles in options: screen shake intensity (0-100%), high-contrast silhouette mode, photosensitivity strobe damper, and colorblind palette ramps.</p>
+            <div class="text-[11px] font-mono text-purple-400">Why: Quality control and player comfort across all screen types.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script>
+    // Tab filtering logic
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.card-item');
+    const phaseGroups = document.querySelectorAll('.phase-group');
+    const searchInput = document.getElementById('roadmap-search');
+    let currentFilter = 'all';
+
+    function applyFilters() {
+      const q = searchInput.value.toLowerCase().trim();
+      cards.forEach(card => {
+        const status = card.dataset.status;
+        const matchesTab = (currentFilter === 'all') || (status === currentFilter);
+        const matchesQuery = !q || card.innerText.toLowerCase().includes(q);
+        if (matchesTab && matchesQuery) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      // Hide phase groups if no visible cards
+      phaseGroups.forEach(group => {
+        const visibleCards = group.querySelectorAll('.card-item:not(.hidden)');
+        if (visibleCards.length === 0) {
+          group.classList.add('hidden');
+        } else {
+          group.classList.remove('hidden');
+        }
+      });
+    }
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.className = 'filter-btn px-3 py-1.5 rounded bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700';
+        });
+        btn.className = 'filter-btn px-3 py-1.5 rounded bg-amber-600 text-slate-950 font-bold';
+        currentFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+
+    // Toggle between Cards view and Raw Markdown view
+    const toggleBtn = document.getElementById('btn-toggle-view');
+    const cardsView = document.getElementById('cards-view');
+    const rawView = document.getElementById('raw-markdown-view');
+    let showingRaw = false;
+
+    toggleBtn.addEventListener('click', async () => {
+      showingRaw = !showingRaw;
+      if (showingRaw) {
+        cardsView.classList.add('hidden');
+        rawView.classList.remove('hidden');
+        toggleBtn.innerText = '🗂️ View Visual Cards';
+        if (rawView.innerText.includes('Loading')) {
+          try {
+            const res = await fetch('/roadmap.md');
+            if (res.ok) {
+              rawView.innerText = await res.text();
+            } else {
+              rawView.innerText = 'Unable to fetch roadmap.md (' + res.status + ')';
+            }
+          } catch (e) {
+            rawView.innerText = 'Error loading roadmap.md: ' + e.message;
+          }
+        }
+      } else {
+        cardsView.classList.remove('hidden');
+        rawView.classList.add('hidden');
+        toggleBtn.innerText = '📄 View Raw Markdown';
+      }
+    });
+  </script>
+</body>
+</html>

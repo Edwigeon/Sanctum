@@ -1,715 +1,164 @@
 import { PALETTE } from '../../shared/Constants.js';
+import { SpriteDatabase } from './SpriteDatabase.js';
+import {
+  BIT_SPRITES,
+  HUD_BIT_SPRITES,
+  ATTRIBUTE_BIT_SPRITES,
+  GEAR_BIT_SPRITES,
+  SLOT_SILHOUETTE_SPRITES
+} from './hud/BitSpriteCatalog.js';
 
-export const BIT_SPRITES = {
-  // HUD Action Icons (10x10)
-  flask: [
-    '...55.....',
-    '...44.....',
-    '..6776....',
-    '.688886...',
-    '.687886...',
-    '.688886...',
-    '.688886...',
-    '..6886....',
-    '...66.....',
-    '..........'
-  ],
-  potion_hp: [
-    '...55.....',
-    '...44.....',
-    '..6776....',
-    '.688886...',
-    '.687886...',
-    '.688886...',
-    '.688886...',
-    '..6886....',
-    '...66.....',
-    '..........'
-  ],
-  potion_mp: [
-    '...55.....',
-    '...44.....',
-    '..6776....',
-    '.6cccc6...',
-    '.6c7cc6...',
-    '.6cccc6...',
-    '.6cccc6...',
-    '..6cc6....',
-    '...66.....',
-    '..........'
-  ],
-  coin: [
-    '...aaaa...',
-    '..a77aaa..',
-    '.a7aaaa9a.',
-    '.a7aa999a.',
-    '.a7aa999a.',
-    '.a7aaaa9a.',
-    '..a9999a..',
-    '...aaaa...',
-    '..........',
-    '..........'
-  ],
-  scroll: [
-    '..ffff....',
-    '.f4444f...',
-    '.f4774f...',
-    '.f4cc4f...',
-    '.f4774f...',
-    '.f4444f...',
-    '..ffff....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  sword: [
-    '........67',
-    '.......676',
-    '......676.',
-    '.....676..',
-    '....676...',
-    '..a.676...',
-    '.4aa6.....',
-    '.44a......',
-    '44........',
-    '..........'
-  ],
-  spark: [
-    '....cc7...',
-    '...c77c...',
-    '..c77c....',
-    '..777ccc..',
-    '...cccc...',
-    '....c77...',
-    '...c7c....',
-    '..c7c.....',
-    '.cc.......',
-    '..........'
-  ],
-  helmet: [
-    '...aa.....',
-    '..a66a....',
-    '.a6776a...',
-    '.676676...',
-    '.660066...',
-    '.607706...',
-    '.660066...',
-    '..6776....',
-    '...66.....',
-    '..........'
-  ],
-  satchel: [
-    '...4444...',
-    '..444444..',
-    '.44444444.',
-    '.444aa444.',
-    '.444aa444.',
-    '.44444444.',
-    '.45555554.',
-    '..444444..',
-    '..........',
-    '..........'
-  ],
-  portal: [
-    '...5665...',
-    '..567765..',
-    '.56111165.',
-    '.51c11c15.',
-    '.511cc115.',
-    '.51cccc15.',
-    '.511cc115.',
-    '.56111165.',
-    '.56655665.',
-    '..........'
-  ],
-
-  // Attribute Icons (8x8)
-  might: [
-    '..8888..',
-    '.88e788.',
-    '.888888.',
-    '.888888.',
-    '..8448..',
-    '..4444..',
-    '..4..4..',
-    '........'
-  ],
-  focus: [
-    '...cc...',
-    '.c1771c.',
-    'c17cc71c',
-    'c7c00c7c',
-    'c7c00c7c',
-    'c17cc71c',
-    '.c1771c.',
-    '...cc...'
-  ],
-  agility: [
-    '....bb..',
-    '..bb7b..',
-    '.b7bb...',
-    'bb7b.bb.',
-    'b7b.bb..',
-    'bbb7b...',
-    '.bb7bb..',
-    '..bbbb..'
-  ],
-  vitality: [
-    '.88..88.',
-    '87888788',
-    '88888888',
-    '88888888',
-    '.888888.',
-    '..8888..',
-    '...88...',
-    '....8...'
-  ],
-
-  // Weapons (10x10)
-  cleaver: [
-    '....66666.',
-    '...6667766',
-    '..66666666',
-    '..6666666.',
-    '..6666....',
-    '...44.....',
-    '....44....',
-    '.....44...',
-    '......4...',
-    '..........'
-  ],
-  wand: [
-    '......cc7.',
-    '.....c77c.',
-    '....c1cc..',
-    '....44....',
-    '...44.....',
-    '..44......',
-    '.44.......',
-    '44........',
-    '..........',
-    '..........'
-  ],
-  dirk: [
-    '.......67.',
-    '......676.',
-    '.....676..',
-    '....676...',
-    '...676....',
-    '..a.a.....',
-    '.a44a.....',
-    '..44......',
-    '...4......',
-    '..........'
-  ],
-  longsword: [
-    '........76',
-    '.......76.',
-    '......76..',
-    '.....76...',
-    '....76....',
-    '..a.a.....',
-    '.aaaaa....',
-    '...44.....',
-    '....44....',
-    '.....a....'
-  ],
-
-  // Armor (10x10)
-  brigandine: [
-    '.4......4.',
-    '.44a..a44.',
-    '.44444444.',
-    '.4a4444a4.',
-    '.444aa444.',
-    '.444aa444.',
-    '.4a4444a4.',
-    '.44444444.',
-    '..444444..',
-    '..........'
-  ],
-  shroud: [
-    '...222...',
-    '..22222..',
-    '.22d7d22.',
-    '.2222222.',
-    '.2d222d2.',
-    '222222222',
-    '22d222d22',
-    '222222222',
-    '.22...22.',
-    '..........'
-  ],
-  cuirass: [
-    '.6......6.',
-    '.66....66.',
-    '.66666666.',
-    '.66777766.',
-    '.66677666.',
-    '.66666666.',
-    '.66666666.',
-    '.66666666.',
-    '..666666..',
-    '..........'
-  ],
-  vestments: [
-    '...dd....',
-    '..d11d...',
-    '.dd77dd..',
-    '.d1aa1d..',
-    '.d1111d..',
-    'dd1aa1dd.',
-    'dd1111dd.',
-    'dd1aa1dd.',
-    'ddd11ddd.',
-    '.........'
-  ],
-
-  // Gloves (10x10)
-  spikegloves: [
-    '7.7.7.....',
-    '.6666.....',
-    '.66666....',
-    '.66666....',
-    '..4444....',
-    '..4444....',
-    '...44.....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  gauntlets: [
-    '...666....',
-    '..66766...',
-    '..66766...',
-    '..66666...',
-    '..66666...',
-    '..66666...',
-    '...666....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  bracers: [
-    '...444....',
-    '..44a44...',
-    '..44444...',
-    '..44a44...',
-    '..44444...',
-    '...444....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  grips: [
-    '.4.4.4.4..',
-    '.4444444..',
-    '.4444444..',
-    '..44444...',
-    '..44444...',
-    '...444....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-
-  // Helms (10x10)
-  bascinet: [
-    '...555....',
-    '..56665...',
-    '.5667665..',
-    '.5666665..',
-    '.5555555..',
-    '..50005...',
-    '..55555...',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  sallet: [
-    '..55555...',
-    '.5666665..',
-    '.5677665..',
-    '.55555555.',
-    '..500005..',
-    '...5555...',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  crown: [
-    '.a.a.a.a..',
-    '.aaaaaaa..',
-    '.a7a7a7a..',
-    '.aaaaaaa..',
-    '..aaaaa...',
-    '..........',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  coif: [
-    '...444....',
-    '..45554...',
-    '.4556554..',
-    '.45...54..',
-    '.455.554..',
-    '..45554...',
-    '..44444...',
-    '..........',
-    '..........',
-    '..........'
-  ],
-
-  // Amulets (10x10)
-  choker: [
-    '.44...44..',
-    '..44.44...',
-    '...444....',
-    '....8.....',
-    '...888....',
-    '....8.....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  talisman: [
-    '.cc...cc..',
-    '..cc.cc...',
-    '...ccc....',
-    '...cdc....',
-    '..cdddc...',
-    '...cdc....',
-    '....c.....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  medallion: [
-    '.aa...aa..',
-    '..aa.aa...',
-    '...aaa....',
-    '..aaaaa...',
-    '..aa7aa...',
-    '..aaaaa...',
-    '...aaa....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  periapt: [
-    '.66...66..',
-    '..66.66...',
-    '...666....',
-    '..6116....',
-    '.617716...',
-    '..6116....',
-    '...66.....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-
-  // Offhands / Shields (10x10)
-  buckler: [
-    '...555....',
-    '..56665...',
-    '.566a665..',
-    '.56aaa65..',
-    '.566a665..',
-    '..56665...',
-    '...555....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  kiteshield: [
-    '.55555555.',
-    '.56666665.',
-    '.56688665.',
-    '..568865..',
-    '..568865..',
-    '...5665...',
-    '...5665...',
-    '....55....',
-    '..........',
-    '..........'
-  ],
-  tome: [
-    '..444444..',
-    '.47777774.',
-    '.47c11c74.',
-    '.471cc174.',
-    '.47c11c74.',
-    '.47777774.',
-    '..444444..',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  orb: [
-    '...ccc....',
-    '..cd17c...',
-    '.cd1117c..',
-    '.cd1117c..',
-    '..cd17c...',
-    '...ccc....',
-    '....5.....',
-    '...555....',
-    '..........',
-    '..........'
-  ],
-
-  // Boots (10x10)
-  greaves: [
-    '.565..565.',
-    '.565..565.',
-    '.565..565.',
-    '.5665.5665',
-    '.566655666',
-    '.555555555',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  treads: [
-    '.454..454.',
-    '.454..454.',
-    '.454..454.',
-    '.4554.4554',
-    '.455544555',
-    '.444444444',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  sabatons: [
-    '.555..555.',
-    '.575..575.',
-    '.565..565.',
-    '.5665.5665',
-    '.577655776',
-    '.555555555',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  boots: [
-    '.444..444.',
-    '.444..444.',
-    '.444..444.',
-    '.4444.4444',
-    '.444444444',
-    '..444..444',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-
-  // Rings (10x10)
-  signet: [
-    '...88.....',
-    '..8aa8....',
-    '.a8aa8a...',
-    '.a....a...',
-    '.a....a...',
-    '..a..a....',
-    '...aa.....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  band: [
-    '...666....',
-    '..67776...',
-    '.67...76..',
-    '.6.....6..',
-    '.67...76..',
-    '..67776...',
-    '...666....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  loop: [
-    '...ccc....',
-    '..c771c...',
-    '.c1...1c..',
-    '.c.....c..',
-    '.c1...1c..',
-    '..c117c...',
-    '...ccc....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  seal: [
-    '...55.....',
-    '..5005....',
-    '.507705...',
-    '.500005...',
-    '.5....5...',
-    '..5..5....',
-    '...55.....',
-    '..........',
-    '..........',
-    '..........'
-  ],
-
-  // Slot Placeholders (Empty socket silhouettes)
-  slot_helm: [
-    '...5555...',
-    '..555555..',
-    '.555..555.',
-    '.55....55.',
-    '.555..555.',
-    '.55555555.',
-    '..55..55..',
-    '...5..5...',
-    '..........',
-    '..........'
-  ],
-  slot_amulet: [
-    '..55..55..',
-    '.55....55.',
-    '..55..55..',
-    '...5555...',
-    '....55....',
-    '...5555...',
-    '..555555..',
-    '...5555...',
-    '....55....',
-    '..........'
-  ],
-  slot_weapon: [
-    '.....5....',
-    '....555...',
-    '...55.55..',
-    '..55...55.',
-    '.55.....55',
-    '..55...55.',
-    '...55.55..',
-    '....555...',
-    '.....5....',
-    '..........'
-  ],
-  slot_armor: [
-    '.5......5.',
-    '.55....55.',
-    '.55555555.',
-    '.55555555.',
-    '.55555555.',
-    '.55555555.',
-    '.55555555.',
-    '..555555..',
-    '..........',
-    '..........'
-  ],
-  slot_offhand: [
-    '.55555555.',
-    '.55555555.',
-    '.55555555.',
-    '..555555..',
-    '..555555..',
-    '...5555...',
-    '...5555...',
-    '....55....',
-    '..........',
-    '..........'
-  ],
-  slot_gloves: [
-    '...555....',
-    '..55555...',
-    '..55555...',
-    '..55555...',
-    '..55555...',
-    '...555....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  slot_boots: [
-    '.55....55.',
-    '.55....55.',
-    '.55....55.',
-    '.555..555.',
-    '.5555.5555',
-    '.5555.5555',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  slot_ring: [
-    '...555....',
-    '..55.55...',
-    '.55...55..',
-    '.55...55..',
-    '..55.55...',
-    '...555....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  slot_ring1: [
-    '...555....',
-    '..55.55...',
-    '.55...55..',
-    '.55...55..',
-    '..55.55...',
-    '...555....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ],
-  slot_ring2: [
-    '...555....',
-    '..55.55...',
-    '.55...55..',
-    '.55...55..',
-    '..55.55...',
-    '...555....',
-    '..........',
-    '..........',
-    '..........',
-    '..........'
-  ]
+export {
+  BIT_SPRITES,
+  HUD_BIT_SPRITES,
+  ATTRIBUTE_BIT_SPRITES,
+  GEAR_BIT_SPRITES,
+  SLOT_SILHOUETTE_SPRITES
 };
 
+export const spriteDb = new SpriteDatabase();
+const DECODED_SPRITE_CACHE = new Map();
 const DATA_URL_CACHE = new Map();
+let dbInitPromise = null;
+
+function computeCatalogSignature() {
+  let hash = 0x811c9dc5;
+  const keys = Object.keys(BIT_SPRITES);
+  for (let k = 0; k < keys.length; k++) {
+    const key = keys[k];
+    for (let i = 0; i < key.length; i++) {
+      hash ^= key.charCodeAt(i);
+      hash = Math.imul(hash, 0x01000193);
+    }
+    const rows = BIT_SPRITES[key];
+    if (Array.isArray(rows)) {
+      for (let r = 0; r < rows.length; r++) {
+        const row = rows[r];
+        for (let c = 0; c < row.length; c++) {
+          hash ^= row.charCodeAt(c);
+          hash = Math.imul(hash, 0x01000193);
+        }
+      }
+    }
+  }
+  return `${keys.length}:${(hash >>> 0).toString(16)}`;
+}
+
+function decodeBitRows(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return null;
+  const h = rows.length;
+  const w = typeof rows[0] === 'string' ? rows[0].length : 0;
+  if (w === 0) return null;
+
+  const pixels = new Uint8Array(w * h);
+  pixels.fill(255);
+
+  for (let r = 0; r < h; r++) {
+    const row = rows[r];
+    if (typeof row !== 'string') continue;
+    const rowOff = r * w;
+    for (let c = 0; c < w && c < row.length; c++) {
+      const ch = row[c];
+      if (ch === '.' || ch === ' ') continue;
+      const colIdx = parseInt(ch, 16);
+      if (!Number.isNaN(colIdx) && colIdx >= 0 && colIdx < 16) {
+        pixels[rowOff + c] = colIdx;
+      }
+    }
+  }
+
+  return { w, h, pixels };
+}
+
+function getDecodedBitSprite(spriteKey) {
+  let frame = DECODED_SPRITE_CACHE.get(spriteKey);
+  if (frame) return frame;
+
+  const rows = BIT_SPRITES[spriteKey];
+  if (!rows) return null;
+
+  frame = decodeBitRows(rows);
+  if (frame) {
+    DECODED_SPRITE_CACHE.set(spriteKey, frame);
+    spriteDb.saveBitSprite(spriteKey, frame).catch(() => {});
+  }
+  return frame;
+}
+
+/**
+ * Hydrates in-memory bit-sprite and Data URL caches from IndexedDB,
+ * or pre-packs and persists the catalog if the signature is missing/stale.
+ */
+export async function initBitSpriteDatabase() {
+  if (dbInitPromise) return dbInitPromise;
+  dbInitPromise = (async () => {
+    const db = await spriteDb.init();
+    if (!db) return false;
+
+    const sig = computeCatalogSignature();
+    const storedSig = await spriteDb.getMeta('catalog_sig');
+
+    if (storedSig === sig) {
+      const [cachedFrames, cachedUrls] = await Promise.all([
+        spriteDb.getAllBitSprites(),
+        spriteDb.getAllDataUrls()
+      ]);
+      if (cachedFrames) {
+        for (const [key, frame] of cachedFrames) {
+          if (!DECODED_SPRITE_CACHE.has(key)) {
+            DECODED_SPRITE_CACHE.set(key, frame);
+          }
+        }
+      }
+      if (cachedUrls) {
+        for (const [key, url] of cachedUrls) {
+          if (!DATA_URL_CACHE.has(key)) {
+            DATA_URL_CACHE.set(key, url);
+          }
+        }
+      }
+      return true;
+    }
+
+    await spriteDb.clearBitSprites();
+    const batch = [];
+    for (const [key, rows] of Object.entries(BIT_SPRITES)) {
+      let frame = DECODED_SPRITE_CACHE.get(key);
+      if (!frame) {
+        frame = decodeBitRows(rows);
+        if (frame) DECODED_SPRITE_CACHE.set(key, frame);
+      }
+      if (frame) batch.push([key, frame]);
+    }
+    await spriteDb.saveBitSpriteBatch(batch);
+    await spriteDb.setMeta('catalog_sig', sig);
+    return true;
+  })().catch(() => false);
+
+  return dbInitPromise;
+}
+
+if (typeof indexedDB !== 'undefined') {
+  initBitSpriteDatabase();
+}
 
 /**
  * Renders a bit-array sprite directly onto a canvas context with integer pixel scaling.
  */
 export function drawBitSprite(ctx, spriteKey, x, y, pixelScale = 2, palette = PALETTE) {
-  const rows = BIT_SPRITES[spriteKey];
-  if (!rows) return;
+  const frame = getDecodedBitSprite(spriteKey);
+  if (!frame) return;
 
-  const h = rows.length;
-  const w = rows[0].length;
+  const { w, h, pixels } = frame;
   const startX = Math.round(x);
   const startY = Math.round(y);
   const pSize = Math.max(1, Math.round(pixelScale));
 
   for (let r = 0; r < h; r++) {
-    const row = rows[r];
+    const rowOff = r * w;
     for (let c = 0; c < w; c++) {
-      const ch = row[c];
-      if (ch === '.' || ch === ' ') continue;
-      const colIdx = parseInt(ch, 16);
-      if (!Number.isNaN(colIdx) && palette[colIdx]) {
+      const colIdx = pixels[rowOff + c];
+      if (colIdx !== 255 && palette[colIdx]) {
         ctx.fillStyle = palette[colIdx];
         ctx.fillRect(startX + c * pSize, startY + r * pSize, pSize, pSize);
       }
@@ -718,7 +167,7 @@ export function drawBitSprite(ctx, spriteKey, x, y, pixelScale = 2, palette = PA
 }
 
 /**
- * Returns a base64 Data URL for a bit-array sprite, memoized for instant DOM rendering.
+ * Returns a base64 Data URL for a bit-array sprite, memoized in memory and persisted in IndexedDB.
  */
 export function getBitSpriteDataUrl(spriteKey, pixelScale = 2) {
   const cacheKey = `${spriteKey}_${pixelScale}`;
@@ -726,11 +175,10 @@ export function getBitSpriteDataUrl(spriteKey, pixelScale = 2) {
     return DATA_URL_CACHE.get(cacheKey);
   }
 
-  const rows = BIT_SPRITES[spriteKey];
-  if (!rows) return '';
+  const frame = getDecodedBitSprite(spriteKey);
+  if (!frame) return '';
 
-  const h = rows.length;
-  const w = rows[0].length;
+  const { w, h, pixels } = frame;
   const pSize = Math.max(1, Math.round(pixelScale));
 
   const canvas = document.createElement('canvas');
@@ -740,12 +188,10 @@ export function getBitSpriteDataUrl(spriteKey, pixelScale = 2) {
   ctx.imageSmoothingEnabled = false;
 
   for (let r = 0; r < h; r++) {
-    const row = rows[r];
+    const rowOff = r * w;
     for (let c = 0; c < w; c++) {
-      const ch = row[c];
-      if (ch === '.' || ch === ' ') continue;
-      const colIdx = parseInt(ch, 16);
-      if (!Number.isNaN(colIdx) && PALETTE[colIdx]) {
+      const colIdx = pixels[rowOff + c];
+      if (colIdx !== 255 && PALETTE[colIdx]) {
         ctx.fillStyle = PALETTE[colIdx];
         ctx.fillRect(c * pSize, r * pSize, pSize, pSize);
       }
@@ -754,6 +200,7 @@ export function getBitSpriteDataUrl(spriteKey, pixelScale = 2) {
 
   const url = canvas.toDataURL();
   DATA_URL_CACHE.set(cacheKey, url);
+  spriteDb.saveDataUrl(cacheKey, url).catch(() => {});
   return url;
 }
 

@@ -272,7 +272,7 @@ export class PotionRenderer {
     oCtx.clearRect(0, 0, PW, PH);
 
     const ratio = Math.max(0, Math.min(1, state.mp / (state.maxMp || 50)));
-    const fillH = Math.round(36 * ratio);
+    const fillH = Math.round(32 * ratio);
     const liquidTop = 46 - fillH;
 
     const bcx = 17.5;
@@ -428,7 +428,7 @@ export class PotionRenderer {
         const isFacetRidge = (Math.abs(dx) >= 5.5 && Math.abs(dx) <= 6.5);
 
         // Liquid Interior
-        const wave = Math.round(Math.cos((px + animTime * 12) * 0.5) * 0.85);
+        const wave = Math.round(Math.sin((px + animTime * 14) * 0.45) * 0.85);
         const surfY = liquidTop + wave;
 
         if (py >= surfY) {
@@ -436,19 +436,19 @@ export class PotionRenderer {
             oCtx.fillStyle = (px % 2 === 0) ? '#67e8f9' : '#fff1e8';
           } else {
             const bayer = (px % 2) ^ (py % 2);
-            const depth = (py - surfY) / Math.max(1, 48 - surfY);
+            const depth = (py - surfY) / Math.max(1, 46 - surfY);
             let col = depth < 0.4 ? '#29adff' : (bayer ? '#29adff' : '#1d2b53');
-
-            const m1 = Math.round((animTime * 16) % 24);
-            if (px === 14 && py === 45 - m1) col = '#fff1e8';
-            const m2 = Math.round((animTime * 14 + 8) % 22);
-            if (px === 21 && py === 44 - m2) col = '#67e8f9';
-            const m3 = Math.round((animTime * 20 + 4) % 26);
-            if (px === 17 && py === 46 - m3) col = '#00e436';
 
             if (isFacetRidge && py > surfY + 2) {
               col = dx < 0 ? '#67e8f9' : '#10172a';
             }
+
+            const b1 = Math.round((animTime * 18) % 24);
+            if (px === 13 && py === 44 - b1) col = '#fff1e8';
+            const b2 = Math.round((animTime * 14 + 10) % 22);
+            if (px === 22 && py === 43 - b2) col = '#67e8f9';
+            const b3 = Math.round((animTime * 20 + 5) % 25);
+            if (px === 17 && py === 44 - b3) col = '#a5f3fc';
 
             oCtx.fillStyle = col;
           }

@@ -83,12 +83,12 @@ export const ACTION_SLOTS = [
 export const TOOLTIP_DEFINITIONS = {
   hp: (state) => ({
     title: 'Life Elixir Flask',
-    desc: `${state.hp} / ${state.maxHp} Health [Click to Drink (1)]`,
+    desc: `${state.hp} / ${state.maxHp} Health • Stock: ${state.potions ?? 0} [Click / (1) to Drink]`,
     color: '#f43f5e'
   }),
   mp: (state) => ({
     title: 'Mana Crystal Phial',
-    desc: `${state.mp} / ${state.maxMp} Mana`,
+    desc: `${state.mp} / ${state.maxMp} Mana • Stock: ${state.manaPotions ?? 0} [Click / (2) to Drink]`,
     color: '#06b6d4'
   }),
   xp: (state) => {

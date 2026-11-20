@@ -102,7 +102,9 @@ export class InputController {
       if (hudHit && e.button === 0) {
         this.renderer.canvasHud?.setMouseDown(true);
         if (hudHit.id === 'potion' || hudHit.id === 'hp') {
-          this.sendPacket({ type: PACKET_TYPES.INPUT_POTION });
+          this.sendPacket({ type: PACKET_TYPES.INPUT_POTION, subType: 'hp' });
+        } else if (hudHit.id === 'mp') {
+          this.sendPacket({ type: PACKET_TYPES.INPUT_POTION, subType: 'mp' });
         } else if (hudHit.id === 'char') {
           this.hud.toggleChar();
         } else if (hudHit.id === 'inv') {
@@ -171,7 +173,9 @@ export class InputController {
       if (!myPlayerId) return;
       const k = e.key.toLowerCase();
       if (k === '1') {
-        this.sendPacket({ type: PACKET_TYPES.INPUT_POTION });
+        this.sendPacket({ type: PACKET_TYPES.INPUT_POTION, subType: 'hp' });
+      } else if (k === '2') {
+        this.sendPacket({ type: PACKET_TYPES.INPUT_POTION, subType: 'mp' });
       } else if (k === 't') {
         const on = this.renderer.lighting.togglePlayerTorch();
         this.audio?.play('torch_toggle', { pitchJitter: 0.08 });

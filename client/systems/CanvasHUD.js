@@ -11,6 +11,7 @@ export class CanvasHUD {
       mp: 50,
       maxMp: 50,
       potions: 3,
+      manaPotions: 0,
       xp: 0,
       nextXp: 100,
       level: 1,

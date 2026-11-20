@@ -198,7 +198,9 @@ function processEvents(events) {
         audio.play(ev.isCrit ? 'crit' : 'hit', { x: ev.x, y: ev.y, pitchJitter: 0.06 });
       }
     } else if (ev.type === 'HEAL') {
-      renderer.addFloatingText(`+${ev.amount} HP`, ev.x, ev.y, '#34D399');
+      const text = ev.isMana ? `+${ev.amount} MP` : `+${ev.amount} HP`;
+      const col = ev.isMana ? '#38BDF8' : '#34D399';
+      renderer.addFloatingText(text, ev.x, ev.y, col);
       audio.play('potion', { x: ev.x, y: ev.y, pitchJitter: 0.03 });
     } else if (ev.type === 'LEVEL_UP') {
       renderer.addFloatingText(`LEVEL ${ev.level}!`, ev.x, ev.y - 6, '#FACC15', true);
