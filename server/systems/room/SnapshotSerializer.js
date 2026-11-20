@@ -26,6 +26,24 @@ export function buildRoomSummary(room) {
   };
 }
 
+/**
+ * Minimal invite resolution preview: never returns inviteToken, inviteCode, internal roomId,
+ * or private player roster details to unauthenticated/external callers.
+ */
+export function buildInvitePreview(room) {
+  const biome = room.floor <= 1 ? 'Crypts' : (room.floor <= 2 ? 'Caverns' : (room.floor <= 4 ? 'Cathedral' : 'Sanctum'));
+  return {
+    name: room.isPublic ? room.displayName : 'Private Realm',
+    mode: room.mode,
+    floor: room.floor,
+    biome,
+    players: room.players.size,
+    maxPlayers: room.maxPlayers,
+    isFull: room.players.size >= room.maxPlayers,
+    hasPassword: !!room.password
+  };
+}
+
 export function broadcastRoomSnapshot(room) {
   if (room.players.size === 0) return;
 

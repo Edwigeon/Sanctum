@@ -274,6 +274,8 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
     } else if (packet.type === PACKET_TYPES.PLAYER_STATE_SYNC) {
       myPrivateState = packet.data;
       syncHUD();
+    } else if (packet.type === PACKET_TYPES.INVITE_UPDATE) {
+      hud.setInvite(packet.data?.inviteCode || '', packet.data?.inviteToken || '');
     }
   };
 

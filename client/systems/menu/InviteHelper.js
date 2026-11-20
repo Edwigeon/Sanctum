@@ -129,6 +129,6 @@ export function bindInviteEvents(menu) {
     }
     document.getElementById('panel-pause').classList.add('hidden');
     document.getElementById('inp-pause-invite').value = '';
-    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', invite.inviteCode, invite.inviteToken);
+    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
   });
 }

@@ -22,8 +22,14 @@
     <section id="mod-login-box" class="hidden max-w-sm mx-auto bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-3 mt-10">
       <h2 class="font-bold text-sm text-amber-300 tracking-wider">MODERATOR SIGN IN</h2>
       <p class="text-[11px] font-mono text-slate-400">Requires an account with moderator role.</p>
-      <input id="mod-login-user" type="text" placeholder="Username (default: admin)" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
-      <input id="mod-login-pass" type="password" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+      <input id="mod-login-user" type="text" placeholder="Moderator username" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+      <input id="mod-login-pass" type="password" maxlength="256" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+      <div id="mod-change-pass-box" class="hidden space-y-2 border-t border-slate-800 pt-2">
+        <p class="text-[11px] font-mono text-amber-300">Initial moderator password change required (min 16 chars):</p>
+        <input id="mod-new-pass" type="password" maxlength="256" placeholder="New strong password (min 16 chars)" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+        <input id="mod-new-pass-confirm" type="password" maxlength="256" placeholder="Confirm new password" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono">
+        <button id="btn-mod-change-pass" type="button" class="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2 rounded text-xs">Update Password &amp; Continue</button>
+      </div>
       <div id="mod-login-err" class="hidden text-[11px] font-mono text-rose-400"></div>
       <button id="btn-mod-login" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 rounded text-xs">Sign In</button>
     </section>

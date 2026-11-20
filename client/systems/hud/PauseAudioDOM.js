@@ -126,6 +126,12 @@ export function bindPauseAndAudioEvents(hud) {
 
   document.getElementById('btn-copy-invite')?.addEventListener('click', copyInvite);
   document.getElementById('btn-pause-copy-invite')?.addEventListener('click', copyInvite);
+  document.getElementById('btn-pause-regen-invite')?.addEventListener('click', () => {
+    hud.sendPacket?.({ type: 'INVITE_REGENERATE' });
+  });
+  document.getElementById('btn-pause-revoke-invite')?.addEventListener('click', () => {
+    hud.sendPacket?.({ type: 'INVITE_REVOKE' });
+  });
 
   const toggleMute = () => {
     if (hud.audio) hud.audio.toggleMute();

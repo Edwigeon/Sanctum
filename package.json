@@ -8,7 +8,9 @@
     "start": "node server/server.js",
     "cluster": "node server/cluster.js",
     "pack:music": "node scripts/pack_soundtrack.js",
-    "test": "node scripts/verify_technical_plan.js"
+    "backup": "node scripts/db_backup.js backup",
+    "test": "node scripts/verify_technical_plan.js && node scripts/verify_security_hardening.js",
+    "test:security": "node scripts/verify_security_hardening.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",

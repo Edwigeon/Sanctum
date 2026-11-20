@@ -15,8 +15,13 @@ async function api(url, opts = {}) {
   return data;
 }
 
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
 async function init() {
   const loginBox = document.getElementById('mod-login-box');
+  const changeBox = document.getElementById('mod-change-pass-box');
   const dash = document.getElementById('mod-dashboard');
   const badge = document.getElementById('mod-user-badge');
 
@@ -34,6 +39,14 @@ async function init() {
       dash.classList.add('hidden');
       return;
     }
+    if (account.mustChangePassword) {
+      badge.textContent = `${account.username} (Password Change Required)`;
+      loginBox.classList.remove('hidden');
+      changeBox?.classList.remove('hidden');
+      dash.classList.add('hidden');
+      return;
+    }
+    changeBox?.classList.add('hidden');
     badge.textContent = `Signed in: ${account.username}`;
     loginBox.classList.add('hidden');
     dash.classList.remove('hidden');
@@ -43,6 +56,29 @@ async function init() {
     dash.classList.add('hidden');
   }
 }
+
+document.getElementById('btn-mod-change-pass')?.addEventListener('click', async () => {
+  const errEl = document.getElementById('mod-login-err');
+  errEl.classList.add('hidden');
+  const currentPassword = document.getElementById('mod-login-pass').value;
+  const newPassword = document.getElementById('mod-new-pass').value;
+  const confirmPassword = document.getElementById('mod-new-pass-confirm').value;
+  try {
+    const data = await api('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+    });
+    token = data.token;
+    localStorage.setItem('sanctum_token', token);
+    document.getElementById('mod-login-pass').value = '';
+    document.getElementById('mod-new-pass').value = '';
+    document.getElementById('mod-new-pass-confirm').value = '';
+    await init();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  }
+});
 
 document.getElementById('btn-mod-login').addEventListener('click', async () => {
   const errEl = document.getElementById('mod-login-err');
@@ -114,10 +150,10 @@ async function searchCharacters() {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-800/40';
     tr.innerHTML = `
-      <td class="p-2.5 font-bold text-slate-100">${c.name}</td>
-      <td class="p-2.5 text-slate-300">${c.ownerUsername}</td>
-      <td class="p-2.5">${c.classId} <span class="text-[10px] px-1 rounded ${c.mode === 'HARDCORE' ? 'bg-rose-950 text-rose-300' : 'bg-indigo-950 text-indigo-300'}">${c.mode}</span></td>
-      <td class="p-2.5">Lv ${c.level} • Fl ${c.highestFloor}</td>
+      <td class="p-2.5 font-bold text-slate-100">${escapeHtml(c.name)}</td>
+      <td class="p-2.5 text-slate-300">${escapeHtml(c.ownerUsername)}</td>
+      <td class="p-2.5">${escapeHtml(c.classId)} <span class="text-[10px] px-1 rounded ${c.mode === 'HARDCORE' ? 'bg-rose-950 text-rose-300' : 'bg-indigo-950 text-indigo-300'}">${escapeHtml(c.mode)}</span></td>
+      <td class="p-2.5">Lv ${Number(c.level) || 1} • Fl ${Number(c.highestFloor) || 1}</td>
       <td class="p-2.5">${c.isDead ? '<span class="text-rose-400">FALLEN</span>' : '<span class="text-emerald-400">ALIVE</span>'}</td>
       <td class="p-2.5 text-right space-x-1.5">
         <button class="btn-edit px-2 py-1 rounded bg-indigo-700 hover:bg-indigo-600 text-white text-[10px]">Edit</button>
@@ -210,9 +246,9 @@ async function searchAccounts() {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-800/40';
     tr.innerHTML = `
-      <td class="p-2.5 font-bold text-slate-100">${a.username}</td>
+      <td class="p-2.5 font-bold text-slate-100">${escapeHtml(a.username)}</td>
       <td class="p-2.5">${a.role === 'moderator' ? '<span class="text-amber-300">moderator</span>' : 'player'}</td>
-      <td class="p-2.5">${a.char_count}</td>
+      <td class="p-2.5">${Number(a.char_count) || 0}</td>
       <td class="p-2.5">${a.role === 'moderator' ? 'Exempt' : `${daysLeft}d`}</td>
       <td class="p-2.5">${a.is_banned ? '<span class="text-rose-400">BANNED</span>' : '<span class="text-emerald-400">ACTIVE</span>'}</td>
       <td class="p-2.5 text-right space-x-1">

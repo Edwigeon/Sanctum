@@ -104,8 +104,8 @@ export async function submitAuth(menu, endpoint) {
       confirmEl?.focus();
       return;
     }
-    if (password.length < 8) {
-      errEl.textContent = 'Password must be at least 8 characters.';
+    if (password.length < 12) {
+      errEl.textContent = 'Password must be at least 12 characters.';
       errEl.classList.remove('hidden');
       return;
     }
@@ -140,6 +140,11 @@ export async function submitAuth(menu, endpoint) {
     localStorage.setItem('sanctum_token', menu.authToken);
     menu.updateAuthUI();
     menu.updateInviteBanner();
+    if (data.account?.mustChangePassword) {
+      document.getElementById('auth-change-pass-wrap')?.classList.remove('hidden');
+      return;
+    }
+    document.getElementById('auth-change-pass-wrap')?.classList.add('hidden');
     menu.screenAuth.classList.add('hidden');
     menu.screenChar.classList.remove('hidden');
     menu.loadCharacterRoster();
@@ -152,6 +157,47 @@ export async function submitAuth(menu, endpoint) {
 export function bindAuthEvents(menu) {
   document.getElementById('btn-auth-login').addEventListener('click', () => menu.submitAuth('/api/auth/login'));
   document.getElementById('btn-auth-register').addEventListener('click', () => menu.submitAuth('/api/auth/register'));
+  document.getElementById('btn-auth-change-pass')?.addEventListener('click', async () => {
+    const errEl = document.getElementById('auth-error');
+    errEl.classList.add('hidden');
+    const currentPassword = document.getElementById('auth-password').value;
+    const newPassword = document.getElementById('auth-new-password')?.value || '';
+    const confirmPassword = document.getElementById('auth-new-password-confirm')?.value || '';
+    if (newPassword.length < 12) {
+      errEl.textContent = 'New password must be at least 12 characters.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      errEl.textContent = 'New passwords do not match.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...menu.authHeaders() },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        errEl.textContent = data.error || 'Password update failed';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      menu.authToken = data.token;
+      menu.currentAccount = data.account;
+      localStorage.setItem('sanctum_token', menu.authToken);
+      document.getElementById('auth-change-pass-wrap')?.classList.add('hidden');
+      menu.updateAuthUI();
+      menu.screenAuth.classList.add('hidden');
+      menu.screenChar.classList.remove('hidden');
+      menu.loadCharacterRoster();
+    } catch {
+      errEl.textContent = 'Network error';
+      errEl.classList.remove('hidden');
+    }
+  });
   document.getElementById('btn-auth-back').addEventListener('click', () => {
     menu.screenAuth.classList.add('hidden');
     menu.screenMain.classList.remove('hidden');

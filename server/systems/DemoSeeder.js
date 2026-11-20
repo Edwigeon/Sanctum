@@ -3,18 +3,18 @@ import { db } from './Database.js';
 import { authService } from './AuthService.js';
 import { saveManager } from './SaveManager.js';
 
-export function seedDemoDatabase() {
+export async function seedDemoDatabase() {
   const existing = db.prepare("SELECT id FROM accounts WHERE username = 'kael_test'").get();
   if (existing) return;
 
-  const a1 = authService.register('kael_test', 'demo1234');
-  const a2 = authService.register('lyra_test', 'demo1234');
-  const a3 = authService.register('vex_test', 'demo1234');
+  const a1 = await authService.register('kael_test', 'DemoHeroPass#2026');
+  const a2 = await authService.register('lyra_test', 'DemoHeroPass#2026');
+  const a3 = await authService.register('vex_test', 'DemoHeroPass#2026');
 
   if (a1.account) {
-    const c1 = saveManager.createCharacter({ accountId: a1.account.id, name: 'Kaelen', classId: 'VANGUARD', mode: GAME_MODES.CLASSIC });
+    const { character: c1 } = saveManager.createCharacter({ accountId: a1.account.id, name: 'Kaelen', classId: 'VANGUARD', mode: GAME_MODES.CLASSIC });
     db.prepare('UPDATE characters SET level = 7, highest_floor = 4 WHERE id = ?').run(c1.id);
-    const c2 = saveManager.createCharacter({ accountId: a1.account.id, name: 'IronVow', classId: 'VANGUARD', mode: GAME_MODES.HARDCORE });
+    const { character: c2 } = saveManager.createCharacter({ accountId: a1.account.id, name: 'IronVow', classId: 'VANGUARD', mode: GAME_MODES.HARDCORE });
     db.prepare('UPDATE characters SET level = 11, highest_floor = 6, is_dead = 1 WHERE id = ?').run(c2.id);
     db.prepare(`
       INSERT INTO fallen_heroes (id, account_id, account_name, hero_name, class_id, level, floor, data_json, died_at)
@@ -23,12 +23,12 @@ export function seedDemoDatabase() {
   }
 
   if (a2.account) {
-    const c3 = saveManager.createCharacter({ accountId: a2.account.id, name: 'Lyra', classId: 'ARCANIST', mode: GAME_MODES.CLASSIC });
+    const { character: c3 } = saveManager.createCharacter({ accountId: a2.account.id, name: 'Lyra', classId: 'ARCANIST', mode: GAME_MODES.CLASSIC });
     db.prepare('UPDATE characters SET level = 14, highest_floor = 8 WHERE id = ?').run(c3.id);
   }
 
   if (a3.account) {
-    const c4 = saveManager.createCharacter({ accountId: a3.account.id, name: 'Vexia', classId: 'SHADOW', mode: GAME_MODES.HARDCORE });
+    const { character: c4 } = saveManager.createCharacter({ accountId: a3.account.id, name: 'Vexia', classId: 'SHADOW', mode: GAME_MODES.HARDCORE });
     db.prepare('UPDATE characters SET level = 5, highest_floor = 3 WHERE id = ?').run(c4.id);
   }
 

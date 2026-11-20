@@ -2,3 +2,11 @@ node_modules/
 .DS_Store
 *.log
 data/saves/
+backups/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+config/initial-moderator.json
+.env
+.env.*

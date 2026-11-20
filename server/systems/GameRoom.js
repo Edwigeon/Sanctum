@@ -29,17 +29,30 @@ import {
   stepProjectiles,
   stepMonsters
 } from './room/CombatAndMonsters.js';
-import { buildRoomSummary, broadcastRoomSnapshot } from './room/SnapshotSerializer.js';
+import { buildRoomSummary, buildInvitePreview, broadcastRoomSnapshot } from './room/SnapshotSerializer.js';
+import { inviteRegistry } from './InviteRegistry.js';
 
 export class GameRoom {
   constructor(roomId, mode = GAME_MODES.CLASSIC, ngCycle = 0, options = {}) {
     this.roomId = roomId;
     this.displayName = options.displayName || roomId;
     this.isPublic = options.isPublic !== false;
-    this.maxPlayers = options.maxPlayers || 4;
+    this.isInviteOnly = Boolean(options.isInviteOnly);
+    this.maxPlayers = Math.max(1, Math.min(4, Math.floor(Number(options.maxPlayers) || 4)));
     this.password = options.password || '';
-    this.inviteCode = options.inviteCode || crypto.randomBytes(3).toString('hex').toUpperCase();
-    this.inviteToken = options.inviteToken || crypto.randomBytes(16).toString('base64url');
+    this.ownerAccountId = options.ownerAccountId || null;
+    this.inviteCode = null;
+    this.inviteToken = null;
+    this.inviteIssuedAt = 0;
+    this.inviteExpiresAt = 0;
+    this.invitesRevoked = false;
+    this.destroyed = false;
+    inviteRegistry.issue(this, { code: options.inviteCode || null });
+    if (options.inviteToken && this.maxPlayers > 1) {
+      inviteRegistry.byToken.delete(this.inviteToken);
+      this.inviteToken = options.inviteToken;
+      inviteRegistry.byToken.set(this.inviteToken, this);
+    }
     this.mode = mode;
     this.ngCycle = ngCycle;
     this.floor = 1;
@@ -63,6 +76,8 @@ export class GameRoom {
   }
 
   destroy() {
+    this.destroyed = true;
+    inviteRegistry.unregister(this);
     if (this.tickInterval) {
       clearInterval(this.tickInterval);
       this.tickInterval = null;
@@ -77,6 +92,39 @@ export class GameRoom {
 
   getSummary() {
     return buildRoomSummary(this);
+  }
+
+  getInvitePreview() {
+    return buildInvitePreview(this);
+  }
+
+  regenerateInvite() {
+    if (this.maxPlayers <= 1) return null;
+    inviteRegistry.issue(this);
+    this._broadcastInviteUpdate();
+    return { inviteCode: this.inviteCode, inviteToken: this.inviteToken, inviteExpiresAt: this.inviteExpiresAt };
+  }
+
+  revokeInvite() {
+    inviteRegistry.revoke(this);
+    this._broadcastInviteUpdate();
+    return { inviteCode: null, inviteToken: null, revoked: true };
+  }
+
+  _broadcastInviteUpdate() {
+    const payload = JSON.stringify({
+      type: PACKET_TYPES.INVITE_UPDATE,
+      data: {
+        inviteCode: this.inviteCode || '',
+        inviteToken: this.inviteToken || '',
+        revoked: Boolean(this.invitesRevoked)
+      }
+    });
+    for (const p of this.players.values()) {
+      if (p.socket && p.socket.readyState === 1) {
+        p.socket.send(payload);
+      }
+    }
   }
 
   isWalkable(x, y, radius = 3) {
@@ -254,6 +302,12 @@ export class GameRoom {
     } else if (packet.type === PACKET_TYPES.DROP_ITEM) {
       if (!Number.isInteger(packet.itemId)) return;
       this.handleDropItem(p, packet.itemId);
+    } else if (packet.type === PACKET_TYPES.INVITE_REGENERATE) {
+      if (this.ownerAccountId && p.accountId && p.accountId !== this.ownerAccountId) return;
+      this.regenerateInvite();
+    } else if (packet.type === PACKET_TYPES.INVITE_REVOKE) {
+      if (this.ownerAccountId && p.accountId && p.accountId !== this.ownerAccountId) return;
+      this.revokeInvite();
     }
   }
 

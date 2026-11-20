@@ -15,6 +15,7 @@ export function createPlayerEntity(room, socket, name = 'Wanderer', classId = 'V
   const player = {
     id,
     characterId: savedChar?.id || null,
+    accountId: savedChar?.accountId || socket?.accountId || null,
     mode: savedChar?.mode || room.mode,
     name: savedChar?.name || name,
     socket,
@@ -48,7 +49,7 @@ export function createPlayerEntity(room, socket, name = 'Wanderer', classId = 'V
     x: sx, y: sy, targetX: sx, targetY: sy,
     targetMonsterId: null, targetLootId: null, holdAttack: false,
     hp: 100, maxHp: 100, mp: 50, maxMp: 50,
-    potions: savedChar?.potions ?? 3, speed: cls.baseSpeed, isDead: false,
+    potions: savedChar?.potions ?? 3, speed: cls.baseSpeed, isDead: Boolean(savedChar?.isDead),
     primaryStat: cls.stats.might, baseDmgMin: cls.baseDmgMin, baseDmgMax: cls.baseDmgMax,
     armor: cls.baseArmor, critChance: cls.baseCrit, spellDmg: 18,
     carryWeight: 0, maxWeight: 60, attackCooldown: 0,
@@ -169,7 +170,8 @@ export function handlePlayerDeath(room, player) {
   player.targetMonsterId = null;
   player.targetLootId = null;
   player.holdAttack = false;
-  saveManager.saveFromPlayer(player, room.floor);
+  // Immediate flush for Hardcore permadeath so disconnect/crash cannot roll back death state
+  saveManager.saveFromPlayer(player, room.floor, { immediate: room.mode === GAME_MODES.HARDCORE });
   room.events.push({
     type: 'PLAYER_DEATH', id: player.id, name: player.name, x: player.x, y: player.y,
     hardcore: room.mode === GAME_MODES.HARDCORE
