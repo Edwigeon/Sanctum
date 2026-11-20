@@ -290,16 +290,39 @@ setInterval(() => {
   }
 }, 15000);
 
+const heartbeatInterval = setInterval(() => {
+  for (const client of wss.clients) {
+    if (client.isAlive === false) {
+      client.terminate();
+      continue;
+    }
+    client.isAlive = false;
+    client.ping();
+  }
+}, 10000);
+
+wss.on('close', () => clearInterval(heartbeatInterval));
+
 wss.on('connection', (ws) => {
   ws.id = nextSocketId++;
   ws.characterId = null;
+  ws.currentRoom = null;
+  ws.isAlive = true;
+  ws.lastSeenAt = Date.now();
   ws.msgCount = 0;
   ws.msgWindowStart = Date.now();
   let currentRoom = null;
   console.log(`[Server] Client #${ws.id} connected`);
 
+  ws.on('pong', () => {
+    ws.isAlive = true;
+    ws.lastSeenAt = Date.now();
+  });
+
   ws.on('message', (message) => {
     const now = Date.now();
+    ws.isAlive = true;
+    ws.lastSeenAt = now;
     if (now - ws.msgWindowStart >= 1000) {
       ws.msgWindowStart = now;
       ws.msgCount = 0;
@@ -328,13 +351,15 @@ wss.on('connection', (ws) => {
         }
 
         const existingSock = activeCharacters.get(savedChar.id);
-        if (existingSock && existingSock !== ws && existingSock.readyState === 1) {
-          return sendLobbyError(ws, `"${savedChar.name}" is already active in another session.`);
-        }
-
         const targetMode = savedChar.mode === GAME_MODES.HARDCORE ? GAME_MODES.HARDCORE : GAME_MODES.CLASSIC;
         const linger = lingeringCharacters.get(savedChar.id);
         let targetRoom = null;
+
+        const isSameRoomReattach = (room) => {
+          if (linger && linger.room === room && room.players.has(linger.playerId)) return true;
+          if (existingSock && existingSock !== ws && existingSock.currentRoom === room && room.players.has(existingSock.playerId || existingSock.id)) return true;
+          return false;
+        };
 
         if (joinType === 'solo') {
           const soloId = `${targetMode}_SOLO_${savedChar.id}`;
@@ -368,8 +393,7 @@ wss.on('connection', (ws) => {
           if (target.mode !== targetMode) {
             return sendLobbyError(ws, `Mode mismatch: invite is for ${target.mode} mode, but your hero is ${targetMode}.`);
           }
-          const isReattaching = linger && linger.room === target && target.players.has(linger.playerId);
-          if (!isReattaching && target.players.size >= target.maxPlayers) {
+          if (!isSameRoomReattach(target) && target.players.size >= target.maxPlayers) {
             return sendLobbyError(ws, `Game room "${target.displayName}" is full (${target.maxPlayers}/${target.maxPlayers}).`);
           }
           targetRoom = target;
@@ -378,8 +402,7 @@ wss.on('connection', (ws) => {
           const roomId = `${targetMode}_${cleanRoom}`;
           const existing = rooms.get(roomId);
           if (existing) {
-            const isReattaching = linger && linger.room === existing && existing.players.has(linger.playerId);
-            if (!isReattaching && existing.players.size >= existing.maxPlayers) {
+            if (!isSameRoomReattach(existing) && existing.players.size >= existing.maxPlayers) {
               return sendLobbyError(ws, `Room "${cleanRoom}" is full (${existing.maxPlayers}/${existing.maxPlayers}).`);
             }
             if (existing.password && existing.password !== (password || '')) {
@@ -398,6 +421,29 @@ wss.on('connection', (ws) => {
           }
         }
 
+        if (existingSock && existingSock !== ws) {
+          const oldPid = existingSock.playerId || existingSock.id;
+          if (existingSock.currentRoom === targetRoom && targetRoom.players.has(oldPid)) {
+            existingSock.replacedByTakeover = true;
+            existingSock.terminate();
+            lingeringCharacters.delete(savedChar.id);
+            currentRoom = targetRoom;
+            ws.currentRoom = targetRoom;
+            ws.characterId = savedChar.id;
+            activeCharacters.set(savedChar.id, ws);
+            currentRoom.reattachPlayer(ws, targetRoom.players.get(oldPid));
+            return;
+          }
+          if (existingSock.readyState === 1) {
+            const isStale = Date.now() - (existingSock.lastSeenAt || 0) > 5000;
+            if (isStale) {
+              existingSock.terminate();
+              return sendLobbyError(ws, `"${savedChar.name}" is still disconnecting from "${existingSock.currentRoom?.displayName || 'another room'}". Please try again in a moment.`);
+            }
+            return sendLobbyError(ws, `"${savedChar.name}" is already active in another session.`);
+          }
+        }
+
         if (linger) {
           const lingerPlayer = linger.room.players.get(linger.playerId);
           if (linger.room !== targetRoom) {
@@ -410,6 +456,7 @@ wss.on('connection', (ws) => {
         }
 
         currentRoom = targetRoom;
+        ws.currentRoom = targetRoom;
         ws.characterId = savedChar.id;
         activeCharacters.set(savedChar.id, ws);
 
@@ -434,6 +481,7 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     console.log(`[Server] Client #${ws.id} disconnected`);
+    if (ws.replacedByTakeover) return;
     if (ws.characterId && activeCharacters.get(ws.characterId) === ws) {
       activeCharacters.delete(ws.characterId);
     }
