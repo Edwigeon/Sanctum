@@ -366,8 +366,11 @@ wss.on('connection', (ws) => {
           targetRoom = getOrCreateRoom(soloId, targetMode, {
             displayName: `${savedChar.name}'s Realm`,
             isPublic: false,
-            maxPlayers: 4
+            maxPlayers: 1
           });
+          if (!isSameRoomReattach(targetRoom) && targetRoom.players.size >= targetRoom.maxPlayers) {
+            return sendLobbyError(ws, `"${savedChar.name}" is already in a solo game on another session.`);
+          }
         } else if (joinType === 'invite') {
           const rawToken = (packet.data?.inviteToken || '').trim();
           const rawCode = (inviteCode || '').trim();
@@ -425,7 +428,15 @@ wss.on('connection', (ws) => {
           const oldPid = existingSock.playerId || existingSock.id;
           if (existingSock.currentRoom === targetRoom && targetRoom.players.has(oldPid)) {
             existingSock.replacedByTakeover = true;
-            existingSock.terminate();
+            if (existingSock.readyState === 1) {
+              existingSock.send(JSON.stringify({
+                type: PACKET_TYPES.LOBBY_ERROR,
+                data: { message: 'Your character was logged into from another session.', kicked: true }
+              }));
+              existingSock.close();
+            } else {
+              existingSock.terminate();
+            }
             lingeringCharacters.delete(savedChar.id);
             currentRoom = targetRoom;
             ws.currentRoom = targetRoom;
@@ -496,6 +507,10 @@ wss.on('connection', (ws) => {
         }
       } else {
         currentRoom.removePlayer(pid);
+        if (currentRoom.players.size === 0 && currentRoom.maxPlayers === 1) {
+          currentRoom.destroy();
+          rooms.delete(currentRoom.roomId);
+        }
       }
     }
   });

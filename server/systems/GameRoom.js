@@ -123,6 +123,13 @@ export class GameRoom {
 
   addPlayer(socket, name = 'Wanderer', classId = 'VANGUARD', savedChar = null) {
     this.emptySince = null;
+    if (savedChar?.id) {
+      const existingPlayer = Array.from(this.players.values()).find(p => p.characterId === savedChar.id);
+      if (existingPlayer) {
+        this.reattachPlayer(socket, existingPlayer);
+        return;
+      }
+    }
     const player = createPlayerEntity(this, socket, name, classId, savedChar);
     socket.playerId = player.id;
     this.players.set(player.id, player);
@@ -135,6 +142,16 @@ export class GameRoom {
 
   reattachPlayer(socket, existingPlayer) {
     this.emptySince = null;
+    if (existingPlayer.socket && existingPlayer.socket !== socket) {
+      if (existingPlayer.socket.readyState === 1) {
+        existingPlayer.socket.send(JSON.stringify({
+          type: PACKET_TYPES.LOBBY_ERROR,
+          data: { message: 'Your character was logged into from another session.', kicked: true }
+        }));
+      }
+      existingPlayer.socket.replacedByTakeover = true;
+      existingPlayer.socket.close();
+    }
     existingPlayer.socket = socket;
     existingPlayer.lingerUntil = null;
     existingPlayer.disconnectedAt = null;

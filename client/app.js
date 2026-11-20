@@ -33,6 +33,44 @@ const perfOSD = new PerfOSD();
 window.__perfOSD = perfOSD;
 audio.loadManifest('/data/sfx.json');
 const music = new MusicPlayer({ audio });
+
+// Music Pre-warm / Synthesizer Progress Feedback (especially critical on mobile like iPad A14)
+const audioBanner = document.getElementById('audio-progress-banner');
+const audioTitle = document.getElementById('audio-progress-title');
+const audioText = document.getElementById('audio-progress-text');
+const audioFill = document.getElementById('audio-progress-fill');
+let audioHideTimer = null;
+
+music.onProgress(({ suiteName, compiled, total, pct, done }) => {
+  if (!audioBanner) return;
+  if (audioHideTimer) {
+    clearTimeout(audioHideTimer);
+    audioHideTimer = null;
+  }
+
+  const name = suiteName ? suiteName.charAt(0).toUpperCase() + suiteName.slice(1) : 'Soundtrack';
+
+  if (done) {
+    audioBanner.classList.remove('hidden');
+    audioBanner.style.opacity = '1';
+    if (audioTitle) audioTitle.textContent = `${name} Ready`;
+    if (audioText) audioText.textContent = '100%';
+    if (audioFill) audioFill.style.width = '100%';
+    audioHideTimer = setTimeout(() => {
+      audioBanner.style.opacity = '0';
+      audioHideTimer = setTimeout(() => {
+        audioBanner.classList.add('hidden');
+      }, 500);
+    }, 1200);
+  } else {
+    audioBanner.classList.remove('hidden');
+    audioBanner.style.opacity = '1';
+    if (audioTitle) audioTitle.textContent = `Synthesizing ${name} (${compiled}/${total})...`;
+    if (audioText) audioText.textContent = `${pct}%`;
+    if (audioFill) audioFill.style.width = `${pct}%`;
+  }
+});
+
 music.setBiome('cathedral', { immediate: false });
 
 // Instant AudioContext Unlock on first user gesture (mouse, touch, keypress)
@@ -189,6 +227,9 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
     if (packet.type === PACKET_TYPES.LOBBY_ERROR) {
       intentionalExit = true;
       sessionStorage.removeItem('sanctum_active_session');
+      if (packet.data?.kicked) {
+        exitToMainMenu();
+      }
       menus.showLobbyError(packet.data?.message, mode);
       return;
     }

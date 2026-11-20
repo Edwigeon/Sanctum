@@ -170,22 +170,65 @@ export function prewarmSections(player, sectionNames) {
   }
 
   const queue = Array.from(patternsToWarm);
-  const processQueue = () => {
-    if (queue.length === 0) return;
+  const total = queue.length;
+  if (total === 0) {
+    player.notifyProgress?.({
+      suiteName: player.currentSuiteName,
+      compiled: 0,
+      total: 0,
+      pct: 100,
+      done: true
+    });
+    return;
+  }
+
+  let completed = 0;
+  player.notifyProgress?.({
+    suiteName: player.currentSuiteName,
+    compiled: 0,
+    total,
+    pct: 0,
+    done: false
+  });
+
+  const processNext = async () => {
+    if (queue.length === 0) {
+      player.notifyProgress?.({
+        suiteName: player.currentSuiteName,
+        compiled: total,
+        total,
+        pct: 100,
+        done: true
+      });
+      return;
+    }
+
     const pid = queue.shift();
-    player.ensurePatternBuffer(suiteData, pid).catch(() => {});
+    try {
+      await player.ensurePatternBuffer(suiteData, pid);
+    } catch (_) {}
+    completed++;
+    const pct = Math.round((completed / total) * 100);
+    player.notifyProgress?.({
+      suiteName: player.currentSuiteName,
+      compiled: completed,
+      total,
+      pct,
+      done: completed >= total
+    });
+
     if (queue.length > 0) {
       if (typeof requestIdleCallback !== 'undefined') {
-        requestIdleCallback(processQueue, { timeout: 1000 });
+        requestIdleCallback(processNext, { timeout: 1000 });
       } else {
-        setTimeout(processQueue, 100);
+        setTimeout(processNext, 20);
       }
     }
   };
 
   if (typeof requestIdleCallback !== 'undefined') {
-    requestIdleCallback(processQueue, { timeout: 1000 });
+    requestIdleCallback(processNext, { timeout: 1000 });
   } else {
-    setTimeout(processQueue, 50);
+    setTimeout(processNext, 20);
   }
 }

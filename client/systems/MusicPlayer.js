@@ -47,6 +47,18 @@ export class MusicPlayer {
 
     // Locked state timer (e.g. while descent cue is playing)
     this.lockedUntilTime = 0;
+    this.progressListeners = new Set();
+  }
+
+  onProgress(fn) {
+    this.progressListeners.add(fn);
+    return () => this.progressListeners.delete(fn);
+  }
+
+  notifyProgress(info) {
+    for (const fn of this.progressListeners) {
+      try { fn(info); } catch (_) {}
+    }
   }
 
   ensureVoiceGraph() {
