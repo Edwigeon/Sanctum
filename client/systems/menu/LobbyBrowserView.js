@@ -74,21 +74,24 @@ export function filterLobbies(menu) {
   for (const l of filtered) {
     const row = document.createElement('div');
     const isSelected = menu.selectedLobby && menu.selectedLobby.roomId === l.roomId;
-    row.className = `grid grid-cols-12 items-center p-2 rounded cursor-pointer border transition text-xs font-mono ${
+    const isFull = l.players >= l.maxPlayers;
+    const statusOrb = isFull ? '🔴' : (l.hasPassword ? '🔒' : '🟢');
+    row.className = `grid grid-cols-12 items-center p-2.5 rounded cursor-pointer border transition text-xs font-mono ${
       isSelected
-        ? 'border-amber-500 bg-amber-950/40 text-amber-200 shadow-md ring-1 ring-amber-500/50'
-        : 'border-slate-800 bg-slate-900/70 hover:border-slate-600 text-slate-200'
+        ? 'border-amber-500 bg-amber-950/50 text-amber-200 shadow-md ring-1 ring-amber-500/60'
+        : 'border-slate-800 bg-slate-900/70 hover:border-slate-600 hover:bg-slate-900/90 text-slate-200'
     }`;
     row.innerHTML = `
       <div class="col-span-6 flex items-center gap-1.5 truncate font-bold">
-        ${l.hasPassword ? '<span class="text-amber-400 text-[10px]">🔒</span>' : ''}
+        ${l.hasPassword ? '<span class="text-amber-400 text-[10px]">🔒</span>' : '<span class="text-amber-500/80 text-[10px]">⚔</span>'}
         <span class="truncate">${l.name}</span>
       </div>
-      <div class="col-span-3 text-center text-[11px] ${l.players >= l.maxPlayers ? 'text-rose-400' : 'text-emerald-400'}">
-        ${l.players}/${l.maxPlayers}
+      <div class="col-span-3 text-center text-[11px] font-bold flex items-center justify-center gap-1.5 ${isFull ? 'text-rose-400' : 'text-emerald-400'}">
+        <span class="text-[9px]">${statusOrb}</span>
+        <span>${l.players}/${l.maxPlayers}</span>
       </div>
       <div class="col-span-3 text-right text-[10px] text-slate-400 truncate">
-        F${l.floor} • ${l.biome || 'Crypts'}
+        F${l.floor} • ${l.biome || 'Cathedral'}
       </div>
     `;
 
@@ -183,12 +186,32 @@ export function bindLobbyBrowserEvents(menu) {
       document.getElementById('inp-invite-code').value = menu.pendingInvite.inviteToken || menu.pendingInvite.inviteCode;
     }
 
+    const tabJoin = document.getElementById('tab-btn-join');
+    const tabCreate = document.getElementById('tab-btn-create');
+    const contentJoin = document.getElementById('tab-join-content');
+    const contentCreate = document.getElementById('tab-create-content');
+    tabJoin?.classList.add('d2-tab-active');
+    tabCreate?.classList.remove('d2-tab-active');
+    contentJoin?.classList.remove('hidden');
+    contentCreate?.classList.add('hidden');
+    menu.currentLobbyTab = 'join';
+
+    const modeSummary = document.getElementById('create-mode-summary');
+    if (modeSummary) {
+      modeSummary.textContent = `${char.mode} Mode • ${char.mode === GAME_MODES.HARDCORE ? 'Permadeath' : 'Normal Respawn'}`;
+    }
+
     menu.roomVisibility = 'public';
     const btnVisPub = document.getElementById('btn-vis-public');
     const btnVisPriv = document.getElementById('btn-vis-private');
+    const descEl = document.getElementById('create-vis-description');
     if (btnVisPub && btnVisPriv) {
-      btnVisPub.className = 'btn-locked-pressed border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-2 rounded font-bold text-center';
-      btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-2 rounded font-bold text-center';
+      btnVisPub.classList.add('btn-locked-pressed');
+      btnVisPriv.classList.remove('btn-locked-pressed');
+      if (descEl) {
+        descEl.className = 'text-[11px] text-emerald-300/90 bg-emerald-950/20 border border-emerald-900/50 rounded p-2.5';
+        descEl.textContent = 'Public realm: Broadcast in the browser for any adventurer to inspect and join.';
+      }
     }
 
     menu.loadLobbies(char.mode);
@@ -203,8 +226,8 @@ export function bindLobbyBrowserEvents(menu) {
   if (tabJoin && tabCreate) {
     tabJoin.addEventListener('click', () => {
       menu.currentLobbyTab = 'join';
-      tabJoin.className = 'flex-1 py-2.5 border-b-2 border-amber-500 text-amber-300 bg-slate-900/90 transition text-center flex items-center justify-center gap-1.5';
-      tabCreate.className = 'flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 bg-transparent transition text-center flex items-center justify-center gap-1.5';
+      tabJoin.classList.add('d2-tab-active');
+      tabCreate.classList.remove('d2-tab-active');
       contentJoin?.classList.remove('hidden');
       contentCreate?.classList.add('hidden');
       const char = menu.getSelectedCharacter();
@@ -213,8 +236,8 @@ export function bindLobbyBrowserEvents(menu) {
 
     tabCreate.addEventListener('click', () => {
       menu.currentLobbyTab = 'create';
-      tabCreate.className = 'flex-1 py-2.5 border-b-2 border-amber-500 text-amber-300 bg-slate-900/90 transition text-center flex items-center justify-center gap-1.5';
-      tabJoin.className = 'flex-1 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 bg-transparent transition text-center flex items-center justify-center gap-1.5';
+      tabCreate.classList.add('d2-tab-active');
+      tabJoin.classList.remove('d2-tab-active');
       contentCreate?.classList.remove('hidden');
       contentJoin?.classList.add('hidden');
     });
@@ -234,29 +257,43 @@ export function bindLobbyBrowserEvents(menu) {
     menu.screenLobby.classList.add('hidden');
   });
 
-  document.getElementById('btn-lobby-back').addEventListener('click', () => {
+  const exitLobby = () => {
     menu.stopLobbyPolling();
     menu.screenLobby.classList.add('hidden');
     menu.screenChar.classList.remove('hidden');
-  });
+  };
+  document.getElementById('btn-lobby-back')?.addEventListener('click', exitLobby);
+  document.getElementById('btn-lobby-exit-join')?.addEventListener('click', exitLobby);
+  document.getElementById('btn-lobby-exit-create')?.addEventListener('click', exitLobby);
 
-  document.getElementById('btn-lobby-refresh').addEventListener('click', () => {
+  document.getElementById('btn-lobby-refresh')?.addEventListener('click', () => {
     const char = menu.getSelectedCharacter();
     if (char) menu.loadLobbies(char.mode);
   });
 
   const btnVisPub = document.getElementById('btn-vis-public');
   const btnVisPriv = document.getElementById('btn-vis-private');
-  btnVisPub.addEventListener('click', () => {
-    menu.roomVisibility = 'public';
-    btnVisPub.className = 'btn-locked-pressed border border-emerald-500 bg-emerald-950/40 text-emerald-200 py-2 rounded font-bold text-center';
-    btnVisPriv.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-2 rounded font-bold text-center';
-  });
-  btnVisPriv.addEventListener('click', () => {
-    menu.roomVisibility = 'private';
-    btnVisPriv.className = 'btn-locked-pressed border border-amber-500 bg-amber-950/40 text-amber-200 py-2 rounded font-bold text-center';
-    btnVisPub.className = 'border border-slate-800 bg-slate-900 text-slate-400 py-2 rounded font-bold text-center';
-  });
+  const descEl = document.getElementById('create-vis-description');
+  if (btnVisPub && btnVisPriv) {
+    btnVisPub.addEventListener('click', () => {
+      menu.roomVisibility = 'public';
+      btnVisPub.classList.add('btn-locked-pressed');
+      btnVisPriv.classList.remove('btn-locked-pressed');
+      if (descEl) {
+        descEl.className = 'text-[11px] text-emerald-300/90 bg-emerald-950/20 border border-emerald-900/50 rounded p-2.5';
+        descEl.textContent = 'Public realm: Broadcast in the browser for any adventurer to inspect and join.';
+      }
+    });
+    btnVisPriv.addEventListener('click', () => {
+      menu.roomVisibility = 'private';
+      btnVisPriv.classList.add('btn-locked-pressed');
+      btnVisPub.classList.remove('btn-locked-pressed');
+      if (descEl) {
+        descEl.className = 'text-[11px] text-amber-300/90 bg-amber-950/20 border border-amber-900/50 rounded p-2.5';
+        descEl.textContent = 'Unlisted realm: Hidden from the realm browser. Adventurers can only enter via direct invite link or 6-digit code.';
+      }
+    });
+  }
 
   document.getElementById('btn-enter-multi').addEventListener('click', () => {
     const char = menu.getSelectedCharacter();
