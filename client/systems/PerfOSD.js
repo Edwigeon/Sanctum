@@ -348,14 +348,14 @@ export class PerfOSD {
       const mem = performance?.memory
         ? `${(performance.memory.usedJSHeapSize / 1048576).toFixed(1)}/${(performance.memory.totalJSHeapSize / 1048576).toFixed(0)}MB`
         : 'n/a';
-      const lag = (m.latestTick - m.renderTick).toFixed(2);
+      const lag = m.bufLen > 0 ? `${(m.latestTick - m.renderTick).toFixed(2)}t` : '--';
       const pingStr = m.rttMs === null ? '--' : `${m.rttMs.toFixed(0)}ms`;
       this.statsEl.textContent =
         `FPS: ${m.fps.toFixed(0).padStart(3)} | Frame: ${m.avgFrameMs.toFixed(1)}ms (max ${m.maxFrameMs.toFixed(1)})\n` +
         `Draw: ${m.drawMs.toFixed(1)}ms | Light: ${m.lightMs.toFixed(1)}ms | Interp: ${m.interpMs.toFixed(2)}ms\n` +
         `Net: ${m.netHz.toFixed(1)}Hz | Ping: ${pingStr} | Jit: ${m.jitterMs.toFixed(1)}ms (max ${m.maxIatMs.toFixed(0)})\n` +
         `BW: ↓${m.rxKBps.toFixed(1)} ↑${m.txKBps.toFixed(1)}KB/s | Snap: ${(m.lastSnapBytes / 1024).toFixed(1)}KB (avg ${(m.avgSnapBytes / 1024).toFixed(1)})\n` +
-        `Tick: ${m.latestTick} (lag ${lag}t, buf ${m.bufLen}/6) | Pkt: s${m.pktSkipped}/o${m.pktOoo}/d${m.pktStale}\n` +
+        `Tick: ${m.latestTick} (lag ${lag}, buf ${m.bufLen}/6) | Pkt: s${m.pktSkipped}/o${m.pktOoo}/d${m.pktStale}\n` +
         `Ent: P:${m.players} M:${m.monsters} Proj:${m.projectiles} Loot:${m.loot}\n` +
         `Mem: ${mem} | SFX: ${m.sfxBuffers}buf/${m.sfxPcm}pcm`;
     }

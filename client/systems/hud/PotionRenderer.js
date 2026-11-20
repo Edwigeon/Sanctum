@@ -138,9 +138,10 @@ export class PotionRenderer {
 
     const waveAmp = 0.85 + fx.slosh * 2.2;
     const isActiveRegen = fx.regen > 0.35;
-    const sweepCycle = animTime % 4.0;
-    const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < 0.45;
-    const sweepOffset = isFullShimmer ? (-3.5 + (sweepCycle / 0.45) * 7.0) : 0;
+    const sweepCycle = animTime % 3.6;
+    const sweepDuration = 0.65;
+    const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < sweepDuration;
+    const sweepProgress = isFullShimmer ? (sweepCycle / sweepDuration) : 0;
 
     const bcx = 17.5;
     const bcy = 30.0;
@@ -347,13 +348,28 @@ export class PotionRenderer {
           }
         }
 
-        // Sweeping arc parallel to specular glint on full health
-        if (isFullShimmer && dx < 0 && py >= 15 && py <= 32) {
-          const dy = (py - bcy + sweepOffset) * (Rx / Ry);
-          const dist = Math.hypot(dx + sweepOffset, dy);
-          if (Math.abs(dist - 11.5) <= 0.8) {
-            oCtx.fillStyle = '#fff1e8';
-            oCtx.fillRect(px, py, 1, 1);
+        // 3D Spherical Specular Shimmer Sweep across full health globe
+        if (isFullShimmer && py >= 14 && py <= 44) {
+          const dy = py - bcy;
+          const nx = dx / (Rx - 1.2);
+          const ny = dy / (Ry - 1.2);
+          const rSq = nx * nx + ny * ny;
+          if (rSq < 1.0) {
+            const nz = Math.sqrt(1.0 - rSq);
+            // 3D light origin at upper-left specular reflection spot
+            const lx = -0.65;
+            const ly = -0.65;
+            const lz = 0.25;
+            const dist3D = Math.hypot(nx - lx, ny - ly, nz - lz);
+            const targetDist = 0.30 + sweepProgress * 1.60;
+            const diff = Math.abs(dist3D - targetDist);
+            if (diff <= 0.055) {
+              oCtx.fillStyle = '#fff1e8'; // Brilliant specular crest
+              oCtx.fillRect(px, py, 1, 1);
+            } else if (diff <= 0.095) {
+              oCtx.fillStyle = '#ffa300'; // Warm golden specular halo
+              oCtx.fillRect(px, py, 1, 1);
+            }
           }
         }
       }
@@ -416,9 +432,10 @@ export class PotionRenderer {
 
     const waveAmp = 0.85 + fx.slosh * 2.2;
     const isActiveRegen = fx.regen > 0.35;
-    const sweepCycle = animTime % 4.0;
-    const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < 0.45;
-    const sweepPos = 22 + (sweepCycle / 0.45) * 20;
+    const sweepCycle = animTime % 3.6;
+    const sweepDuration = 0.65;
+    const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < sweepDuration;
+    const sweepProgress = isFullShimmer ? (sweepCycle / sweepDuration) : 0;
 
     const bcx = 17.5;
 
@@ -624,10 +641,25 @@ export class PotionRenderer {
           }
         }
 
-        // Full-globe diagonal shimmer sweep every 4s
-        if (isFullShimmer && dx < 0 && py >= 14 && py <= 32 && Math.abs((px + py) - sweepPos) <= 0.8) {
-          oCtx.fillStyle = '#fff1e8';
-          oCtx.fillRect(px, py, 1, 1);
+        // 3D Crystalline Specular Shimmer Sweep across full mana phial
+        if (isFullShimmer && py >= 14 && py <= 44) {
+          const dy = py - 30.0;
+          const nx = dx / Math.max(1, hw - 1.2);
+          const ny = dy / 16.0;
+          const cz = Math.max(0, Math.cos(Math.max(-1, Math.min(1, nx)) * Math.PI * 0.5));
+          const lx = -0.65;
+          const ly = -0.65;
+          const lz = 0.25;
+          const dist3D = Math.hypot(nx - lx, ny - ly, cz - lz);
+          const targetDist = 0.30 + sweepProgress * 1.60;
+          const diff = Math.abs(dist3D - targetDist);
+          if (diff <= 0.055) {
+            oCtx.fillStyle = '#fff1e8'; // Brilliant diamond glint crest
+            oCtx.fillRect(px, py, 1, 1);
+          } else if (diff <= 0.095) {
+            oCtx.fillStyle = '#67e8f9'; // Electric cyan facet sheen
+            oCtx.fillRect(px, py, 1, 1);
+          }
         }
       }
     }

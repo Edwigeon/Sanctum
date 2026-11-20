@@ -95,7 +95,8 @@ export class Interpolator {
         if (this._lastPushAt > 0) {
           const iat = now - this._lastPushAt;
           const dev = Math.abs(iat - ENGINE.TICK_INTERVAL_MS);
-          this.jitterMs = this.jitterMs * 0.85 + dev * 0.15;
+          const rate = dev > this.jitterMs ? 0.35 : 0.05;
+          this.jitterMs = this.jitterMs * (1 - rate) + dev * rate;
         }
       }
       this._lastPushAt = now;
@@ -158,7 +159,7 @@ export class Interpolator {
       const gain = Math.abs(drift) > 0.5 ? 3.0 : 0.8;
       this.renderTick += drift * Math.min(1, dt * gain);
     }
-    this.underrun = this.renderTick > latest.tick;
+    this.underrun = this.renderTick > latest.tick + 0.5;
 
     let snapA = this.snapshotBuffer[0];
     let snapB = latest;
