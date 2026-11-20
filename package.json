@@ -9,6 +9,7 @@
     "cluster": "node server/cluster.js",
     "pack:music": "node scripts/pack_soundtrack.js",
     "backup": "node scripts/db_backup.js backup",
+    "sprites:extract": "node scripts/extract_sprites.js",
     "test": "node scripts/verify_technical_plan.js && node scripts/verify_security_hardening.js",
     "test:security": "node scripts/verify_security_hardening.js"
   },
