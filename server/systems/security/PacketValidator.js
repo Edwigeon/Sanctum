@@ -54,8 +54,7 @@ const SCHEMAS = {
         joinType: oneOf(d.joinType, JOIN_TYPES, 'public'),
         roomName: str(d.roomName, 64),
         password: str(d.password, 64),
-        inviteCode: str(d.inviteCode, 512),
-        inviteToken: str(d.inviteToken, 64)
+        inviteToken: str(d.inviteToken, 512)
       };
       if (d.maxPlayers !== undefined && d.maxPlayers !== null && d.maxPlayers !== '') {
         const mp = Number(d.maxPlayers);

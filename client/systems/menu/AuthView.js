@@ -38,16 +38,24 @@ export async function checkAuth(menu) {
     menu.updateAuthUI();
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlToken = urlParams.get('invite');
-  const urlCode = urlParams.get('join');
-  const savedCode = sessionStorage.getItem('sanctum_pending_invite');
-  const toResolve = urlToken || urlCode || savedCode;
-  if (urlToken || urlCode) {
+  let toResolve = '';
+  if (window.location.hash) {
+    const hash = window.location.hash.slice(1);
+    const m = hash.match(/(?:^|[?&#])invite=([^&#\s]+)/);
+    if (m) toResolve = decodeURIComponent(m[1]);
+    else if (/^[A-Za-z0-9_-]{22}$/.test(hash)) toResolve = hash;
+  }
+  if (!toResolve) {
+    const urlParams = new URLSearchParams(window.location.search);
+    toResolve = urlParams.get('invite') || '';
+  }
+  const savedInvite = sessionStorage.getItem('sanctum_pending_invite') || '';
+  const initialInvite = toResolve || savedInvite;
+  if (toResolve) {
     window.history.replaceState({}, '', window.location.pathname);
   }
-  if (toResolve) {
-    const inv = await menu.resolvePendingInvite(toResolve);
+  if (initialInvite) {
+    const inv = await menu.resolvePendingInvite(initialInvite);
     if (inv && menu.currentAccount) {
       menu.screenMain.classList.add('hidden');
       menu.screenAuth.classList.add('hidden');
@@ -75,7 +83,6 @@ export async function checkAuth(menu) {
               s.characterId,
               s.joinType,
               s.password,
-              s.inviteCode,
               s.inviteToken,
               s.maxPlayers
             );

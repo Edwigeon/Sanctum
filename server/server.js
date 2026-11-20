@@ -288,17 +288,16 @@ async function handleHttpRequest(req, res) {
       const hit = rateLimiters.inviteLookupMin.hit(ip);
       if (!hit.allowed) return sendRateLimited(req, res, 'Too many invite lookups. Please wait a moment.', hit.retryAfterMs);
 
-      inviteRegistry.rotateExpired();
+      const rotated = inviteRegistry.rotateExpired();
+      for (const r of rotated) {
+        r._broadcastInviteUpdate();
+      }
       const rawToken = (parsedUrl.searchParams.get('token') || '').trim();
-      const rawCode = (parsedUrl.searchParams.get('code') || '').trim();
-      const room = rawToken
-        ? inviteRegistry.resolveToken(rawToken)
-        : (rawCode ? inviteRegistry.resolveCode(rawCode) : null);
+      const room = rawToken ? inviteRegistry.resolveToken(rawToken) : null;
 
       if (!room || room.maxPlayers <= 1) {
-        return sendJson(req, res, 404, { error: 'Invite link or code is invalid or the game room has closed.' });
+        return sendJson(req, res, 404, { error: 'Invite link is invalid or the game room has closed.' });
       }
-      // Never return inviteToken or inviteCode on lookup
       return sendJson(req, res, 200, { invite: room.getInvitePreview() });
     }
 
@@ -608,7 +607,10 @@ function getOrCreateRoom(roomId, mode, options = {}) {
 
 const roomSweepInterval = setInterval(() => {
   const now = Date.now();
-  inviteRegistry.rotateExpired(now);
+  const rotated = inviteRegistry.rotateExpired(now);
+  for (const r of rotated) {
+    r._broadcastInviteUpdate();
+  }
   for (const [roomId, room] of rooms.entries()) {
     if (room.players.size === 0 && room.emptySince && (now - room.emptySince >= LOBBY_RETENTION.EMPTY_ROOM_MS)) {
       console.log(`[Lobby] Room ${roomId} retention expired, cleaning up`);
@@ -746,7 +748,7 @@ wss.on('connection', (ws, req) => {
       if (ws.lastJoinAt && now - ws.lastJoinAt < L.wsJoinMinGapMs) return;
       ws.lastJoinAt = now;
 
-      const { roomName, joinType, password, inviteCode, inviteToken, characterId, token, maxPlayers } = packet.data;
+      const { roomName, joinType, password, inviteToken, characterId, token, maxPlayers } = packet.data;
       const account = authService.validateSession(token);
       if (!account) return sendLobbyError(ws, 'Session expired. Please log in again.');
       if (account.mustChangePassword) {
@@ -792,11 +794,12 @@ wss.on('connection', (ws, req) => {
         if (!invHit.allowed) {
           return sendLobbyError(ws, 'Too many invite join attempts. Please wait a moment.');
         }
-        inviteRegistry.rotateExpired();
-        const parsed = parseInviteCredential(inviteToken || inviteCode);
-        const target = parsed.token
-          ? inviteRegistry.resolveToken(parsed.token)
-          : (parsed.code ? inviteRegistry.resolveCode(parsed.code) : null);
+        const rotated = inviteRegistry.rotateExpired();
+        for (const r of rotated) {
+          r._broadcastInviteUpdate();
+        }
+        const parsed = parseInviteCredential(inviteToken);
+        const target = parsed.token ? inviteRegistry.resolveToken(parsed.token) : null;
 
         if (!target || target.maxPlayers <= 1) {
           return sendLobbyError(ws, 'Invite is invalid, expired, or the game room has closed.');

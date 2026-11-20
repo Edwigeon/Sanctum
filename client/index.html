@@ -349,12 +349,12 @@
             </div>
           </div>
 
-          <!-- BOTTOM BAR: REALM INVITE CODE / LINK JOIN + EXIT LOBBY -->
+          <!-- BOTTOM BAR: REALM INVITE LINK JOIN + EXIT LOBBY -->
           <div class="shrink-0 bg-slate-950/80 px-3.5 py-2.5 rounded-lg border border-slate-800 flex flex-col sm:flex-row items-center gap-3 text-xs font-mono">
             <div class="shrink-0 flex items-center gap-1.5 text-amber-300 font-bold whitespace-nowrap">
-              <span>🗝</span> Invite Link or Code:
+              <span>🗝</span> Invite Link or Token:
             </div>
-            <input id="inp-invite-code" type="text" placeholder="Paste realm invite link or 6-char code..."
+            <input id="inp-invite-token" type="text" placeholder="Paste realm invite link or token..."
               class="flex-1 min-w-[220px] w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 font-mono focus:outline-none focus:border-amber-500">
             <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
               <button id="btn-join-invite" type="button"
@@ -745,26 +745,22 @@
             </label>
           </div>
 
-          <!-- REALM SHARING / INVITE CODES (HIDDEN / REVEALABLE) -->
+          <!-- REALM SHARING / INVITE LINKS (HIDDEN / REVEALABLE) -->
           <div id="pause-share-box" class="hidden pt-2 border-t border-slate-800 space-y-2 text-left">
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-              <span>Realm Invite</span>
+              <span>Realm Invite Link</span>
               <div class="flex items-center gap-1.5">
-                <span id="pause-my-code" class="text-amber-300 font-bold font-mono tracking-widest">••••••</span>
-                <button id="btn-pause-reveal-code" type="button"
+                <span id="pause-my-link" class="text-amber-300 font-bold font-mono tracking-widest text-[11px] truncate max-w-[140px]">••••••••••••••••</span>
+                <button id="btn-pause-reveal-link" type="button"
                   class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
                   Reveal
                 </button>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <button id="btn-pause-copy-code" type="button"
-                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-mono font-medium py-1.5 rounded text-xs transition cursor-pointer">
-                Copy Code
-              </button>
+            <div>
               <button id="btn-pause-copy-invite" type="button"
-                class="bg-amber-950/70 hover:bg-amber-900/70 border border-amber-700/70 text-amber-200 font-mono font-bold py-1.5 rounded text-xs transition cursor-pointer">
-                Copy Link
+                class="w-full bg-amber-950/70 hover:bg-amber-900/70 border border-amber-700/70 text-amber-200 font-mono font-bold py-1.5 rounded text-xs transition cursor-pointer">
+                Copy Invite Link
               </button>
             </div>
             <div class="grid grid-cols-2 gap-2">
@@ -782,7 +778,7 @@
           <div class="pt-2 border-t border-slate-800 space-y-1.5 text-left">
             <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Join Another Realm</div>
             <div class="flex gap-1.5 text-xs font-mono">
-              <input id="inp-pause-invite" type="text" placeholder="Invite link or code..."
+              <input id="inp-pause-invite" type="text" placeholder="Paste invite link or token..."
                 class="flex-1 bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-slate-100 focus:outline-none focus:border-amber-500">
               <button id="btn-pause-invite" type="button"
                 class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold cursor-pointer">Join</button>

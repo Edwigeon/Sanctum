@@ -1,7 +1,6 @@
 import { GAME_MODES } from '../../shared/Constants.js';
 import {
   parseInviteInput,
-  extractInviteCode,
   clearPendingInvite,
   updateInviteBanner,
   resolvePendingInvite,
@@ -27,7 +26,7 @@ import {
   bindLobbyBrowserEvents
 } from './menu/LobbyBrowserView.js';
 
-export { parseInviteInput, extractInviteCode };
+export { parseInviteInput };
 
 export class MenuController {
   constructor({ onConnect, getCurrentInviteCode, audio = null }) {

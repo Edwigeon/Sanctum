@@ -1,31 +1,37 @@
 /**
- * Cryptographic Invite Token / Code Parser & Invite Flow Handler
+ * Cryptographic Invite Token Parser & Invite Flow Handler
  */
 
 import { GAME_MODES } from '../../../shared/Constants.js';
 
-export function parseInviteInput(raw) {
-  const s = (raw || '').trim();
-  if (!s) return { token: '', code: '' };
-  try {
-    if (s.includes('invite=') || s.includes('join=')) {
-      const u = new URL(s.startsWith('http') ? s : `http://dummy/${s}`, 'http://dummy');
-      const param = u.searchParams.get('invite') || u.searchParams.get('join') || '';
-      if (param.length > 12) {
-        return { token: param, code: '' };
-      }
-      return { token: '', code: param.toUpperCase() };
-    }
-  } catch { /* ignore */ }
-  if (s.length > 12) {
-    return { token: s, code: '' };
-  }
-  return { token: '', code: s.toUpperCase() };
+const INVITE_TOKEN_RE = /^[A-Za-z0-9_-]{22}$/;
+
+function decodeURIComponentSafe(s) {
+  try { return decodeURIComponent(s); } catch { return ''; }
 }
 
-export function extractInviteCode(raw) {
-  const parsed = parseInviteInput(raw);
-  return parsed.token || parsed.code;
+export function parseInviteInput(raw) {
+  const s = (raw || '').trim();
+  if (!s) return { token: '' };
+  let val = s;
+  const hashIdx = s.indexOf('#');
+  if (hashIdx !== -1) {
+    const frag = s.slice(hashIdx + 1);
+    const m = frag.match(/(?:^|[?&#])invite=([^&#\s]+)/);
+    if (m) val = decodeURIComponentSafe(m[1]);
+    else if (INVITE_TOKEN_RE.test(frag)) val = frag;
+  } else {
+    const m = s.match(/[?&]invite=([^&#\s]+)/);
+    if (m) val = decodeURIComponentSafe(m[1]);
+  }
+  if (INVITE_TOKEN_RE.test(val)) {
+    return { token: val };
+  }
+  return { token: '' };
+}
+
+export function extractInviteToken(raw) {
+  return parseInviteInput(raw).token;
 }
 
 export function clearPendingInvite(menu) {
@@ -51,25 +57,33 @@ export function updateInviteBanner(menu) {
 }
 
 export async function resolvePendingInvite(menu, rawInput) {
-  const { token, code } = parseInviteInput(rawInput);
-  if (!token && !code) return null;
-  const query = token ? `token=${encodeURIComponent(token)}` : `code=${encodeURIComponent(code)}`;
+  const { token } = parseInviteInput(rawInput);
+  if (!token) {
+    const banner = document.getElementById('invite-banner');
+    if (banner) {
+      document.getElementById('invite-banner-text').textContent = 'Invite link is invalid or expired.';
+      banner.classList.remove('hidden');
+    }
+    sessionStorage.removeItem('sanctum_pending_invite');
+    return null;
+  }
   try {
-    const res = await fetch(`/api/invite?${query}`);
+    const res = await fetch(`/api/invite?token=${encodeURIComponent(token)}`);
     if (!res.ok) {
       const banner = document.getElementById('invite-banner');
-      document.getElementById('invite-banner-text').textContent = 'Invite is invalid or the game room has closed.';
-      banner.classList.remove('hidden');
+      if (banner) {
+        document.getElementById('invite-banner-text').textContent = 'Invite link is invalid, expired, or the game room has closed.';
+        banner.classList.remove('hidden');
+      }
       sessionStorage.removeItem('sanctum_pending_invite');
       return null;
     }
     const { invite } = await res.json();
     menu.pendingInvite = {
       ...invite,
-      inviteToken: token || '',
-      inviteCode: code || ''
+      inviteToken: token
     };
-    sessionStorage.setItem('sanctum_pending_invite', token || code);
+    sessionStorage.setItem('sanctum_pending_invite', token);
     if (invite.mode === GAME_MODES.HARDCORE) menu.btnHardcore.click();
     else menu.btnClassic.click();
     menu.updateInviteBanner();
@@ -85,20 +99,20 @@ export function bindInviteEvents(menu) {
   document.getElementById('btn-accept-invite').addEventListener('click', () => {
     const char = menu.getSelectedCharacter();
     if (!char || !menu.pendingInvite || char.mode !== menu.pendingInvite.mode) return;
-    const code = menu.pendingInvite.inviteCode || '';
     const token = menu.pendingInvite.inviteToken || '';
     menu.stopLobbyPolling();
-    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
+    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', token);
     menu.screenChar.classList.add('hidden');
   });
 
   document.getElementById('btn-join-invite').addEventListener('click', () => {
     const char = menu.getSelectedCharacter();
-    const raw = document.getElementById('inp-invite-code').value;
-    const { token, code } = parseInviteInput(raw);
-    if (!char || (!token && !code)) return;
+    const inp = document.getElementById('inp-invite-token') || document.getElementById('inp-invite-code');
+    const raw = inp ? inp.value : '';
+    const { token } = parseInviteInput(raw);
+    if (!char || !token) return;
     menu.stopLobbyPolling();
-    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
+    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', token);
     menu.screenLobby.classList.add('hidden');
   });
 
@@ -106,12 +120,15 @@ export function bindInviteEvents(menu) {
     const errEl = document.getElementById('pause-invite-err');
     errEl.classList.add('hidden');
     const raw = document.getElementById('inp-pause-invite').value;
-    const { token, code } = parseInviteInput(raw);
-    if (!token && !code) return;
-    const query = token ? `token=${encodeURIComponent(token)}` : `code=${encodeURIComponent(code)}`;
-    const res = await fetch(`/api/invite?${query}`);
+    const { token } = parseInviteInput(raw);
+    if (!token) {
+      errEl.textContent = 'Please enter a valid invite link or token.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    const res = await fetch(`/api/invite?token=${encodeURIComponent(token)}`);
     if (!res.ok) {
-      errEl.textContent = 'Invite is invalid or the game room has closed.';
+      errEl.textContent = 'Invite is invalid, expired, or the game room has closed.';
       errEl.classList.remove('hidden');
       return;
     }
@@ -129,6 +146,6 @@ export function bindInviteEvents(menu) {
     }
     document.getElementById('panel-pause').classList.add('hidden');
     document.getElementById('inp-pause-invite').value = '';
-    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', code, token);
+    menu.onConnect(char.name, '', char.mode, char.classId, char.id, 'invite', '', token);
   });
 }

@@ -44,7 +44,7 @@ export function seedDemoLobbies(rooms, GameRoom) {
     { id: 'CLASSIC_crypt_01', name: 'crypt_01', mode: GAME_MODES.CLASSIC, isPublic: true, floor: 1, bots: [{ name: 'Kaelen', cls: 'VANGUARD' }] },
     { id: 'CLASSIC_obsidian_vault', name: 'obsidian_vault', mode: GAME_MODES.CLASSIC, isPublic: true, floor: 3, bots: [{ name: 'Lyra', cls: 'ARCANIST' }, { name: 'Aldric', cls: 'SHADOW' }] },
     { id: 'HARDCORE_iron_gauntlet', name: 'iron_gauntlet', mode: GAME_MODES.HARDCORE, isPublic: true, floor: 2, bots: [{ name: 'Vexia', cls: 'SHADOW' }] },
-    { id: 'CLASSIC_secret_sanctum', name: 'secret_sanctum', mode: GAME_MODES.CLASSIC, isPublic: false, inviteCode: 'DEMO99', floor: 1, bots: [{ name: 'Kaelen', cls: 'VANGUARD' }] }
+    { id: 'CLASSIC_secret_sanctum', name: 'secret_sanctum', mode: GAME_MODES.CLASSIC, isPublic: false, floor: 1, bots: [{ name: 'Kaelen', cls: 'VANGUARD' }] }
   ];
 
   let mockId = -1;
@@ -53,8 +53,7 @@ export function seedDemoLobbies(rooms, GameRoom) {
     const room = new GameRoom(s.id, s.mode, 0, {
       displayName: s.name,
       isPublic: s.isPublic,
-      maxPlayers: 4,
-      inviteCode: s.inviteCode
+      maxPlayers: 4
     });
     room.floor = s.floor;
     for (const b of s.bots) {

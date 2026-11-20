@@ -553,22 +553,30 @@ try {
     }));
     const roomInit = await hostWs.waitFor(m => m.type === PACKET_TYPES.ROOM_INIT);
     const { inviteCode, inviteToken, roomId } = roomInit.data;
-    assert(inviteCode && inviteCode.length === 6, '[4.1] Short inviteCode must be 6 chars');
+    assert.equal(inviteCode, undefined, '[4.1] Short inviteCode must be removed from ROOM_INIT');
     assert(inviteToken && inviteToken.length === 22, '[4.1] Full inviteToken must be 128-bit base64url (22 chars)');
-    assert.notEqual(inviteCode, inviteToken);
 
     // Private room must not appear in public /api/lobbies
     const lobbiesRes = await api(`/api/lobbies?mode=${GAME_MODES.CLASSIC}`);
     assert.equal(lobbiesRes.json.lobbies.some(l => l.roomId === roomId), false, '[4.2] Private room must not be listed in /api/lobbies');
 
-    // Resolving a short code MUST NEVER return the full inviteToken, inviteCode, internal roomId, or private room name/playerList
-    const codeLookup = await api(`/api/invite?code=${encodeURIComponent(inviteCode)}`);
-    assert.equal(codeLookup.status, 200);
-    assert.equal(codeLookup.json.invite.inviteToken, undefined, '[4.3] Short code lookup must never disclose full inviteToken');
-    assert.equal(codeLookup.json.invite.inviteCode, undefined, '[4.3] Lookup must not echo invite credentials');
-    assert.equal(codeLookup.json.invite.roomId, undefined, '[4.4] Private room lookup must not leak internal roomId');
-    assert.equal(codeLookup.json.invite.playerList, undefined, '[4.4] Private room lookup must not leak player roster');
-    assert.equal(codeLookup.json.invite.name, 'Private Realm', '[4.4] Private room lookup must mask custom room name');
+    // Resolving a short code must fail; endpoint accepts only cryptographic token
+    const codeLookup = await api('/api/invite?code=ABCDEF');
+    assert.equal(codeLookup.status, 404, '[4.3] Short code lookup must return 404');
+
+    // Resolving a token MUST NEVER return full inviteToken, internal roomId, or private room name/playerList
+    const tokenLookup = await api(`/api/invite?token=${encodeURIComponent(inviteToken)}`);
+    assert.equal(tokenLookup.status, 200, '[4.4] Valid token lookup must succeed');
+    assert.equal(tokenLookup.json.invite.inviteToken, undefined, '[4.4] Lookup must never disclose full inviteToken');
+    assert.equal(tokenLookup.json.invite.inviteCode, undefined, '[4.4] Lookup must not echo invite credentials');
+    assert.equal(tokenLookup.json.invite.roomId, undefined, '[4.4] Private room lookup must not leak internal roomId');
+    assert.equal(tokenLookup.json.invite.playerList, undefined, '[4.4] Private room lookup must not leak player roster');
+    assert.equal(tokenLookup.json.invite.name, 'Private Realm', '[4.4] Private room lookup must mask custom room name');
+
+    // Invalid tokens must never reveal room existence or metadata
+    const badLookup = await api('/api/invite?token=invalid_token_123456');
+    assert.equal(badLookup.status, 404, '[4.4] Invalid token must return 404');
+    assert.equal(badLookup.json.invite, undefined, '[4.4] Invalid token lookup must not return invite preview');
 
     // Unauthorized user cannot bypass invite by joining the private room by its roomName directly
     const bypassWs = await openWs();
@@ -585,26 +593,56 @@ try {
     assert(bypassErr.data.message.includes('private'), '[4.5] Private room must reject direct roomName join without invite');
     await bypassWs.waitForClose();
 
-    // Token regeneration invalidates old token & code immediately
-    const oldCode = inviteCode;
+    // Legacy short code join must be rejected
+    const legacyJoinWs = await openWs();
+    legacyJoinWs.send(JSON.stringify({
+      type: PACKET_TYPES.JOIN_LOBBY,
+      data: {
+        token: guestToken,
+        characterId: guestChar.id,
+        joinType: 'invite',
+        inviteCode: 'ABCDEF'
+      }
+    }));
+    const legacyErr = await legacyJoinWs.waitFor(m => m.type === PACKET_TYPES.LOBBY_ERROR);
+    assert(legacyErr.data.message.includes('Invalid') || legacyErr.data.message.includes('expired') || legacyErr.data.message.includes('closed'), '[4.5] Legacy inviteCode must not permit join');
+    await legacyJoinWs.waitForClose();
+
+    // Token regeneration invalidates old token immediately
     const oldToken = inviteToken;
     hostWs.send(JSON.stringify({ type: PACKET_TYPES.INVITE_REGENERATE }));
     const regenMsg = await hostWs.waitFor(m => m.type === PACKET_TYPES.INVITE_UPDATE);
+    assert.equal(regenMsg.data.inviteCode, undefined, '[4.6] Regenerated invite packet must not contain inviteCode');
     assert(regenMsg.data.inviteToken && regenMsg.data.inviteToken !== oldToken, '[4.6] Regenerated token must differ from old token');
-    assert(regenMsg.data.inviteCode && regenMsg.data.inviteCode !== oldCode, '[4.6] Regenerated code must differ from old code');
     assert.equal((await api(`/api/invite?token=${encodeURIComponent(oldToken)}`)).status, 404, '[4.6] Old token must be rejected after regeneration');
-    assert.equal((await api(`/api/invite?code=${encodeURIComponent(oldCode)}`)).status, 404, '[4.6] Old code must be rejected after regeneration');
 
-    // Invite revocation disables all invite links/codes for the room
+    // Invite revocation disables all invite links for the room immediately
     hostWs.send(JSON.stringify({ type: PACKET_TYPES.INVITE_REVOKE }));
     const revMsg = await hostWs.waitFor(m => m.type === PACKET_TYPES.INVITE_UPDATE);
+    assert.equal(revMsg.data.inviteCode, undefined, '[4.7] Revocation packet must not contain inviteCode');
     assert.equal(revMsg.data.revoked, true, '[4.7] Invite revocation must mark invites as revoked');
-    assert.equal((await api(`/api/invite?token=${encodeURIComponent(regenMsg.data.inviteToken)}`)).status, 404, '[4.7] Revoked token must be rejected');
+    assert.equal((await api(`/api/invite?token=${encodeURIComponent(regenMsg.data.inviteToken)}`)).status, 404, '[4.7] Revoked token must be rejected by /api/invite');
+
+    // Revoked token cannot be used to join room
+    const revokedJoinWs = await openWs();
+    revokedJoinWs.send(JSON.stringify({
+      type: PACKET_TYPES.JOIN_LOBBY,
+      data: {
+        token: guestToken,
+        characterId: guestChar.id,
+        joinType: 'invite',
+        inviteToken: regenMsg.data.inviteToken
+      }
+    }));
+    const revJoinErr = await revokedJoinWs.waitFor(m => m.type === PACKET_TYPES.LOBBY_ERROR);
+    assert(revJoinErr.data.message.includes('Invalid') || revJoinErr.data.message.includes('expired') || revJoinErr.data.message.includes('closed'), '[4.7] Revoked token must not permit join');
+    await revokedJoinWs.waitForClose();
 
     // Re-issue invite and verify room capacity enforcement at admission time
     hostWs.send(JSON.stringify({ type: PACKET_TYPES.INVITE_REGENERATE }));
     const freshInvite = await hostWs.waitFor(m => m.type === PACKET_TYPES.INVITE_UPDATE);
 
+    // Guest joins via valid token (supporting fragment-based link input)
     const guestWs = await openWs();
     guestWs.send(JSON.stringify({
       type: PACKET_TYPES.JOIN_LOBBY,
@@ -612,7 +650,7 @@ try {
         token: guestToken,
         characterId: guestChar.id,
         joinType: 'invite',
-        inviteToken: freshInvite.data.inviteToken
+        inviteToken: `http://localhost:8080/#invite=${freshInvite.data.inviteToken}`
       }
     }));
     await guestWs.waitFor(m => m.type === PACKET_TYPES.ROOM_INIT);
@@ -642,25 +680,77 @@ try {
     assert(fullErr.data.message.includes('full'), '[4.8] Room capacity must be enforced at admission time');
     await p3Ws.waitForClose();
 
-    // Expired invite rejection
+    // Automatic token rotation updates connected room members and invalidates old token
     const liveRoom = rooms.get(roomId);
+    const preRotationToken = liveRoom.inviteToken;
     liveRoom.inviteExpiresAt = Date.now() - 1000;
-    assert.equal(inviteRegistry.resolveToken(freshInvite.data.inviteToken), null, '[4.9] Expired invite token must not resolve');
+    const rotatedRooms = inviteRegistry.rotateExpired(Date.now());
+    assert(rotatedRooms.includes(liveRoom), '[4.9] rotateExpired must include expired room');
+    for (const r of rotatedRooms) {
+      r._broadcastInviteUpdate();
+    }
+    const hostRotateUpdate = await hostWs.waitFor(m => m.type === PACKET_TYPES.INVITE_UPDATE);
+    const guestRotateUpdate = await guestWs.waitFor(m => m.type === PACKET_TYPES.INVITE_UPDATE);
+    assert(hostRotateUpdate.data.inviteToken && hostRotateUpdate.data.inviteToken !== preRotationToken, '[4.9] Rotated token must differ from pre-rotation token');
+    assert.equal(guestRotateUpdate.data.inviteToken, hostRotateUpdate.data.inviteToken, '[4.9] All connected members receive synchronized token rotation');
+    assert.equal(inviteRegistry.resolveToken(preRotationToken), null, '[4.9] Expired pre-rotation token must not resolve');
+    assert.equal(inviteRegistry.resolveToken(hostRotateUpdate.data.inviteToken), liveRoom, '[4.9] New rotated token resolves correctly');
+
+    // Expired token cannot be used to join room
+    const expiredWs = await openWs();
+    expiredWs.send(JSON.stringify({
+      type: PACKET_TYPES.JOIN_LOBBY,
+      data: {
+        token: p3.json.token,
+        characterId: p3Char.id,
+        joinType: 'invite',
+        inviteToken: preRotationToken
+      }
+    }));
+    const expiredErr = await expiredWs.waitFor(m => m.type === PACKET_TYPES.LOBBY_ERROR);
+    assert(expiredErr.data.message.includes('Invalid') || expiredErr.data.message.includes('expired') || expiredErr.data.message.includes('closed'), '[4.9] Expired token cannot join room');
+    await expiredWs.waitForClose();
 
     // Rate limiting on /api/invite enumeration attempts
     resetLimits();
     let inviteRateLimited = false;
     for (let i = 0; i < 25; i++) {
-      const r = await api(`/api/invite?code=GUESS${i % 10}`);
+      const r = await api(`/api/invite?token=GUESS_TOKEN_BASE64URL_${i % 10}`);
       if (r.status === 429) inviteRateLimited = true;
     }
     assert.equal(inviteRateLimited, true, '[4.10] Invite lookup endpoint must enforce rate limiting');
+
+    // Rate limiting across multiple WebSocket connections for invite admission
+    resetLimits();
+    let wsInviteRateLimited = false;
+    for (let i = 0; i < 25; i++) {
+      const testWs = await openWs();
+      testWs.send(JSON.stringify({
+        type: PACKET_TYPES.JOIN_LOBBY,
+        data: {
+          token: p3.json.token,
+          characterId: p3Char.id,
+          joinType: 'invite',
+          inviteToken: hostRotateUpdate.data.inviteToken
+        }
+      }));
+      const res = await testWs.waitFor(m => m.type === PACKET_TYPES.LOBBY_ERROR || m.type === PACKET_TYPES.ROOM_INIT);
+      if (res.type === PACKET_TYPES.LOBBY_ERROR && res.data.message.includes('Too many')) {
+        wsInviteRateLimited = true;
+        testWs.close();
+        await testWs.waitForClose();
+        break;
+      }
+      testWs.close();
+      await testWs.waitForClose();
+    }
+    assert.equal(wsInviteRateLimited, true, '[4.11] Rate limiting on invite admission must work across multiple WebSocket connections');
 
     guestWs.send(JSON.stringify({ type: PACKET_TYPES.LEAVE_LOBBY }));
     hostWs.send(JSON.stringify({ type: PACKET_TYPES.LEAVE_LOBBY }));
     await guestWs.waitForClose();
     await hostWs.waitForClose();
-    console.log('✔ Section 4: Invite code/token separation, zero credential leakage, privacy, capacity, rotation, revocation & rate limits verified.');
+    console.log('✔ Section 4: Cryptographic invite tokens, zero credential leakage, privacy, capacity, rotation, revocation & rate limits verified.');
   }
 
   // =========================================================================

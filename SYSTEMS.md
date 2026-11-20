@@ -216,7 +216,7 @@ Sanctum embeds a sample-accurate, zero-dependency procedural audio engine ported
 * **Dirty-Checked DOM Updates**: `HUDController` hashes vitals (`hp|maxHp|mp|maxMp|isDead`) and inventory JSON so DOM nodes are only mutated when values change.
 * **Character Sheet (`C`)**: Level, XP bar, core attributes (`Might`, `Focus`, `Agility`, `Vitality`), interactive `+` stat allocation buttons, and derived combat stats.
 * **Inventory & Paperdoll (`I`)**: 8 equipment sockets (`Helm`, `Amulet`, `Weapon`, `Armor`, `Off-hand`, `Gloves`, `Boots`, `Ring`) arranged in a Diablo-style sunken stone paperdoll with click-to-unequip, dynamic Carry Weight bar (`lb`), pack items list, and side-by-side comparative hover tooltips displaying green/red stat deltas.
-* **Invite Links**: Every active room (including `Quick Play (Private)` rooms) has a 6-character uppercase `inviteCode` with **`Copy Invite`** buttons in both the top status bar and the `ESC` Pause Menu.
+* **Invite Links**: Every active private room has a 128-bit cryptographic `inviteToken` with URL fragment sharing (`#invite=<token>`) and **`Copy Invite`** buttons in both the top status bar and the `ESC` Pause Menu.
 
 ---
 

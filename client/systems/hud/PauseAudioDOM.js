@@ -58,32 +58,36 @@ export function syncAudioUI(settings) {
   });
 }
 
-export function updatePauseCodeDisplay(hud) {
-  const pauseCode = document.getElementById('pause-my-code');
-  const btnReveal = document.getElementById('btn-pause-reveal-code');
-  if (!pauseCode) return;
-  if (hud.isInviteCodeRevealed) {
-    pauseCode.textContent = hud.currentInviteCode || (hud.currentInviteToken ? hud.currentInviteToken.slice(0, 8) + '...' : '—');
+export function updatePauseInviteDisplay(hud) {
+  const pauseLink = document.getElementById('pause-my-link');
+  const btnReveal = document.getElementById('btn-pause-reveal-link');
+  if (!pauseLink) return;
+  if (hud.isInviteRevealed) {
+    const fullUrl = hud.currentInviteToken
+      ? `${window.location.origin}${window.location.pathname}#invite=${hud.currentInviteToken}`
+      : '—';
+    pauseLink.textContent = fullUrl;
+    pauseLink.title = fullUrl;
     if (btnReveal) btnReveal.textContent = 'Hide';
   } else {
-    pauseCode.textContent = '••••••';
+    pauseLink.textContent = hud.currentInviteToken ? '••••••••••••••••' : '—';
+    pauseLink.title = '';
     if (btnReveal) btnReveal.textContent = 'Reveal';
   }
 }
 
-export function setInvite(hud, code, token = '') {
-  hud.currentInviteCode = code || '';
+export function setInvite(hud, token = '') {
   hud.currentInviteToken = token || '';
-  hud.isInviteCodeRevealed = false;
+  hud.isInviteRevealed = false;
   const invBtn = document.getElementById('btn-copy-invite');
   const pauseShare = document.getElementById('pause-share-box');
-  if (hud.currentInviteCode || hud.currentInviteToken) {
+  if (hud.currentInviteToken) {
     if (invBtn) {
       invBtn.textContent = 'Invite Link';
       invBtn.classList.remove('hidden');
     }
     pauseShare?.classList.remove('hidden');
-    hud.updatePauseCodeDisplay();
+    hud.updatePauseInviteDisplay();
   } else {
     invBtn?.classList.add('hidden');
     pauseShare?.classList.add('hidden');
@@ -91,28 +95,16 @@ export function setInvite(hud, code, token = '') {
 }
 
 export function bindPauseAndAudioEvents(hud) {
-  const btnReveal = document.getElementById('btn-pause-reveal-code');
+  const btnReveal = document.getElementById('btn-pause-reveal-link');
   btnReveal?.addEventListener('click', () => {
-    hud.isInviteCodeRevealed = !hud.isInviteCodeRevealed;
-    hud.updatePauseCodeDisplay();
-  });
-
-  const btnCopyCode = document.getElementById('btn-pause-copy-code');
-  btnCopyCode?.addEventListener('click', async () => {
-    const code = hud.currentInviteCode || hud.currentInviteToken;
-    if (!code) return;
-    await navigator.clipboard?.writeText(code).catch(() => {});
-    if (btnCopyCode) btnCopyCode.textContent = 'Copied!';
-    setTimeout(() => {
-      if (btnCopyCode) btnCopyCode.textContent = 'Copy Code';
-    }, 1500);
+    hud.isInviteRevealed = !hud.isInviteRevealed;
+    hud.updatePauseInviteDisplay();
   });
 
   const copyInvite = async () => {
     const token = hud.currentInviteToken;
-    const code = hud.currentInviteCode;
-    if (!token && !code) return;
-    const link = token ? `${window.location.origin}/?invite=${token}` : `${window.location.origin}/?join=${code}`;
+    if (!token) return;
+    const link = `${window.location.origin}${window.location.pathname}#invite=${token}`;
     await navigator.clipboard?.writeText(link).catch(() => {});
     const btnTop = document.getElementById('btn-copy-invite');
     const btnPause = document.getElementById('btn-pause-copy-invite');

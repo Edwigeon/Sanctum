@@ -241,14 +241,20 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   const { parseInviteInput } = await import('../client/systems/MenuController.js');
   const room = new GameRoom('TEST_CRYPTO', GAME_MODES.CLASSIC, 0, {});
   
-  assert(typeof room.inviteToken === 'string' && room.inviteToken.length >= 22, '[P3.11] Cryptographic inviteToken must be >= 22 characters');
-  assert(typeof room.inviteCode === 'string' && room.inviteCode.length === 6, '[P3.11] Short inviteCode must be 6 hex characters');
+  assert(typeof room.inviteToken === 'string' && room.inviteToken.length === 22, '[P3.11] Cryptographic inviteToken must be 22 characters');
+  assert(room.inviteCode === undefined, '[P3.11] Legacy inviteCode must not exist');
 
-  const parsedUrl = parseInviteInput(`http://localhost:8080/?invite=${room.inviteToken}`);
-  assert(parsedUrl.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract ?invite= token');
+  const parsedUrl = parseInviteInput(`http://localhost:8080/#invite=${room.inviteToken}`);
+  assert(parsedUrl.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract #invite= token');
 
-  const parsedJoin = parseInviteInput('http://localhost:8080/?join=DEMO99');
-  assert(parsedJoin.code === 'DEMO99', '[P3.11] parseInviteInput failed to extract ?join= code');
+  const parsedHash = parseInviteInput(`http://localhost:8080/#${room.inviteToken}`);
+  assert(parsedHash.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract raw fragment token');
+
+  const parsedQuery = parseInviteInput(`http://localhost:8080/?invite=${room.inviteToken}`);
+  assert(parsedQuery.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract ?invite= token');
+
+  const parsedLegacy = parseInviteInput('DEMO99');
+  assert(!parsedLegacy.token, '[P3.11] Legacy short codes must not parse');
 
   const summary = room.getSummary();
   assert(summary.inviteToken === undefined && summary.inviteCode === undefined, '[P3.11] Summary must not leak invite credentials');

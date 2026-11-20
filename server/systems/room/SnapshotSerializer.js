@@ -27,7 +27,7 @@ export function buildRoomSummary(room) {
 }
 
 /**
- * Minimal invite resolution preview: never returns inviteToken, inviteCode, internal roomId,
+ * Minimal invite resolution preview: never returns inviteToken, internal roomId,
  * or private player roster details to unauthenticated/external callers.
  */
 export function buildInvitePreview(room) {

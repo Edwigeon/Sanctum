@@ -736,7 +736,8 @@ input[type=password]:focus {
   margin-right: 4px;
 }
 
-/* Guaranteed Wide Room Code / Invite Link Input */
+/* Guaranteed Wide Invite Link / Token Input */
+#inp-invite-token,
 #inp-invite-code {
   flex: 1 1 240px !important;
   min-width: 220px !important;

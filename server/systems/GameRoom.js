@@ -41,13 +41,12 @@ export class GameRoom {
     this.maxPlayers = Math.max(1, Math.min(4, Math.floor(Number(options.maxPlayers) || 4)));
     this.password = options.password || '';
     this.ownerAccountId = options.ownerAccountId || null;
-    this.inviteCode = null;
     this.inviteToken = null;
     this.inviteIssuedAt = 0;
     this.inviteExpiresAt = 0;
     this.invitesRevoked = false;
     this.destroyed = false;
-    inviteRegistry.issue(this, { code: options.inviteCode || null });
+    inviteRegistry.issue(this);
     if (options.inviteToken && this.maxPlayers > 1) {
       inviteRegistry.byToken.delete(this.inviteToken);
       this.inviteToken = options.inviteToken;
@@ -102,20 +101,19 @@ export class GameRoom {
     if (this.maxPlayers <= 1) return null;
     inviteRegistry.issue(this);
     this._broadcastInviteUpdate();
-    return { inviteCode: this.inviteCode, inviteToken: this.inviteToken, inviteExpiresAt: this.inviteExpiresAt };
+    return { inviteToken: this.inviteToken, inviteExpiresAt: this.inviteExpiresAt };
   }
 
   revokeInvite() {
     inviteRegistry.revoke(this);
     this._broadcastInviteUpdate();
-    return { inviteCode: null, inviteToken: null, revoked: true };
+    return { inviteToken: null, revoked: true };
   }
 
   _broadcastInviteUpdate() {
     const payload = JSON.stringify({
       type: PACKET_TYPES.INVITE_UPDATE,
       data: {
-        inviteCode: this.inviteCode || '',
         inviteToken: this.inviteToken || '',
         revoked: Boolean(this.invitesRevoked)
       }
@@ -162,7 +160,6 @@ export class GameRoom {
         ngCycle: this.ngCycle,
         floor: this.floor,
         playerId,
-        inviteCode: this.inviteCode,
         inviteToken: this.inviteToken,
         maxPlayers: this.maxPlayers
       }

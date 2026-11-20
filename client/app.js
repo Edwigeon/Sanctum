@@ -117,7 +117,7 @@ const input = new InputController({
 const menus = new MenuController({
   audio,
   onConnect: connect,
-  getCurrentInviteCode: () => hud.currentInviteCode
+  getCurrentInviteToken: () => hud.currentInviteToken
 });
 
 function syncHUD() {
@@ -164,18 +164,18 @@ function exitToMainMenu() {
   menus.showMainMenu();
 }
 
-function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteCode = '', inviteToken = '', maxPlayers = 4) {
+function connect(playerName, roomName, mode, playerClass, characterId, joinType = 'public', password = '', inviteToken = '', maxPlayers = 4) {
   intentionalExit = false;
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
     reconnectTimer = null;
   }
-  lastJoinParams = { playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode, inviteToken, maxPlayers };
+  lastJoinParams = { playerName, roomName, mode, playerClass, characterId, joinType, password, inviteToken, maxPlayers };
 
   if (ws) {
     const oldWs = ws;
     ws = null;
-    oldWs.onclose = () => connect(playerName, roomName, mode, playerClass, characterId, joinType, password, inviteCode, inviteToken, maxPlayers);
+    oldWs.onclose = () => connect(playerName, roomName, mode, playerClass, characterId, joinType, password, inviteToken, maxPlayers);
     oldWs.close();
     return;
   }
@@ -203,7 +203,6 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
         characterId,
         joinType,
         password,
-        inviteCode,
         inviteToken,
         maxPlayers,
         token: menus.getAuthToken()
@@ -249,7 +248,7 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       interpolator.reset();
       latestSnapshot = null;
       hud.reset();
-      hud.setInvite(packet.data.inviteCode || '', packet.data.inviteToken || '');
+      hud.setInvite(packet.data.inviteToken || '');
       if (packet.data.floor) {
         hud.setFloorStatus(packet.data.floor);
       }
@@ -275,7 +274,7 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
       myPrivateState = packet.data;
       syncHUD();
     } else if (packet.type === PACKET_TYPES.INVITE_UPDATE) {
-      hud.setInvite(packet.data?.inviteCode || '', packet.data?.inviteToken || '');
+      hud.setInvite(packet.data?.inviteToken || '');
     }
   };
 
@@ -305,7 +304,6 @@ function connect(playerName, roomName, mode, playerClass, characterId, joinType 
             params.characterId,
             params.joinType,
             params.password,
-            params.inviteCode,
             params.inviteToken,
             params.maxPlayers
           );

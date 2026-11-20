@@ -182,8 +182,9 @@ export function bindLobbyBrowserEvents(menu) {
         ? 'px-2 py-0.5 rounded text-[10px] font-mono border border-rose-700/60 bg-rose-950/70 text-rose-300'
         : 'px-2 py-0.5 rounded text-[10px] font-mono border border-indigo-700/50 bg-indigo-950/60 text-indigo-300';
     }
-    if (menu.pendingInvite?.inviteToken || menu.pendingInvite?.inviteCode) {
-      document.getElementById('inp-invite-code').value = menu.pendingInvite.inviteToken || menu.pendingInvite.inviteCode;
+    if (menu.pendingInvite?.inviteToken) {
+      const inp = document.getElementById('inp-invite-token') || document.getElementById('inp-invite-code');
+      if (inp) inp.value = menu.pendingInvite.inviteToken;
     }
 
     const tabJoin = document.getElementById('tab-btn-join');

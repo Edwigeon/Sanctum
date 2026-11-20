@@ -12,7 +12,7 @@ import {
 } from './hud/ItemTooltipDOM.js';
 import {
   syncAudioUI,
-  updatePauseCodeDisplay,
+  updatePauseInviteDisplay,
   setInvite,
   bindPauseAndAudioEvents
 } from './hud/PauseAudioDOM.js';
@@ -41,9 +41,8 @@ export class HUDController {
     this.lastInvKey = '';
     this.lastVitalsKey = '';
     this.lastPrivRef = null;
-    this.currentInviteCode = '';
     this.currentInviteToken = '';
-    this.isInviteCodeRevealed = false;
+    this.isInviteRevealed = false;
     this.combatRemainingMs = 0;
     this.isDead = false;
 
@@ -193,8 +192,8 @@ export class HUDController {
   togglePause() {
     const isOpening = this.panelPause.classList.contains('hidden');
     if (isOpening) {
-      this.isInviteCodeRevealed = false;
-      this.updatePauseCodeDisplay();
+      this.isInviteRevealed = false;
+      this.updatePauseInviteDisplay();
     }
     this.panelPause.classList.toggle('hidden');
     this.updateHUDButtonStates();
@@ -208,24 +207,20 @@ export class HUDController {
     } else {
       const isOpening = this.panelPause.classList.contains('hidden');
       if (isOpening) {
-        this.isInviteCodeRevealed = false;
-        this.updatePauseCodeDisplay();
+        this.isInviteRevealed = false;
+        this.updatePauseInviteDisplay();
       }
       this.panelPause.classList.toggle('hidden');
     }
     this.updateHUDButtonStates();
   }
 
-  updatePauseCodeDisplay() {
-    updatePauseCodeDisplay(this);
+  updatePauseInviteDisplay() {
+    updatePauseInviteDisplay(this);
   }
 
-  setInvite(code, token = '') {
-    setInvite(this, code, token);
-  }
-
-  setInviteCode(code) {
-    this.setInvite(code, '');
+  setInvite(token = '') {
+    setInvite(this, token);
   }
 
   setFloorStatus(floor) {
@@ -239,8 +234,8 @@ export class HUDController {
     this.lastInvKey = '';
     this.lastVitalsKey = '';
     this.lastPrivRef = null;
-    this.isInviteCodeRevealed = false;
-    this.setInviteCode('');
+    this.isInviteRevealed = false;
+    this.setInvite('');
     this.panelChar.classList.add('hidden');
     this.panelInv.classList.add('hidden');
     this.panelPause.classList.add('hidden');
