@@ -23,6 +23,28 @@ function sendJson(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
+const httpRateLimits = new Map(); // key -> { count, windowStart }
+
+function getClientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  if (typeof fwd === 'string' && fwd.length > 0) {
+    return fwd.split(',')[0].trim();
+  }
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+function checkHttpRateLimit(req, bucket, maxReq, windowMs = 60000) {
+  const now = Date.now();
+  const key = `${bucket}:${getClientIp(req)}`;
+  let entry = httpRateLimits.get(key);
+  if (!entry || now - entry.windowStart >= windowMs) {
+    entry = { count: 0, windowStart: now };
+    httpRateLimits.set(key, entry);
+  }
+  entry.count++;
+  return entry.count <= maxReq;
+}
+
 function readBody(req, maxBytes = 131072) {
   return new Promise((resolve, reject) => {
     let body = '';
@@ -45,14 +67,23 @@ const server = http.createServer(async (req, res) => {
 
   // --- AUTH ENDPOINTS ---
   if (reqPath === '/api/auth/register' && req.method === 'POST') {
+    if (!checkHttpRateLimit(req, 'auth_register', 5, 60000)) {
+      return sendJson(res, 429, { error: 'Too many registration attempts. Please wait a minute.' });
+    }
     try {
-      const { username, password } = await readBody(req);
+      const { username, password, confirmPassword } = await readBody(req);
+      if (confirmPassword !== undefined && password !== confirmPassword) {
+        return sendJson(res, 400, { error: 'Passwords do not match.' });
+      }
       const result = authService.register(username, password);
       return sendJson(res, result.error ? 400 : 201, result);
     } catch { return sendJson(res, 400, { error: 'Invalid JSON' }); }
   }
 
   if (reqPath === '/api/auth/login' && req.method === 'POST') {
+    if (!checkHttpRateLimit(req, 'auth_login', 10, 60000)) {
+      return sendJson(res, 429, { error: 'Too many login attempts. Please wait a minute.' });
+    }
     try {
       const { username, password } = await readBody(req);
       const result = authService.login(username, password);
@@ -110,6 +141,9 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (reqPath === '/api/invite' && req.method === 'GET') {
+    if (!checkHttpRateLimit(req, 'invite_lookup', 15, 60000)) {
+      return sendJson(res, 429, { error: 'Too many invite lookups. Please wait a moment.' });
+    }
     const token = (parsedUrl.searchParams.get('token') || '').trim();
     const code = (parsedUrl.searchParams.get('code') || '').trim().toUpperCase();
     const room = Array.from(rooms.values()).find(r =>
@@ -120,11 +154,7 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 404, { error: 'Invite link or code is invalid or the game room has closed.' });
     }
     return sendJson(res, 200, {
-      invite: {
-        ...room.getSummary(),
-        inviteCode: room.inviteCode,
-        inviteToken: room.inviteToken
-      }
+      invite: room.getSummary()
     });
   }
 

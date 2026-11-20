@@ -16,8 +16,6 @@ export function buildRoomSummary(room) {
     players: room.players.size,
     maxPlayers: room.maxPlayers,
     hasPassword: !!room.password,
-    inviteCode: room.inviteCode,
-    inviteToken: room.inviteToken,
     playerList: Array.from(room.players.values()).map(p => ({
       id: p.id,
       name: p.name,

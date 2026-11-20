@@ -3,6 +3,7 @@
  * Regression test suite and performance benchmark for Sanctum Technical Update Plan.
  */
 
+import assert from 'node:assert/strict';
 import { ENGINE, GAME_MODES, PACKET_TYPES } from '../shared/Constants.js';
 import { DungeonGen } from '../shared/DungeonGen.js';
 import { GameRoom } from '../server/systems/GameRoom.js';
@@ -53,7 +54,7 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   // Sample at wx=3 (gx=0.5, halfway between c0 and c1)
   const u32 = ls.sampleLitPixelU32(3, 0, 1);
   const rCol = u32 & 255;
-  console.assert(rCol >= 50, `[P1.1] Neighboring colored light skipped! Expected rCol >= 50, got ${rCol}`);
+  assert(rCol >= 50, `[P1.1] Neighboring colored light skipped! Expected rCol >= 50, got ${rCol}`);
   console.log('✔ P1.1 Lighting interpolation across cell boundaries verified.');
 }
 
@@ -63,12 +64,12 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   const maxW = room.dungeon.width * ENGINE.TILE_SIZE;
   const maxH = room.dungeon.height * ENGINE.TILE_SIZE;
 
-  console.assert(room.isWalkable(-10, -10) === false, '[P1.2] Negative coordinate (-10, -10) must return false');
-  console.assert(room.isWalkable(-1, 50) === false, '[P1.2] Negative X must return false');
-  console.assert(room.isWalkable(50, -1) === false, '[P1.2] Negative Y must return false');
-  console.assert(room.isWalkable(maxW + 20, 50) === false, '[P1.2] Out-of-bounds width must return false');
-  console.assert(room.isWalkable(50, maxH + 20) === false, '[P1.2] Out-of-bounds height must return false');
-  console.assert(room.isWalkable(maxW + 20, maxH + 20) === false, '[P1.2] Corner out-of-bounds must return false');
+  assert(room.isWalkable(-10, -10) === false, '[P1.2] Negative coordinate (-10, -10) must return false');
+  assert(room.isWalkable(-1, 50) === false, '[P1.2] Negative X must return false');
+  assert(room.isWalkable(50, -1) === false, '[P1.2] Negative Y must return false');
+  assert(room.isWalkable(maxW + 20, 50) === false, '[P1.2] Out-of-bounds width must return false');
+  assert(room.isWalkable(50, maxH + 20) === false, '[P1.2] Out-of-bounds height must return false');
+  assert(room.isWalkable(maxW + 20, maxH + 20) === false, '[P1.2] Corner out-of-bounds must return false');
   console.log('✔ P1.2 Dungeon collision bounds rejection verified.');
 }
 
@@ -93,8 +94,8 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   room.update();
   const mA = room.monsters.get(1);
   const mB = room.monsters.get(2);
-  console.assert(mA.x === px + 22, `[P1.3] Monster A moved outside aggro range (x=${mA.x})`);
-  console.assert(mB.x < px + 22, `[P1.3] Monster B did not move inside aggro range (x=${mB.x})`);
+  assert(mA.x === px + 22, `[P1.3] Monster A moved outside aggro range (x=${mA.x})`);
+  assert(mB.x < px + 22, `[P1.3] Monster B did not move inside aggro range (x=${mB.x})`);
   room.destroy();
   console.log('✔ P1.3 Monster-specific aggro ranges verified.');
 }
@@ -109,8 +110,8 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   packets.length = 0;
   room.advanceFloor();
   const snap = packets.find(p => p.type === PACKET_TYPES.WORLD_SNAPSHOT);
-  console.assert(snap !== undefined, '[P1.4] Snapshot not dispatched on advanceFloor');
-  console.assert(snap.data.events.some(e => e.type === 'FLOOR_DESCENT'), '[P1.4] FLOOR_DESCENT event missing from transition snapshot');
+  assert(snap !== undefined, '[P1.4] Snapshot not dispatched on advanceFloor');
+  assert(snap.data.events.some(e => e.type === 'FLOOR_DESCENT'), '[P1.4] FLOOR_DESCENT event missing from transition snapshot');
   room.destroy();
   console.log('✔ P1.4 Floor transition event ordering verified.');
 }
@@ -121,16 +122,16 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
 
 // 5. Data registry validation
 {
-  console.assert(dataRegistry.validationErrors.length === 0, `[P2.5] Expected 0 validation errors, got: ${dataRegistry.validationErrors.join(', ')}`);
-  console.assert(dataRegistry.hasClass('VANGUARD') === true, '[P2.5] Vanguard class should be present');
-  console.assert(dataRegistry.hasClass('UNKNOWN_ID') === false, '[P2.5] Unknown class should return false');
-  console.assert(dataRegistry.getClass('UNKNOWN_ID', false) === null, '[P2.5] getClass with allowFallback=false should return null');
-  console.assert(dataRegistry.getClass('UNKNOWN_ID', true) !== null, '[P2.5] getClass with allowFallback=true should return default');
+  assert(dataRegistry.validationErrors.length === 0, `[P2.5] Expected 0 validation errors, got: ${dataRegistry.validationErrors.join(', ')}`);
+  assert(dataRegistry.hasClass('VANGUARD') === true, '[P2.5] Vanguard class should be present');
+  assert(dataRegistry.hasClass('UNKNOWN_ID') === false, '[P2.5] Unknown class should return false');
+  assert(dataRegistry.getClass('UNKNOWN_ID', false) === null, '[P2.5] getClass with allowFallback=false should return null');
+  assert(dataRegistry.getClass('UNKNOWN_ID', true) !== null, '[P2.5] getClass with allowFallback=true should return default');
 
-  console.assert(dataRegistry.hasMonster('crawler') === true, '[P2.5] Crawler should be present');
-  console.assert(dataRegistry.hasMonster('unknown_mob') === false, '[P2.5] Unknown mob should return false');
-  console.assert(dataRegistry.getMonster('unknown_mob', false) === null, '[P2.5] getMonster with allowFallback=false should return null');
-  console.assert(dataRegistry.getMonster('unknown_mob', true) !== null, '[P2.5] getMonster with allowFallback=true should return default');
+  assert(dataRegistry.hasMonster('crawler') === true, '[P2.5] Crawler should be present');
+  assert(dataRegistry.hasMonster('unknown_mob') === false, '[P2.5] Unknown mob should return false');
+  assert(dataRegistry.getMonster('unknown_mob', false) === null, '[P2.5] getMonster with allowFallback=false should return null');
+  assert(dataRegistry.getMonster('unknown_mob', true) !== null, '[P2.5] getMonster with allowFallback=true should return default');
   console.log('✔ P2.5 Data registry schema validation and fallback distinction verified.');
 }
 
@@ -142,21 +143,21 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
 
   // Duplicate tick
   interp.pushSnapshot({ tick: 11, players: [{ id: 1, x: 20, y: 10 }], monsters: [] });
-  console.assert(interp.snapshotBuffer.length === 2, '[P2.6] Duplicate tick was added');
+  assert(interp.snapshotBuffer.length === 2, '[P2.6] Duplicate tick was added');
 
   // Stale tick older than window
   interp.pushSnapshot({ tick: 5, players: [{ id: 1, x: 0, y: 0 }], monsters: [] });
-  console.assert(interp.snapshotBuffer.length === 2, '[P2.6] Stale tick was added');
+  assert(interp.snapshotBuffer.length === 2, '[P2.6] Stale tick was added');
 
   // Out-of-order tick (tick 13 followed by tick 12)
   interp.pushSnapshot({ tick: 13, players: [{ id: 1, x: 40, y: 10 }], monsters: [] });
   interp.pushSnapshot({ tick: 12, players: [{ id: 1, x: 30, y: 10 }], monsters: [] });
   const ticks = interp.snapshotBuffer.map(s => s.tick);
-  console.assert(JSON.stringify(ticks) === JSON.stringify([10, 11, 12, 13]), `[P2.6] Buffer ticks not sorted ascending: ${JSON.stringify(ticks)}`);
+  assert(JSON.stringify(ticks) === JSON.stringify([10, 11, 12, 13]), `[P2.6] Buffer ticks not sorted ascending: ${JSON.stringify(ticks)}`);
 
   // Verify interpolation output stability
   const state = interp.getInterpolatedEntities(0.016);
-  console.assert(!Number.isNaN(state.players[0].rx), '[P2.6] Interpolated player rx is NaN');
+  assert(!Number.isNaN(state.players[0].rx), '[P2.6] Interpolated player rx is NaN');
   console.log('✔ P2.6 Snapshot buffer ordering and irregularity tolerance verified.');
 }
 
@@ -171,11 +172,11 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
       stats: { might: 'invalid', focus: 999999, arbitraryField: 42 },
       inventory: 'not an array'
     });
-    console.assert(!updated.name.includes('<script>'), '[P2.7] XSS tag was not sanitized');
-    console.assert(updated.level >= 1, '[P2.7] Level was not clamped >= 1');
-    console.assert(updated.potions <= 99, '[P2.7] Potions was not clamped <= 99');
-    console.assert(updated.stats.arbitraryField === undefined, '[P2.7] Arbitrary stats injected');
-    console.assert(Array.isArray(updated.inventory), '[P2.7] Inventory was corrupted');
+    assert(!updated.name.includes('<script>'), '[P2.7] XSS tag was not sanitized');
+    assert(updated.level >= 1, '[P2.7] Level was not clamped >= 1');
+    assert(updated.potions <= 99, '[P2.7] Potions was not clamped <= 99');
+    assert(updated.stats.arbitraryField === undefined, '[P2.7] Arbitrary stats injected');
+    assert(Array.isArray(updated.inventory), '[P2.7] Inventory was corrupted');
     console.log('✔ P2.7 ModService sanitization and isolation verified.');
   }
 }
@@ -220,18 +221,18 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
 // 10. Game room lifecycle
 {
   const room = new GameRoom('TEST_LIFECYCLE', GAME_MODES.CLASSIC, 0, {});
-  console.assert(room.tickInterval === null, '[P3.10] Empty room must not have running tickInterval before players join');
+  assert(room.tickInterval === null, '[P3.10] Empty room must not have running tickInterval before players join');
 
   const mockSocket = { id: 201, readyState: 1, send: () => {} };
   room.addPlayer(mockSocket, 'TestPlayer', 'VANGUARD');
-  console.assert(room.tickInterval !== null, '[P3.10] Room must start tickInterval when player joins');
+  assert(room.tickInterval !== null, '[P3.10] Room must start tickInterval when player joins');
 
   room.removePlayer(201);
-  console.assert(room.tickInterval === null, '[P3.10] Room must clear tickInterval when all players leave');
+  assert(room.tickInterval === null, '[P3.10] Room must clear tickInterval when all players leave');
 
   room.destroy();
-  console.assert(room.players.size === 0, '[P3.10] Players map must be empty after destroy');
-  console.assert(room.monsters.size === 0, '[P3.10] Monsters map must be empty after destroy');
+  assert(room.players.size === 0, '[P3.10] Players map must be empty after destroy');
+  assert(room.monsters.size === 0, '[P3.10] Monsters map must be empty after destroy');
   console.log('✔ P3.10 GameRoom lifecycle and interval cleanup verified.');
 }
 
@@ -240,19 +241,19 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   const { parseInviteInput } = await import('../client/systems/MenuController.js');
   const room = new GameRoom('TEST_CRYPTO', GAME_MODES.CLASSIC, 0, {});
   
-  console.assert(typeof room.inviteToken === 'string' && room.inviteToken.length >= 22, '[P3.11] Cryptographic inviteToken must be >= 22 characters');
-  console.assert(typeof room.inviteCode === 'string' && room.inviteCode.length === 6, '[P3.11] Short inviteCode must be 6 hex characters');
+  assert(typeof room.inviteToken === 'string' && room.inviteToken.length >= 22, '[P3.11] Cryptographic inviteToken must be >= 22 characters');
+  assert(typeof room.inviteCode === 'string' && room.inviteCode.length === 6, '[P3.11] Short inviteCode must be 6 hex characters');
 
   const parsedUrl = parseInviteInput(`http://localhost:8080/?invite=${room.inviteToken}`);
-  console.assert(parsedUrl.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract ?invite= token');
+  assert(parsedUrl.token === room.inviteToken, '[P3.11] parseInviteInput failed to extract ?invite= token');
 
   const parsedJoin = parseInviteInput('http://localhost:8080/?join=DEMO99');
-  console.assert(parsedJoin.code === 'DEMO99', '[P3.11] parseInviteInput failed to extract ?join= code');
+  assert(parsedJoin.code === 'DEMO99', '[P3.11] parseInviteInput failed to extract ?join= code');
 
   const summary = room.getSummary();
-  console.assert(summary.inviteToken === room.inviteToken, '[P3.11] Summary must include inviteToken');
-  console.assert(Array.isArray(summary.playerList), '[P3.11] Summary must include playerList for realm lobby');
-  console.assert(typeof summary.biome === 'string', '[P3.11] Summary must include biome');
+  assert(summary.inviteToken === undefined && summary.inviteCode === undefined, '[P3.11] Summary must not leak invite credentials');
+  assert(Array.isArray(summary.playerList), '[P3.11] Summary must include playerList for realm lobby');
+  assert(typeof summary.biome === 'string', '[P3.11] Summary must include biome');
 
   room.destroy();
   console.log('✔ P3.11 Realm lobby metadata & cryptographic invite links verified.');
@@ -274,9 +275,9 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   audio.ctx = { currentTime: 1.0 };
 
   audio.resetMacroState();
-  console.assert(audio.macroState.lowHealth === false, '[P3.12] lowHealth must reset to false');
-  console.assert(audio.lowHealthFilter.frequency.value === 22000, '[P3.12] lowHealth filter frequency must restore to 22 kHz');
-  console.assert(audio.lowHealthFilter.Q.value === 0.7, '[P3.12] lowHealth filter Q must restore to 0.7');
+  assert(audio.macroState.lowHealth === false, '[P3.12] lowHealth must reset to false');
+  assert(audio.lowHealthFilter.frequency.value === 22000, '[P3.12] lowHealth filter frequency must restore to 22 kHz');
+  assert(audio.lowHealthFilter.Q.value === 0.7, '[P3.12] lowHealth filter Q must restore to 0.7');
 
   // Verify lobby discovery rules:
   // Public room appears in lobbies; unlisted room does not; both can be joined via cryptographic inviteToken
@@ -295,13 +296,13 @@ console.log('=== RUNNING SANCTUM TECHNICAL VERIFICATION SUITE ===\n');
   const allRooms = [publicRoom, unlistedRoom];
   const publicLobbies = allRooms.filter(r => r.isPublic && r.mode === GAME_MODES.CLASSIC).map(r => r.getSummary());
 
-  console.assert(publicLobbies.length === 1, '[P3.12] Exactly 1 public lobby must be discoverable');
-  console.assert(publicLobbies[0].roomId === 'CLASSIC_pub_test', '[P3.12] Public room must match');
-  console.assert(publicLobbies[0].hasPassword === true, '[P3.12] Password protected room must indicate hasPassword=true');
+  assert(publicLobbies.length === 1, '[P3.12] Exactly 1 public lobby must be discoverable');
+  assert(publicLobbies[0].roomId === 'CLASSIC_pub_test', '[P3.12] Public room must match');
+  assert(publicLobbies[0].hasPassword === true, '[P3.12] Password protected room must indicate hasPassword=true');
 
   // Unlisted room must be joinable via cryptographic inviteToken
   const foundByToken = allRooms.find(r => r.inviteToken === unlistedRoom.inviteToken);
-  console.assert(foundByToken && foundByToken.roomId === 'CLASSIC_unlisted_test', '[P3.12] Unlisted room must resolve via inviteToken');
+  assert(foundByToken && foundByToken.roomId === 'CLASSIC_unlisted_test', '[P3.12] Unlisted room must resolve via inviteToken');
 
   publicRoom.destroy();
   unlistedRoom.destroy();

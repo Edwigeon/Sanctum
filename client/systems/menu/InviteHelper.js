@@ -64,8 +64,12 @@ export async function resolvePendingInvite(menu, rawInput) {
       return null;
     }
     const { invite } = await res.json();
-    menu.pendingInvite = invite;
-    sessionStorage.setItem('sanctum_pending_invite', invite.inviteToken || invite.inviteCode);
+    menu.pendingInvite = {
+      ...invite,
+      inviteToken: token || '',
+      inviteCode: code || ''
+    };
+    sessionStorage.setItem('sanctum_pending_invite', token || code);
     if (invite.mode === GAME_MODES.HARDCORE) menu.btnHardcore.click();
     else menu.btnClassic.click();
     menu.updateInviteBanner();

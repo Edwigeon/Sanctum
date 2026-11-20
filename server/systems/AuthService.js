@@ -7,8 +7,8 @@ class AuthService {
     if (!/^[a-zA-Z0-9_]{3,20}$/.test(cleanUser)) {
       return { error: 'Username must be 3-20 alphanumeric/underscore characters.' };
     }
-    if (!password || password.length < 4 || password.length > 100) {
-      return { error: 'Password must be at least 4 characters.' };
+    if (!password || password.length < 8 || password.length > 100) {
+      return { error: 'Password must be 8-100 characters.' };
     }
 
     const existing = db.prepare('SELECT id FROM accounts WHERE username = ?').get(cleanUser);

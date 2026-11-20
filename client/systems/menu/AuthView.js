@@ -93,11 +93,41 @@ export async function submitAuth(menu, endpoint) {
   errEl.classList.add('hidden');
   const username = document.getElementById('auth-username').value.trim();
   const password = document.getElementById('auth-password').value;
+  const confirmWrap = document.getElementById('auth-confirm-wrap');
+  const confirmEl = document.getElementById('auth-password-confirm');
+  const regBtn = document.getElementById('btn-auth-register');
+
+  if (endpoint === '/api/auth/register') {
+    if (confirmWrap && confirmWrap.classList.contains('hidden')) {
+      confirmWrap.classList.remove('hidden');
+      if (regBtn) regBtn.textContent = 'Create Account';
+      confirmEl?.focus();
+      return;
+    }
+    if (password.length < 8) {
+      errEl.textContent = 'Password must be at least 8 characters.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (confirmEl && password !== confirmEl.value) {
+      errEl.textContent = 'Passwords do not match.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+  } else if (confirmWrap && !confirmWrap.classList.contains('hidden')) {
+    confirmWrap.classList.add('hidden');
+    if (confirmEl) confirmEl.value = '';
+    if (regBtn) regBtn.textContent = 'Register';
+  }
+
   try {
+    const body = endpoint === '/api/auth/register'
+      ? { username, password, confirmPassword: confirmEl ? confirmEl.value : password }
+      : { username, password };
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     if (!res.ok || data.error) {

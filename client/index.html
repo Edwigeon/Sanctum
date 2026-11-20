@@ -110,8 +110,18 @@
         </div>
         <div>
           <label class="block text-slate-400 mb-1">Password</label>
-          <input id="auth-password" type="password" maxlength="100" placeholder="Min 4 characters"
+          <input id="auth-password" type="password" maxlength="100" placeholder="Min 8 characters"
             class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+        </div>
+        <div id="auth-confirm-wrap" class="hidden space-y-2.5">
+          <div>
+            <label class="block text-slate-400 mb-1">Confirm Password</label>
+            <input id="auth-password-confirm" type="password" maxlength="100" placeholder="Re-enter password"
+              class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500 font-mono">
+          </div>
+          <div class="text-[10px] font-mono text-amber-200/90 bg-amber-950/30 border border-amber-800/50 rounded px-2.5 py-2 leading-relaxed">
+            <strong>Notice:</strong> There is <strong>no password recovery</strong>—save your password safely. Accounts inactive for <strong>180 days (6 months)</strong> are automatically deleted along with their characters.
+          </div>
         </div>
         <div id="auth-error"
           class="hidden text-[11px] font-mono text-rose-400 bg-rose-950/40 border border-rose-900/60 rounded px-2.5 py-1.5">
