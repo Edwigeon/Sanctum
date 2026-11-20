@@ -140,7 +140,7 @@ export class PotionRenderer {
     const isActiveRegen = fx.regen > 0.35;
     const sweepCycle = animTime % 4.0;
     const isFullShimmer = ratio >= 1.0 && fx.regen === 0 && fx.slosh === 0 && sweepCycle < 0.45;
-    const sweepPos = 22 + (sweepCycle / 0.45) * 20;
+    const sweepOffset = isFullShimmer ? (-3.5 + (sweepCycle / 0.45) * 7.0) : 0;
 
     const bcx = 17.5;
     const bcy = 30.0;
@@ -347,10 +347,14 @@ export class PotionRenderer {
           }
         }
 
-        // Full-globe diagonal shimmer sweep every 4s
-        if (isFullShimmer && dx < 0 && py >= 14 && py <= 32 && Math.abs((px + py) - sweepPos) <= 0.8) {
-          oCtx.fillStyle = '#fff1e8';
-          oCtx.fillRect(px, py, 1, 1);
+        // Sweeping arc parallel to specular glint on full health
+        if (isFullShimmer && dx < 0 && py >= 15 && py <= 32) {
+          const dy = (py - bcy + sweepOffset) * (Rx / Ry);
+          const dist = Math.hypot(dx + sweepOffset, dy);
+          if (Math.abs(dist - 11.5) <= 0.8) {
+            oCtx.fillStyle = '#fff1e8';
+            oCtx.fillRect(px, py, 1, 1);
+          }
         }
       }
     }

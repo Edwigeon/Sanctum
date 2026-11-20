@@ -60,6 +60,7 @@ export class PerfOSD {
     this._lastNetWindowAt = typeof performance !== 'undefined' ? performance.now() : 0;
     this._lastSnapAt = 0;
     this._lastSnapTick = null;
+    this._lastUnderrunLogAt = 0;
 
     this.root = null;
     this.statsEl = null;
@@ -200,7 +201,7 @@ export class PerfOSD {
       if (gap > this._iatWindowMax) this._iatWindowMax = gap;
       const dev = Math.abs(gap - 66.67);
       this.metrics.jitterMs = this.metrics.jitterMs * 0.8 + dev * 0.2;
-      if (gap > 130) {
+      if (gap > 220) {
         this.log('NET_GAP', `Snapshot gap ${gap.toFixed(1)}ms (tick ${snap?.tick})`, 'warn');
       }
     }
@@ -258,6 +259,11 @@ export class PerfOSD {
         this.metrics.pktSkipped = interpolator.stats.skipped;
         this.metrics.pktOoo = interpolator.stats.ooo;
         this.metrics.pktStale = interpolator.stats.stale;
+      }
+      if (interpolator.underrun && now - this._lastUnderrunLogAt > 1000) {
+        this._lastUnderrunLogAt = now;
+        const lag = (this.metrics.latestTick - this.metrics.renderTick).toFixed(2);
+        this.log('NET_UNDERRUN', `Interpolation buffer underrun (lag ${lag}t)`, 'warn');
       }
     }
     if (interp) {

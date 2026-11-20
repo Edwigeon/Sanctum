@@ -51,6 +51,10 @@ export class Interpolator {
   constructor() {
     this.snapshotBuffer = [];
     this.renderTick = null;
+    this.jitterMs = 0;
+    this.delayTicks = 1.35;
+    this.underrun = false;
+    this._lastPushAt = 0;
     this._prevMap = new Map();
     this._outPlayers = [];
     this._outMonsters = [];
@@ -62,6 +66,10 @@ export class Interpolator {
   reset() {
     this.snapshotBuffer = [];
     this.renderTick = null;
+    this.jitterMs = 0;
+    this.delayTicks = 1.35;
+    this.underrun = false;
+    this._lastPushAt = 0;
     this._lastLoot = [];
     this.stats.skipped = 0;
     this.stats.ooo = 0;
@@ -75,6 +83,7 @@ export class Interpolator {
       this._lastLoot = snap.loot;
     }
 
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const buf = this.snapshotBuffer;
     const len = buf.length;
 
@@ -83,7 +92,13 @@ export class Interpolator {
       if (len > 0) {
         const gap = snap.tick - buf[len - 1].tick;
         if (gap > 1) this.stats.skipped += gap - 1;
+        if (this._lastPushAt > 0) {
+          const iat = now - this._lastPushAt;
+          const dev = Math.abs(iat - ENGINE.TICK_INTERVAL_MS);
+          this.jitterMs = this.jitterMs * 0.85 + dev * 0.15;
+        }
       }
+      this._lastPushAt = now;
       buf.push(snap);
       if (buf.length > 6) buf.shift();
     } else {
@@ -131,8 +146,10 @@ export class Interpolator {
       };
     }
 
-    const targetTick = latest.tick - 1.25;
-    if (this.renderTick === null || Math.abs(targetTick - this.renderTick) > 3.0) {
+    const targetDelayTicks = Math.max(1.35, Math.min(3.0, 1.35 + (this.jitterMs * 1.5) / ENGINE.TICK_INTERVAL_MS));
+    this.delayTicks += (targetDelayTicks - this.delayTicks) * Math.min(1, dt * 2.5);
+    const targetTick = latest.tick - this.delayTicks;
+    if (this.renderTick === null || Math.abs(targetTick - this.renderTick) > 3.5) {
       this.renderTick = targetTick;
     } else {
       this.renderTick += dt * ENGINE.TICK_RATE;
@@ -141,6 +158,7 @@ export class Interpolator {
       const gain = Math.abs(drift) > 0.5 ? 3.0 : 0.8;
       this.renderTick += drift * Math.min(1, dt * gain);
     }
+    this.underrun = this.renderTick > latest.tick;
 
     let snapA = this.snapshotBuffer[0];
     let snapB = latest;
@@ -158,7 +176,7 @@ export class Interpolator {
     }
 
     const span = Math.max(1, snapB.tick - snapA.tick);
-    const alpha = Math.max(0, Math.min(1.15, (this.renderTick - snapA.tick) / span));
+    const alpha = Math.max(0, Math.min(1.5, (this.renderTick - snapA.tick) / span));
 
     return {
       players: interpolateList(snapA.players, snapB.players, alpha, this._prevMap, this._outPlayers),
