@@ -1,4 +1,6 @@
 import { PACKET_TYPES } from '../../shared/Constants.js';
+import { UIInventory } from './ui/containers/UIInventory.js';
+import { UICharacter } from './ui/containers/UICharacter.js';
 import {
   PAPERDOLL_SLOTS,
   STAT_LABELS,
@@ -49,6 +51,24 @@ export class HUDController {
     this.bindEvents();
     this.initAudioSettings();
     this.initBitSpriteIcons();
+
+    // Canvas-Native Inventory
+    this.uiInventory = new UIInventory({
+      sendPacket: this.sendPacket,
+      audio: this.audio,
+      onClose: () => this.toggleInv()
+    });
+    this.renderer.uiManager?.register(this.uiInventory);
+    this.uiInventory.visible = false;
+
+    // Canvas-Native Character Sheet
+    this.uiCharacter = new UICharacter({
+      sendPacket: this.sendPacket,
+      audio: this.audio,
+      onClose: () => this.toggleChar()
+    });
+    this.renderer.uiManager?.register(this.uiCharacter);
+    this.uiCharacter.visible = false;
   }
 
   initBitSpriteIcons() {
@@ -163,8 +183,8 @@ export class HUDController {
   }
 
   updateHUDButtonStates() {
-    const isCharOpen = this.panelChar && !this.panelChar.classList.contains('hidden');
-    const isInvOpen = this.panelInv && !this.panelInv.classList.contains('hidden');
+    const isCharOpen = Boolean(this.uiCharacter?.visible);
+    const isInvOpen = Boolean(this.uiInventory?.visible);
     const isPauseOpen = this.panelPause && !this.panelPause.classList.contains('hidden');
     document.getElementById('btn-toggle-char')?.classList.toggle('btn-locked-pressed', isCharOpen);
     document.getElementById('btn-toggle-inv')?.classList.toggle('btn-locked-pressed', isInvOpen);
@@ -177,13 +197,29 @@ export class HUDController {
   }
 
   toggleChar() {
-    this.panelChar.classList.toggle('hidden');
+    const willOpen = !this.uiCharacter.visible;
+    this.uiCharacter.visible = willOpen;
+    if (willOpen) {
+      this.renderer.uiManager?.openModal(this.uiCharacter);
+    } else {
+      this.renderer.uiManager?.closeModal(this.uiCharacter);
+    }
+    if (this.panelChar) {
+      this.panelChar.classList.add('hidden');
+    }
     this.updateHUDButtonStates();
   }
 
   toggleInv() {
-    this.panelInv.classList.toggle('hidden');
-    if (this.panelInv.classList.contains('hidden')) {
+    const willOpen = !this.uiInventory.visible;
+    this.uiInventory.visible = willOpen;
+    if (willOpen) {
+      this.renderer.uiManager?.openModal(this.uiInventory);
+    } else {
+      this.renderer.uiManager?.closeModal(this.uiInventory);
+    }
+    if (this.panelInv) {
+      this.panelInv.classList.add('hidden');
       this.hideComparisonTooltip();
     }
     this.updateHUDButtonStates();
@@ -201,10 +237,21 @@ export class HUDController {
 
   handleEscape() {
     this.hideComparisonTooltip();
-    if (!this.panelChar.classList.contains('hidden') || !this.panelInv.classList.contains('hidden')) {
+    let handled = false;
+    if (this.uiInventory?.visible) {
+      this.renderer.uiManager?.closeModal(this.uiInventory);
+      this.uiInventory.visible = false;
+      handled = true;
+    }
+    if (this.panelChar && !this.panelChar.classList.contains('hidden')) {
       this.panelChar.classList.add('hidden');
+      handled = true;
+    }
+    if (this.panelInv && !this.panelInv.classList.contains('hidden')) {
       this.panelInv.classList.add('hidden');
-    } else {
+      handled = true;
+    }
+    if (!handled) {
       const isOpening = this.panelPause.classList.contains('hidden');
       if (isOpening) {
         this.isInviteRevealed = false;
@@ -240,6 +287,14 @@ export class HUDController {
     this.panelInv.classList.add('hidden');
     this.panelPause.classList.add('hidden');
     this.panelDeath.classList.add('hidden');
+    if (this.uiInventory) {
+      this.renderer.uiManager?.closeModal(this.uiInventory);
+      this.uiInventory.visible = false;
+    }
+    if (this.uiCharacter) {
+      this.renderer.uiManager?.closeModal(this.uiCharacter);
+      this.uiCharacter.visible = false;
+    }
     this.updateHUDButtonStates();
     this.audio?.resetMacroState?.();
     this.renderer?.updateHUD({
@@ -274,18 +329,25 @@ export class HUDController {
       nextXp: priv?.nextXp || 100,
       level: priv?.level || 1,
       statPoints: priv?.statPoints || 0,
-      isCharOpen: this.panelChar && !this.panelChar.classList.contains('hidden'),
-      isInvOpen: this.panelInv && !this.panelInv.classList.contains('hidden'),
+      isCharOpen: Boolean(this.uiCharacter?.visible),
+      isInvOpen: Boolean(this.uiInventory?.visible),
       isPauseOpen: this.panelPause && !this.panelPause.classList.contains('hidden')
     });
 
     updateVitalsAndDeathDOM(this, myP, activeRoomMode);
+
+    if (this.uiCharacter) {
+      this.uiCharacter.updateData(myP, priv, activeRoomMode, this.renderer.floor || 1);
+    }
 
     if (!priv || priv === this.lastPrivRef) return;
     this.lastPrivRef = priv;
 
     updateCharacterSheetDOM(myP, priv);
     updateInventoryAndPaperdollDOM(this, priv);
+    if (this.uiInventory) {
+      this.uiInventory.updateData(priv);
+    }
   }
 
   showConsumableTooltip(item, targetEl) {

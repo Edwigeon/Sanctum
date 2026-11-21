@@ -66,10 +66,11 @@ export class InputController {
       const pxX = e.clientX - rect.left;
       const pxY = e.clientY - rect.top;
 
-      // Update Canvas HUD mouse position & cursor
+      // Update Canvas HUD & UI Manager mouse position & cursor
+      const uiHit = this.renderer.uiManager?.handlePointerMove(pxX, pxY, e.pointerType || 'mouse');
       this.renderer.canvasHud?.setMousePos(pxX, pxY);
       const hudHit = this.renderer.canvasHud?.hitTest(pxX, pxY);
-      if (hudHit && hudHit.id !== 'belt_bg') {
+      if (uiHit || (hudHit && hudHit.id !== 'belt_bg')) {
         stage.style.cursor = 'pointer';
       } else {
         stage.style.cursor = 'crosshair';
@@ -82,11 +83,27 @@ export class InputController {
     });
 
     stage.addEventListener('mouseleave', () => {
+      this.renderer.uiManager?.handlePointerMove(-1, -1);
       this.renderer.canvasHud?.setMousePos(-1, -1);
       stage.style.cursor = 'crosshair';
     });
 
-    stage.addEventListener('contextmenu', (e) => e.preventDefault());
+    stage.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = stage.getBoundingClientRect();
+      const pxX = e.clientX - rect.left;
+      const pxY = e.clientY - rect.top;
+      this.renderer.uiManager?.handleContextMenu(pxX, pxY);
+    });
+
+    stage.addEventListener('wheel', (e) => {
+      const rect = stage.getBoundingClientRect();
+      const pxX = e.clientX - rect.left;
+      const pxY = e.clientY - rect.top;
+      if (this.renderer.uiManager?.handleWheel(pxX, pxY, e.deltaY)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
 
     stage.addEventListener('mousedown', (e) => {
       if (e.target !== stage && e.target !== this.renderer.pCanvas && e.target !== this.renderer.hCanvas) return;
@@ -96,6 +113,11 @@ export class InputController {
       const rect = stage.getBoundingClientRect();
       const pxX = e.clientX - rect.left;
       const pxY = e.clientY - rect.top;
+
+      // Canvas UI Manager Click Interception (Modals, Custom Panels)
+      if (this.renderer.uiManager?.handlePointerDown(pxX, pxY, e.button, e.pointerType || 'mouse')) {
+        return;
+      }
 
       // Canvas HUD Click Interception
       const hudHit = this.renderer.canvasHud?.hitTest(pxX, pxY);
@@ -157,6 +179,10 @@ export class InputController {
     });
 
     window.addEventListener('mouseup', (e) => {
+      const rect = stage.getBoundingClientRect();
+      const pxX = e.clientX - rect.left;
+      const pxY = e.clientY - rect.top;
+      this.renderer.uiManager?.handlePointerUp(pxX, pxY, e.button);
       this.renderer.canvasHud?.setMouseDown(false);
       if (e.button !== 0 || !this.lmbDown) return;
       this.lmbDown = false;

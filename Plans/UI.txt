@@ -1,0 +1,672 @@
+# Sanctum — Unified UI Framework & Rendering Migration Plan
+
+**Project:** Sanctum  
+**Initiative:** Canvas-Native UI and Visual Presentation  
+**Status:** Proposed  
+**Priority:** High  
+**Scope:** Client-side UI, rendering, interaction, and presentation
+
+---
+
+# 1. Vision
+
+Transition Sanctum's existing CSS/HTML-based game presentation into a unified, canvas-native UI system that shares the game's visual identity and rendering technology.
+
+The objective is to make the entire player-facing experience feel like one cohesive game:
+
+- World presentation.
+- Inventory.
+- Character sheet.
+- Equipment.
+- Resource displays.
+- Main menus.
+- Tooltips.
+- Notifications.
+- Other interactive interface elements.
+
+Rather than maintaining two different visual systems, Sanctum should use its existing indexed-palette rendering approach for both the world and the interface.
+
+The existing resource globes provide the initial visual and technical reference for this direction.
+
+**Core philosophy: Build on what already works. Keep the implementation compact, reusable, and consistent with the rest of the engine.**
+
+---
+
+# 2. Design Principles
+
+The UI framework should follow the same architectural principles that guide Sanctum's rendering engine.
+
+1. **Consistency:** Interface elements should look like they belong to the same game as the world.
+2. **Reuse:** Build a small collection of reusable drawing primitives rather than specialized implementations for every screen.
+3. **Performance:** Reuse existing rendering infrastructure and avoid unnecessary layers, allocations, and processing.
+4. **Simplicity:** Do not introduce a heavyweight UI framework or a second rendering engine.
+5. **Separation:** Keep presentation and interaction separate from authoritative gameplay logic.
+6. **Palette discipline:** Use the game's indexed palette as the canonical source of UI colors.
+7. **Visual independence:** UI elements should not inherit environmental lighting or world brightness.
+8. **Extensibility:** New interfaces should be assembled from existing components wherever possible.
+
+---
+
+# 3. Existing Technical Foundation
+
+Sanctum already has most of the rendering infrastructure needed to support this transition.
+
+## Rendering
+
+- 240×144 internal LoRes gameplay resolution.
+- Separate HiRes canvas for detailed elements and smooth movement.
+- Shared rendering data and logic between both canvases.
+- Palette-indexed artwork.
+- Sixteen-color PICO-8-style palette.
+- Nine brightness bands for world rendering.
+- Dithered lighting and shading.
+- Existing sprite-stamp and pixel-rendering techniques.
+- Existing resource globe rendering.
+
+## Important architectural distinction
+
+The UI will share the game's palette and rendering infrastructure, but it will not automatically share the world's lighting conditions.
+
+World rendering and UI rendering have different responsibilities.
+
+**World rendering:**
+- Environmental lighting.
+- Brightness bands.
+- Colored light accumulation.
+- World-space dithering.
+- Ambient and local illumination.
+
+**UI rendering:**
+- Stable, intentional interface colors.
+- Palette-indexed artwork.
+- Consistent text and icon contrast.
+- Explicitly authored shading and highlights.
+- Optional stylistic dithering.
+
+A character sheet should not become darker when the player enters a cave. Inventory text should not fluctuate with nearby torches.
+
+The UI is visually integrated with the game, but it remains independent of environmental lighting.
+
+---
+
+# 4. Target Architecture
+
+The intended architecture is a shared UI presentation and interaction system that draws into the existing canvas infrastructure.
+
+## 4.1 UI state and data
+
+Owns the presentation state necessary for the interface:
+
+- Active screen.
+- Open panels.
+- Selected inventory item.
+- Hovered component.
+- Active tooltip.
+- Menu selection.
+- Interface transitions.
+
+Gameplay data remains owned by existing game systems.
+
+The UI should consume existing character, inventory, equipment, and resource data rather than duplicate or independently maintain authoritative state.
+
+## 4.2 UI component framework
+
+Provides reusable components:
+
+- Panels.
+- Borders.
+- Buttons.
+- Icons.
+- Text.
+- Slots.
+- Meters.
+- Tooltips.
+- Portraits.
+- Resource globes.
+
+Components should define their own layout bounds, rendering behavior, and interaction regions.
+
+## 4.3 Rendering backend
+
+Use the existing canvases rather than introducing another rendering surface.
+
+**LoRes**
+- World presentation.
+- World-scale graphics.
+- Elements that should share the physical pixel scale of the environment.
+
+**HiRes**
+- UI panels.
+- Inventory and character sheet.
+- Resource globes.
+- Detailed illustrations.
+- Tooltips.
+- Menus.
+- Smooth interface animation.
+
+The UI should render into the existing HiRes canvas unless a particular element has a compelling reason to use the LoRes layer.
+
+Both layers should maintain their existing rendering responsibilities.
+
+## 4.4 Input and interaction
+
+Use the existing DOM input infrastructure where practical.
+
+The UI framework should provide its own component hit-testing and interaction handling.
+
+A component's visual bounds should also define its clickable or hoverable bounds.
+
+This avoids maintaining separate visual and interaction layouts.
+
+The framework should support:
+- Mouse interaction.
+- Hover states.
+- Selection.
+- Click and activation.
+- Keyboard navigation where appropriate.
+- Tooltip activation.
+- Dragging or movement where required by inventory interactions.
+
+---
+
+# 5. Palette-Indexed Color Architecture
+
+## 5.1 Canonical color representation
+
+All normal canvas-native UI components must use `PALETTE_INDEX` values as their canonical color representation.
+
+The UI framework should not store independent RGB or hexadecimal color definitions for ordinary interface artwork.
+
+This applies to:
+
+- Panels and backgrounds.
+- Borders and highlights.
+- Text and typography.
+- Buttons and interaction states.
+- Inventory and equipment icons.
+- Character portraits.
+- Resource meters.
+- Tooltips and notifications.
+- Decorative elements and interface artwork.
+
+Components should reference palette indices rather than hardcoded hexadecimal colors.
+
+## 5.2 Color resolution
+
+Palette indices should be resolved through the existing palette infrastructure.
+
+The UI rendering path should conceptually follow:
+
+`PALETTE_INDEX → Global Palette Lookup → Final Pixel Color`
+
+The UI should not automatically pass through the world brightness tables or environmental lighting calculations.
+
+This is an intentional distinction from the world rendering pipeline.
+
+## 5.3 Separation of color and shading
+
+Palette index and visual shading should be separate properties.
+
+For example, the same palette color may be used for:
+- Normal text.
+- A highlighted border.
+- A shadowed panel.
+- A decorative accent.
+
+However, those effects should be explicitly defined by the UI artwork or component rather than inherited from the world's lighting system.
+
+Where a component needs multiple shades, it should select appropriate palette indices or use deliberately authored pixel patterns.
+
+## 5.4 Palette swapping compatibility
+
+The UI must automatically inherit global palette changes.
+
+Because components store palette indices rather than RGB values, changing the underlying palette should update the appearance of the entire interface without modifying individual components or assets.
+
+This preserves support for:
+- Alternate palette themes.
+- Global palette substitutions.
+- Consistent world and interface coloration.
+- Future visual variants.
+
+## 5.5 Brightness and environmental lighting
+
+UI elements should not automatically participate in:
+
+- Nine-band world brightness calculations.
+- Torch illumination.
+- Ambient world lighting.
+- Colored light accumulation.
+- World-space light propagation.
+
+The UI should remain readable and visually stable regardless of the player's environment.
+
+If a future interface element deliberately needs a lighting effect, it should be an explicitly authored presentation effect, not an automatic consequence of world position or nearby light sources.
+
+## 5.6 Dithering
+
+Dithering should be optional and intentional.
+
+Appropriate uses include:
+- Globe shading.
+- Decorative backgrounds.
+- Illustrated panels.
+- Pixel-art textures.
+- Specific visual transitions.
+
+Avoid indiscriminate dithering on:
+- Small text.
+- Fine borders.
+- Small icons.
+- Interaction indicators where clarity is important.
+
+## 5.7 Exceptions
+
+Direct RGB or hexadecimal colors should be reserved for cases where they are technically necessary, such as:
+
+- Browser or DOM elements outside the canvas renderer.
+- Temporary debugging and development visualization.
+- External assets requiring conversion before entering the indexed rendering pipeline.
+
+Such exceptions should not become the normal interface-authoring workflow.
+
+**Guiding rule: The UI owns its visual shading, but never owns its underlying color definitions. It references the game's palette without inheriting the world's lighting conditions.**
+
+---
+
+# 6. Visual Direction and Pixel Scale
+
+## 6.1 Character and sprite scale
+
+The preferred baseline is 12×24 pixels for standard character presentation.
+
+This preserves consistency with the existing 240×144 world resolution.
+
+An alternative worth experimenting with is creating larger 32×64 source sprites and scaling them to the equivalent 12×24 physical display size.
+
+However, larger source artwork should not become a requirement for the entire game.
+
+### Recommended usage
+
+| Element | Preferred presentation |
+|---|---|
+| World characters | 12×24 (LoRes simulation) |
+| World objects | Existing world pixel scale (LoRes simulation) |
+| UI Panels & Modals | HighRes canvas (Tome / Grimoire / Gothic Iron decorative fidelity matching resource globes) |
+| Inventory icons | 16-color indexed bit-sprites (scaled cleanly with integer pixel doubling) |
+| Equipment illustrations | Indexed-palette sprites with animated rarity gleams |
+| Character portrait | HighRes detailed gothic illustration |
+| Special artwork | Larger source assets where useful |
+
+### High-Fidelity UI Rendering Principle
+The 240×144 LoRes restriction applies strictly to the authoritative world simulation and environmental lighting, NOT to the UI panels or modals. Just like the resource globes, interface panels (inventory, character sheet, tomes, menus) render directly on the HighRes canvas with full decorative fidelity: cast brass book corners, embossed calfskin leather tooling, layered deckled vellum pages, and animated soul gems.
+
+## 6.2 Visual language
+
+All interface elements should follow the existing visual constraints:
+
+- Sixteen-color indexed palette.
+- Deliberate color combinations.
+- Consistent pixel scale.
+- Pixel-aligned borders.
+- Explicit highlights and shadows.
+- Restrained animation.
+- Clear visual hierarchy.
+- Consistent iconography.
+
+Avoid generic modern interface styling, excessive gradients, or visual effects that conflict with the game's established aesthetic.
+
+---
+
+# 7. Multi-Device Scaling, Aspect Ratio, and Responsive Layout Architecture
+
+## 7.1 The Dual-Layer Scaling Separation
+
+Sanctum employs a dual-canvas architecture where the world simulation and the interface have distinct scaling responsibilities:
+
+1. **LoRes World Layer (`#pixelCanvas`, 240×144 base)**:
+   - Maintains the canonical 5:3 (~1.667:1) simulation aspect ratio.
+   - Gameplay authority, tile coordinate grids, monster aggro ranges, and lighting bakes remain locked to this internal resolution.
+   - Scales via pixelated nearest-neighbor interpolation to preserve authentic pixel-art fidelity.
+
+2. **HiRes UI Layer (`#highResCanvas`)**:
+   - Matches the full display resolution and adapts to the device's native pixel density.
+   - Renders vector-sharp pixel borders, high-DPI micro-sprites, crystal-clear typography, and smooth gauge animations without subpixel blur.
+   - Dynamically repositions and scales interface elements using an anchor-and-tier system.
+
+## 7.2 Aspect Ratio Support & Viewport Strategy
+
+Players access Sanctum on a wide variety of hardware:
+- **16:9** (Standard Desktop, Laptops, Steam Deck OLED) — 1.778:1
+- **16:10** (MacBooks, PC Laptops, Original Steam Deck) — 1.600:1
+- **21:9 & 32:9** (Ultrawide Gaming Monitors) — 2.333:1+
+- **4:3 & 3:2** (iPads, Tablets, Surface devices) — 1.333:1 – 1.500:1
+- **Mobile / Handheld Viewports** (Variable aspect ratios)
+
+### Viewport Matting & Framing
+- The world aspect ratio (5:3) must never be stretched or distorted. Pixels remain strictly 1:1 square.
+- When the screen aspect ratio differs from 5:3, the stage applies clean letterboxing (horizontal bars) or pillarboxing (vertical bars).
+- Rather than leaving raw, empty black bars, the letterbox/pillarbox regions are integrated into the game's aesthetic with dark forged-iron framing and subtle decorative filigree.
+
+### Ultrawide Safe Zones
+- On ultrawide displays (21:9 or wider), pinning UI elements to the extreme outer edges forces excessive neck and eye movement.
+- The UI framework introduces a **Safe Zone Constraint** (max 16:9 or 16:10 span) centered on screen.
+- Resource globes, action bars, and status displays remain within comfortable peripheral vision, while atmospheric framing extends to the display edges.
+
+## 7.3 Responsive Anchoring System
+
+UI elements must not be positioned with fixed global pixel offsets. Instead, components bind to relative screen anchors:
+
+| Anchor | Target Elements | Behavior |
+|---|---|---|
+| `BOTTOM_LEFT` | Life Globe / Health Flask | Pinned to bottom-left safe-zone boundary |
+| `BOTTOM_RIGHT` | Mana Globe / Mana Phial | Pinned to bottom-right safe-zone boundary |
+| `BOTTOM_CENTER` | Action Belt, Hotkey Slots, XP Bar | Centered horizontally along bottom edge |
+| `TOP_LEFT` | Floor Badge, Status Effects, Buffs | Pinned to top-left corner |
+| `TOP_RIGHT` | Minimap, Latency / Ping OSD | Pinned to top-right corner |
+| `CENTER` / `FLOATING` | Inventory, Character Sheet, Pause Menu | Centered or docked based on active breakpoint |
+
+When the browser window resizes, anchored components recalculate their positions automatically, keeping vital interaction areas reachable and balanced.
+
+## 7.4 Virtual Reference Space & Quantized Scale Tiers
+
+To prevent blurry borders and non-uniform pixel artifacts, the UI uses a standardized **Virtual Reference Resolution** of **720×432** (exactly 3× of the 240×144 internal world resolution).
+
+UI scaling uses **quantized discrete scale tiers** rather than unbounded continuous floats:
+
+| Tier | Viewport Width | Scale Factor | Intended Devices |
+|---|---|---|---|
+| **Compact** | < 720px | 0.75× – 0.85× | Mobile phones, narrow split windows |
+| **Standard** | 720px – 1199px | 1.00× (Baseline) | Standard laptops, tablets (iPad), 720p displays |
+| **Large** | 1200px – 1799px | 1.25× – 1.50× | 1080p desktop monitors, 1440p laptops |
+| **Ultra** | ≥ 1800px | 2.00× – 2.50× | 1440p desktops, 4K displays |
+
+### Player UI Scale Preference
+The framework supports a user setting:
+`UI Scale: [ Auto | 75% | 100% | 125% | 150% ]`
+Allowing players on small high-resolution screens (or players needing enhanced accessibility) to customize interface sizing.
+
+### Integer Pixel Snapping
+- All computed layout boundaries, line coordinates, and 9-slice borders must be rounded to integer device pixels (`Math.round`).
+- This prevents half-pixel anti-aliasing artifacts that cause blurry outlines or fuzzy fonts in canvas rendering.
+
+## 7.5 Device Pixel Ratio (DPR) & Retina Display Crispness
+
+Modern mobile devices and high-end monitors feature Device Pixel Ratios of 2.0×, 3.0×, or fractional scales.
+- `#highResCanvas` buffer dimensions match physical pixels: `width = Math.round(stageW * dpr)`, `height = Math.round(stageH * dpr)`.
+- The canvas 2D context applies `ctx.setTransform(dpr, 0, 0, dpr, 0, 0)`.
+- `ctx.imageSmoothingEnabled = false` is maintained across all UI renders so that pixel art icons and bit-sprites remain razor-sharp.
+
+## 7.6 Breakpoints & Adaptive Modal Layouts
+
+Screen width dictates modal placement to prevent UI panels from obstructing gameplay:
+
+1. **Wide Breakpoint (Stage Width ≥ 960px)**:
+   - **Dual-Panel Side-by-Side**: Character Sheet docks to the left side; Inventory docks to the right side.
+   - The central playfield remains unobstructed for combat and movement.
+2. **Medium Breakpoint (720px – 959px)**:
+   - Dual panels fit with reduced horizontal margins, or opening one panel gently slides the second into a tabbed underlay.
+3. **Compact Breakpoint (< 720px)**:
+   - Single-modal presentation: only one major panel (Character Sheet or Inventory) is visible at a time, centered on screen.
+   - Seamless top tabs or hotkeys allow instantaneous switching between panels.
+
+## 7.7 Touch, Pointer, and Mobile Ergonomics
+
+- All interaction handlers use unified Pointer Events (`pointerdown`, `pointermove`, `pointerup`) to support mouse, stylus, and touch inputs identically.
+- For touch devices (detected via `pointerType === 'touch'`), hit-test bounding boxes add an ergonomic invisible padding (minimum 36×36 physical px) to ensure small slots and close buttons are effortless to tap without misclicks.
+
+---
+
+# 8. Core UI Components
+
+The framework should begin with a small collection of reusable primitives.
+
+| Component | Responsibilities |
+|---|---|
+| Panel | Backgrounds, containers, framed sections |
+| Border | Consistent pixel borders and decorative edges |
+| Button | Selection, hover, pressed, and disabled states |
+| Icon | Item, equipment, and action graphics |
+| Text | Pixel-font drawing, alignment, and formatting |
+| Slot | Inventory and equipment item containers |
+| Meter | Health, mana, experience, and progress |
+| Tooltip | Item descriptions and contextual information |
+| Portrait | Character and creature presentation |
+| Globe | Resource visualization based on the existing implementation |
+
+## Component requirements
+
+Where applicable, components should support:
+
+- Position and dimensions.
+- Visibility.
+- Rendering state.
+- Interaction state.
+- Palette-indexed color definitions.
+- Explicit visual shading.
+- Optional animation.
+- Input bounds.
+
+Avoid introducing features that are not needed by actual interface screens.
+
+The framework should remain a compact drawing and interaction toolkit, not a general-purpose web UI library.
+
+---
+
+# 9. Implementation Roadmap
+
+## Phase 1 — Framework Foundation
+
+**Goal:** Establish the reusable canvas-native UI system and multi-device scaling foundation.
+
+Tasks:
+
+1. Review the existing resource globe implementation.
+2. Identify reusable pixel-drawing techniques.
+3. Define common UI dimensions and spacing conventions based on 720×432 virtual reference resolution.
+4. Establish the responsive anchoring engine (`BOTTOM_LEFT`, `BOTTOM_RIGHT`, `BOTTOM_CENTER`, `TOP_LEFT`, `TOP_RIGHT`, `CENTER`).
+5. Implement discrete UI scale tiers and integer pixel snapping for high-DPI / Retina screens.
+6. Implement stage aspect ratio letterbox/pillarbox matting with dark iron framing to prevent gameplay distortion.
+7. Define the palette-indexed color interface (`PALETTE_INDEX` resolution).
+8. Ensure UI colors resolve independently of world lighting and brightness tables.
+9. Implement panel rendering (9-slice beveled borders and riveted plates).
+10. Implement borders and decorative edges.
+11. Implement basic text and icon rendering helpers with crisp pixel alignment.
+12. Implement reusable buttons and interaction states (idle, hover, pressed, disabled).
+13. Implement slot and meter primitives.
+14. Establish component bounds and unified pointer event hit-testing with mobile touch padding.
+15. Verify correct rendering on the existing HiRes canvas across multiple device aspect ratios (16:9, 16:10, 21:9, 4:3).
+16. Verify palette swapping and color consistency.
+
+**Deliverable:** A small reusable UI rendering, scaling, and interaction framework operating alongside the existing interface.
+
+## Phase 2 — Inventory
+
+**Goal:** Build the first complete interface using the new framework.
+
+Tasks:
+
+1. Establish the inventory layout for wide, medium, and compact breakpoints.
+2. Implement the inventory panel.
+3. Implement the item slot grid.
+4. Render indexed-palette item icons.
+5. Implement selection and hover states.
+6. Implement item tooltips.
+7. Add stack counts and quantities.
+8. Implement item selection and movement.
+9. Implement item use and interaction.
+10. Connect the interface to existing inventory and item data.
+11. Replace the existing HTML/CSS inventory presentation.
+
+**Deliverable:** A fully functional canvas-rendered inventory with responsive breakpoint support.
+
+The inventory should act as the primary test of the framework's layout, drawing, interaction, and data integration.
+
+## Phase 3 — Character Sheet
+
+**Goal:** Bring character information into the new UI system.
+
+Tasks:
+
+1. Establish the character sheet layout across wide and compact breakpoints.
+2. Implement character portrait or sprite presentation.
+3. Display core attributes and statistics.
+4. Implement health, mana, and experience meters.
+5. Display equipment slots with paperdoll silhouette backdrops.
+6. Connect equipment slots to inventory data.
+7. Display relevant progression and status information.
+8. Add contextual tooltips.
+9. Support simultaneous side-by-side docking with Inventory on wide viewports (≥960px).
+10. Replace the existing character sheet presentation.
+
+**Deliverable:** A fully functional canvas-rendered character sheet using the same components and anchor rules as the inventory.
+
+## Phase 4 — Main Menu and Navigation
+
+**Goal:** Extend the visual identity to the game's primary navigation.
+
+Tasks:
+
+1. Establish the main menu layout with responsive center anchoring.
+2. Implement reusable menu buttons.
+3. Add selection and interaction states.
+4. Implement title and decorative presentation.
+5. Implement character selection or entry points as appropriate.
+6. Establish consistent menu navigation.
+7. Implement transitions between menu screens.
+8. Replace existing CSS/HTML menu presentation.
+
+**Deliverable:** A unified canvas-rendered main menu and navigation system.
+
+## Phase 5 — Remaining Interface Migration
+
+**Goal:** Remove remaining dependence on CSS/HTML for the game's visual presentation.
+
+Tasks:
+
+1. Identify remaining player-facing HTML/CSS interface elements.
+2. Migrate notifications.
+3. Migrate contextual prompts.
+4. Migrate remaining resource and status displays.
+5. Migrate confirmation and selection dialogs.
+6. Replace remaining decorative interface elements.
+7. Remove obsolete CSS rules and HTML markup.
+8. Verify that no gameplay functionality depends on removed presentation elements.
+
+**Deliverable:** A consistent canvas-native player-facing interface.
+
+## Phase 6 — Polish and Expansion
+
+**Goal:** Refine the UI framework based on real usage.
+
+Potential additions:
+
+- Animated item presentation.
+- Equipment comparisons.
+- More elaborate character portraits.
+- Additional resource globe variants.
+- Contextual notifications.
+- Small HiRes particle accents.
+- Interface transitions.
+- Additional panel layouts.
+- Optional high-detail illustrations.
+
+These should be added only when they provide clear value.
+
+**Deliverable:** A stable, polished UI framework ready for future gameplay features.
+
+---
+
+# 10. Technical Constraints
+
+The new framework should preserve the existing architecture.
+
+1. Do not introduce a separate UI rendering engine.
+2. Do not create individual canvases for individual UI components.
+3. Use the existing HiRes canvas for primary interface presentation.
+4. Reuse existing palette infrastructure.
+5. Do not automatically apply world brightness or lighting to UI.
+6. Preserve strict 1:1 square pixel aspect ratio for the world simulation (no stretching or non-uniform scaling).
+7. Apply integer pixel snapping on borders, lines, and sprite coordinates to eliminate subpixel blurring on high-DPI displays.
+8. Restrict UI elements within a comfortable Safe Zone boundary on ultrawide monitors (21:9+).
+9. Avoid duplicating gameplay state.
+10. Keep UI interaction separate from authoritative server logic.
+11. Avoid unnecessary per-frame allocations.
+12. Keep component definitions compact and composable.
+13. Reuse existing input handling and support unified Pointer Events.
+14. Preserve the ability to render world and interface elements consistently.
+15. Avoid hardcoded RGB or hexadecimal colors in standard UI components.
+
+## Performance considerations
+
+The UI should not introduce unnecessary rendering work.
+
+Prefer:
+- Drawing only visible components.
+- Caching static artwork where useful.
+- Reusing precomputed palette data.
+- Avoiding repeated allocation of temporary image data.
+- Keeping interaction and hit-testing inexpensive.
+- Using the existing canvas pipeline.
+
+Do not optimize prematurely. Establish a clean baseline and measure actual costs.
+
+---
+
+# 11. Completion Criteria
+
+The initiative is complete when:
+
+- Inventory, character sheet, and menus are rendered through the new framework.
+- Remaining player-facing CSS/HTML presentation has been migrated.
+- UI components use `PALETTE_INDEX` rather than independent RGB or hex definitions.
+- Global palette swapping affects the entire interface.
+- UI colors remain independent of world lighting and brightness.
+- UI shading is intentional and component-controlled.
+- The existing dual-canvas architecture remains intact.
+- Multi-device scaling operates consistently across standard aspect ratios (16:9, 16:10, 21:9, 4:3) and device pixel ratios.
+- Modal panels adapt gracefully between wide side-by-side layouts and compact single-panel tabbed layouts.
+- Interface interaction uses shared component bounds, responsive anchors, and unified pointer hit-testing.
+- Gameplay data remains owned by existing systems.
+- UI rendering does not introduce unnecessary performance overhead.
+- Components are reusable across multiple screens.
+- The framework remains small and understandable.
+- Obsolete presentation code has been removed.
+
+---
+
+# 12. Recommended Development Order
+
+| Priority | Work | Outcome |
+|---|---|---|
+| 1 | Review resource globe renderer | Establish reference |
+| 2 | Define UI coordinates, anchors, and scaling tiers | Shared responsive foundation |
+| 3 | Establish palette-indexed color API | Consistent color architecture |
+| 4 | Implement panels and borders | Basic presentation |
+| 5 | Implement text, icons, and buttons | Core interaction |
+| 6 | Implement slots, meters, and tooltips | Feature-ready components |
+| 7 | Build inventory | First complete screen |
+| 8 | Build character sheet | Validate reuse and dual-docking |
+| 9 | Build main menu | Complete primary navigation |
+| 10 | Migrate remaining HTML/CSS | Unified presentation |
+| 11 | Polish and profile | Stabilize framework |
+
+---
+
+# 13. Final Direction
+
+Sanctum already has a distinctive rendering identity. The UI should reinforce that identity rather than introduce a competing presentation system.
+
+The resource globes demonstrate the direction: compact, palette-driven, deliberately shaded interface artwork that feels native to the game.
+
+The inventory should be the first major implementation, followed by the character sheet and main menu.
+
+The 12×24 sprite scale remains the baseline, with larger source artwork available for selective HiRes presentation.
+
+HTML and CSS should remain part of the application where they serve infrastructure or browser functionality, but the game's visual interface should ultimately belong to the canvas renderer.
+
+The UI should share the game's palette, but not its environmental lighting. It should have stable, deliberately authored colors and shading.
+
+Scaling must be robust and predictable across desktop, laptops, tablets, and ultrawide displays, anchoring controls to screen boundaries while protecting the 1:1 pixel fidelity of the world simulation.
+
+**The end goal is one coherent rendering language across the entire game, built from a small set of reusable components and the systems Sanctum already has.**

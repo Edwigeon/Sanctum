@@ -1,6 +1,7 @@
 import { ENGINE, PALETTE, PALETTE_INDEX, RARITY_COLORS } from '../../shared/Constants.js';
 import { LightingSystem } from './LightingSystem.js';
 import { CanvasHUD } from './CanvasHUD.js';
+import { uiManager } from './ui/UIManager.js';
 
 // Pre-allocated entity geometry templates (zero per-frame array allocations)
 const LOOT_RECTS = [
@@ -60,6 +61,7 @@ export class Renderer {
     this.floatingTexts = [];
     this.clickMarker = null;
     this.canvasHud = new CanvasHUD();
+    this.uiManager = uiManager;
 
     window.addEventListener('resize', () => this.resizeStage());
     this.resizeStage();
@@ -109,6 +111,10 @@ export class Renderer {
     this.hCtx.imageSmoothingEnabled = false;
     this.pCtx.imageSmoothingEnabled = false;
     this.lastTransformStr = '';
+
+    if (this.uiManager) {
+      this.uiManager.onResize(w, h, dpr);
+    }
   }
 
   bakeDungeonBuffer(d) {
@@ -424,7 +430,12 @@ export class Renderer {
     }
     hCtx.textAlign = 'start';
 
-    // 3. Canvas-Native Action Bar & Vitals HUD (Life/Mana Globes, Belt, XP Bar)
+    // 3. Canvas-Native UI Framework & Modal Stack
+    if (this.uiManager) {
+      this.uiManager.render(hCtx, this.animTime);
+    }
+
+    // 4. Action Bar & Vitals HUD (Life/Mana Globes, Belt, XP Bar)
     if (this.canvasHud) {
       this.canvasHud.render(hCtx, this.stageW, this.stageH, dt, this.animTime);
     }

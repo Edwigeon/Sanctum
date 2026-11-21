@@ -289,7 +289,7 @@ export class GameRoom {
       this.handleAllocStat(p, packet.stat);
     } else if (packet.type === PACKET_TYPES.EQUIP_ITEM) {
       if (!Number.isInteger(packet.itemId)) return;
-      this.handleEquipItem(p, packet.itemId);
+      this.handleEquipItem(p, packet.itemId, packet.slot);
     } else if (packet.type === PACKET_TYPES.UNEQUIP_ITEM) {
       if (typeof packet.slot !== 'string') return;
       this.handleUnequipItem(p, packet.slot);
@@ -312,8 +312,8 @@ export class GameRoom {
     handleAllocStat(this, p, stat);
   }
 
-  handleEquipItem(p, itemId) {
-    handleEquipItem(this, p, itemId);
+  handleEquipItem(p, itemId, slot) {
+    handleEquipItem(this, p, itemId, slot);
   }
 
   handleUnequipItem(p, slot) {

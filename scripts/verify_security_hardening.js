@@ -818,13 +818,16 @@ try {
       method: 'POST',
       body: { username: 'alice_hero', password: 'AliceStrongPassword#2026' }
     });
-    const aliceChars = (await api('/api/characters', { token: floodLogin.json.token })).json.characters;
-    const classicChar = aliceChars.find(c => c.mode === GAME_MODES.CLASSIC);
+    const floodChar = (await api('/api/characters', {
+      method: 'POST',
+      token: floodLogin.json.token,
+      body: { name: 'FloodTester', classId: 'VANGUARD', mode: GAME_MODES.CLASSIC }
+    })).json.character;
 
     const playWs = await openWs();
     playWs.send(JSON.stringify({
       type: PACKET_TYPES.JOIN_LOBBY,
-      data: { token: floodLogin.json.token, characterId: classicChar.id, joinType: 'solo' }
+      data: { token: floodLogin.json.token, characterId: floodChar.id, joinType: 'solo' }
     }));
     const playInit = await playWs.waitFor(m => m.type === PACKET_TYPES.ROOM_INIT);
     const playRoom = rooms.get(playInit.data.roomId);

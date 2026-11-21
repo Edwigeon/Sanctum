@@ -5,13 +5,19 @@
 import { dist } from '../../../shared/MathUtils.js';
 import { saveManager } from '../SaveManager.js';
 
-export function handleEquipItem(room, p, itemId) {
+export function handleEquipItem(room, p, itemId, requestedSlot = null) {
   const idx = p.inventory.findIndex(i => i.id === itemId);
   if (idx === -1) return;
   const item = p.inventory[idx];
   let targetSlot = item.slot;
   if (targetSlot === 'ring') {
-    targetSlot = !p.equipment.ring1 ? 'ring1' : (!p.equipment.ring2 ? 'ring2' : 'ring1');
+    if (requestedSlot === 'ring1' || requestedSlot === 'ring2') {
+      targetSlot = requestedSlot;
+    } else {
+      targetSlot = !p.equipment.ring1 ? 'ring1' : (!p.equipment.ring2 ? 'ring2' : 'ring1');
+    }
+  } else if (requestedSlot && requestedSlot === item.slot) {
+    targetSlot = requestedSlot;
   }
   if (!targetSlot || !(targetSlot in p.equipment)) return;
   const prev = p.equipment[targetSlot];
