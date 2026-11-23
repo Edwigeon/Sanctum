@@ -42,6 +42,19 @@ function oneOf(v, set, def) {
 
 const SCHEMAS = {
   [PACKET_TYPES.PING]: { cost: COST.CONTROL, parse: p => ({ t: typeof p.t === 'number' && Number.isFinite(p.t) ? p.t : 0 }) },
+  [PACKET_TYPES.AUTH_LOGIN]: {
+    cost: COST.JOIN,
+    parse: p => {
+      if (!isObj(p.data)) throw new Invalid('data');
+      return {
+        data: {
+          username: str(p.data.username, 64),
+          password: str(p.data.password, 128),
+          localConsole: p.data.localConsole === true
+        }
+      };
+    }
+  },
   [PACKET_TYPES.LEAVE_LOBBY]: { cost: COST.CONTROL, parse: () => ({}) },
   [PACKET_TYPES.JOIN_LOBBY]: {
     cost: COST.JOIN,

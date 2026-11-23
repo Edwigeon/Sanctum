@@ -2,7 +2,7 @@
 
 **Project:** Sanctum  
 **Initiative:** Canvas-Native UI and Visual Presentation  
-**Status:** Proposed  
+**Status:** In Progress / Active Implementation (Grimoires & Core Framework Completed)  
 **Priority:** High  
 **Scope:** Client-side UI, rendering, interaction, and presentation
 
@@ -637,19 +637,19 @@ The initiative is complete when:
 
 # 12. Recommended Development Order
 
-| Priority | Work | Outcome |
-|---|---|---|
-| 1 | Review resource globe renderer | Establish reference |
-| 2 | Define UI coordinates, anchors, and scaling tiers | Shared responsive foundation |
-| 3 | Establish palette-indexed color API | Consistent color architecture |
-| 4 | Implement panels and borders | Basic presentation |
-| 5 | Implement text, icons, and buttons | Core interaction |
-| 6 | Implement slots, meters, and tooltips | Feature-ready components |
-| 7 | Build inventory | First complete screen |
-| 8 | Build character sheet | Validate reuse and dual-docking |
-| 9 | Build main menu | Complete primary navigation |
-| 10 | Migrate remaining HTML/CSS | Unified presentation |
-| 11 | Polish and profile | Stabilize framework |
+| Priority | Status | Work | Implemented Artifacts & Outcome |
+|---|---|---|---|
+| 1 | `[x]` Complete | Review resource globe renderer | Established canvas presentation baseline and palette indexing rules (`UIOrbs.js`) |
+| 2 | `[x]` Complete | Define UI coordinates, anchors, and scaling tiers | Shared responsive layout engine (`client/systems/ui/engine/UILayout.js`), safe zones, multi-tier DPI scaling |
+| 3 | `[x]` Complete | Establish palette-indexed color API | Centralized design tokens and color management (`client/systems/ui/engine/UITheme.js`) |
+| 4 | `[x]` Complete | Implement panels and borders | Canvas 9-slice dark stone frames, beveled tabs, and gold hardware (`client/systems/ui/components/UIPanel.js`) |
+| 5 | `[x]` Complete | Implement text, icons, and buttons | Shadowed retro typography (`UIText.js`), responsive buttons with hover/active feedback (`UIButton.js`) |
+| 6 | `[x]` Complete | Implement slots, meters, and tooltips | Equipment/inventory sockets (`UISlot.js`), resource bars (`UIMeter.js`), Diablo III comparative tooltips (`UITooltip.js`) backed by `shared/StatEngine.js` |
+| 7 | `[x]` Complete | Build inventory | Full paperdoll layout, 40-slot bag grid, dynamic carry weight bar, responsive `TOP_RIGHT` docking (`UIInventory.js`) |
+| 8 | `[x]` Complete | Build character sheet | Tabbed grimoire (`STATS`, `OFFENSE`, `DEFENSE`), uncommitted [+] allocation, Total Armor, DPS/APS, 7-element resistance breakdown, responsive `TOP_LEFT` docking (`UICharacter.js`) |
+| 9 | `[ ]` Active | Build in-game pause menu & settings | Canvas esc/pause menu (`UIPauseMenu.js`): Resume, Audio sliders, CRT toggle, Camp return, Quit |
+| 10 | `[ ]` Queued | Migrate remaining HTML/CSS modals & HUD | Canvas death modal (`UIDeathModal.js`), Action Belt potion/skill HUD (`UIActionBelt.js`) |
+| 11 | `[ ]` Queued | Polish and profile | Multi-device stress testing, zero-allocation cache tuning, touch-friendly hit areas |
 
 ---
 

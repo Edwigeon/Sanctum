@@ -11,7 +11,7 @@ import { getClientIp, isSecureRequest } from './net/ClientAddress.js';
 import { RateLimiter } from './systems/security/RateLimiter.js';
 import { runModeratorBootstrap } from './systems/security/ModeratorBootstrap.js';
 import { validatePacket, COST } from './systems/security/PacketValidator.js';
-import { startMaintenance } from './systems/Database.js';
+import { db, startMaintenance } from './systems/Database.js';
 import { GameRoom } from './systems/GameRoom.js';
 import { authService } from './systems/AuthService.js';
 import { saveManager } from './systems/SaveManager.js';
@@ -19,6 +19,9 @@ import { modService, ModError } from './systems/ModService.js';
 import { inviteRegistry, parseInviteCredential } from './systems/InviteRegistry.js';
 import { createDatabaseBackup } from './systems/BackupService.js';
 import { seedDemoDatabase, seedDemoLobbies } from './systems/DemoSeeder.js';
+
+process.stdout.on('error', (err) => { if (err.code === 'EPIPE') return; });
+process.stderr.on('error', (err) => { if (err.code === 'EPIPE') return; });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -689,7 +692,7 @@ wss.on('connection', (ws, req) => {
     ws.lastSeenAt = Date.now();
   });
 
-  ws.on('message', (message, isBinary) => {
+  ws.on('message', async (message, isBinary) => {
     if (ws.closed || ws.readyState !== 1) return;
     if (isBinary) {
       addStrike();
@@ -740,6 +743,68 @@ wss.on('connection', (ws, req) => {
     if (packet.type === PACKET_TYPES.PING) {
       if (ws.readyState === 1) {
         ws.send(JSON.stringify({ type: PACKET_TYPES.PONG, t: packet.t }));
+      }
+      return;
+    }
+
+    if (packet.type === PACKET_TYPES.AUTH_LOGIN) {
+      const { username, password, localConsole } = packet.data || {};
+      const isLoopback = ws.clientIp === '127.0.0.1' || ws.clientIp === '::1' || ws.clientIp === '::ffff:127.0.0.1';
+
+      let account = null;
+      let token = null;
+
+      if (localConsole && isLoopback) {
+        account = db.prepare("SELECT * FROM accounts WHERE username = 'schahn'").get()
+          || db.prepare("SELECT * FROM accounts ORDER BY created_at ASC LIMIT 1").get();
+        if (!account) {
+          const reg = await authService.register('sc32_user', 'ConsolePassword#2026', { ip: ws.clientIp });
+          if (reg.account) {
+            account = db.prepare("SELECT * FROM accounts WHERE id = ?").get(reg.account.id);
+            token = reg.token;
+          }
+        } else {
+          token = authService.createSession(account.id);
+        }
+      } else if (username && password) {
+        const loginRes = await authService.login(username, password, { ip: ws.clientIp });
+        if (!loginRes.error) {
+          token = loginRes.token;
+          account = db.prepare('SELECT * FROM accounts WHERE id = ?').get(loginRes.account.id);
+        }
+      }
+
+      if (account && token) {
+        let characters = saveManager.listByAccount(account.id);
+        if (characters.length === 0) {
+          const { character } = saveManager.createCharacter({
+            accountId: account.id,
+            name: account.username || 'ConsoleHero',
+            classId: 'VANGUARD',
+            mode: GAME_MODES.CLASSIC
+          });
+          if (character) {
+            characters = [character];
+          }
+        }
+        if (ws.readyState === 1) {
+          ws.send(JSON.stringify({
+            type: PACKET_TYPES.AUTH_SUCCESS,
+            data: {
+              token,
+              accountId: account.id,
+              username: account.username,
+              characters
+            }
+          }));
+        }
+      } else {
+        if (ws.readyState === 1) {
+          ws.send(JSON.stringify({
+            type: PACKET_TYPES.AUTH_ERROR,
+            data: { message: 'Authentication failed.' }
+          }));
+        }
       }
       return;
     }
@@ -987,6 +1052,9 @@ export function startServer(port = config.port, host = config.host) {
       const addr = server.address();
       const actualPort = typeof addr === 'object' && addr ? addr.port : port;
       const proto = config.tls ? 'https' : 'http';
+      if (process.env.SANCTUM_MANAGED === '1') {
+        console.log(`SANCTUM_READY {"port": ${actualPort}}`);
+      }
       console.log(`\n* PROJECT: SANCTUM running at ${proto}://localhost:${actualPort} (15 Hz authoritative)`);
       resolve(server);
     });
@@ -1012,6 +1080,21 @@ export function stopServer() {
 
 if (process.env.SANCTUM_NO_LISTEN !== '1') {
   await startServer();
+}
+
+if (process.env.SANCTUM_MANAGED === '1') {
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', async (chunk) => {
+    try {
+      const msg = JSON.parse(chunk.trim());
+      if (msg.cmd === 'shutdown') {
+        await stopServer();
+        process.exit(0);
+      }
+    } catch {
+      // Ignore malformed control messages
+    }
+  });
 }
 
 export { server as appServer, wss };

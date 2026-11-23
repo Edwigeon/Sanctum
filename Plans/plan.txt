@@ -6,12 +6,18 @@ Motto: Small. Fast. Efficient. Moddable.
 Microscopic Footprint, Zero Bloat:
 No multi-megabyte game engines, no heavy client frameworks, no sprawling asset packs.
 The entire web client loads in milliseconds (< 100 KB) and runs smoothly on any browser, low-power laptop, or desktop.
+SC-32 Virtual Console Foundation:
+Sanctum is architected as the flagship debut cartridge for the **SC-32 Virtual Computing System** (a 32-bit logical fantasy console implemented in Rust with a fixed virtual specification: 32 MiB RAM, 12 MiB VRAM, 3-plane VDP, 8-voice Lanthorn-PSG APU, and `.scart` v1.0 cartridge containers).
 1984 Spirit, Modern Feel:
-Inspired by the pacing, loot addiction, and dark-fantasy loop of classic dark-fantasy ARPGs, distilled through the blocky, 16-color charm of a PICO-8 / 1984 fantasy console.
+Inspired by the pacing, loot addiction, and dark-fantasy loop of classic dark-fantasy ARPGs, distilled through the blocky, 16-color charm of a PICO-8 / 1984 fantasy console with SANCTUM-48 color engine expansion.
 Mouse-First ARPG Controls: Left-click to move, target, and loot; right-click for active skills; 1–4 for belt potions.
 Dual-Resolution Clarity:
-World Tile Layer (Low-Res Pixel Canvas): 240×144 internal viewport (242×146 canvas with a 2px subpixel scroll margin) upscaled with nearest-neighbor (image-rendering: pixelated) for chunky, evocative retro dungeon tiles, combined with integer tile snapping and fractional GPU CSS translation (translate3d) for silky subpixel camera scrolling.
-Entity & UI Overlay Layer (High-DPI Vector Canvas & Bespoke HTML/CSS): Native screen resolution (devicePixelRatio-scaled) overlaid cleanly on top for subpixel-interpolated pawn sprites (players, monsters, projectiles, ground loot), visible held weapons, gear palette tints, health bars, target highlights, razor-sharp floating damage numbers, and legible item tooltips. Crisp HUD orbs, character sheet, and inventory panels are rendered through a zero-dependency, handcrafted retro dark-fantasy CSS stylesheet (purging external CDN frameworks).
+World Tile Layer (Low-Res Pixel Canvas / Plane 1): 240×144 internal viewport (242×146 canvas with a 2px subpixel scroll margin) upscaled with nearest-neighbor (image-rendering: pixelated) for chunky, evocative retro dungeon tiles, combined with integer tile snapping and fractional GPU CSS translation (translate3d) for silky subpixel camera scrolling.
+Entity & UI Overlay Layer (High-DPI Vector Canvas / Planes 2 & 3): Native screen resolution (devicePixelRatio-scaled) overlaid cleanly on top for subpixel-interpolated pawn sprites (players, monsters, projectiles, ground loot), visible held weapons, gear palette tints, health bars, target highlights, razor-sharp floating damage numbers, and Diablo III-style comparative item tooltips.
+Canvas-Native ARPG UI Framework:
+All core game interfaces (Character Chronicle, Inventory & Paperdoll, Comparative Tooltips, Action Belt, and Modals) are rendered directly to the HiRes canvas overlay via a unified, zero-dependency component framework (`client/systems/ui/`: `UITheme`, `UILayout`, `UIPanel`, `UIButton`, `UISlot`, `UIMeter`, `UIText`, `UIManager`). Zero DOM reflow, pixel-perfect integer snapping, and responsive docking (`TOP_LEFT` / `TOP_RIGHT`).
+Authoritative Single Source of Truth (`StatEngine`):
+All combat calculations, item stats, primary/secondary scaling, elemental resistances, and comparative deltas are strictly calculated by `shared/StatEngine.js`, ensuring 100% mathematical parity across tooltips, character sheet tabs, and gameplay simulation.
 Data-Driven & Moddable:
 Engine mechanics (/shared/, /server/, /client/) are strictly decoupled from content (/data/ JSON tables).
 Stories, acts, monster stats, skill curves, and item affixes can be expanded or modded without rewriting core simulation code.
@@ -46,13 +52,17 @@ Slain heroes become permanent Fallen Spirits and are immortalized in the server'
 Accounts, Retention & Moderation:
 Scrypt-authenticated accounts with a 180-day rolling retention policy (auto-pruning expired accounts and sessions) and a dedicated Moderator Portal (/mod) for account and character administration.
 4. Technical & Infrastructure Plan
+Dual-Platform Architecture:
+1. Native Desktop Runtime: Implemented in Rust as the **SC-32 Virtual Computing System** (`crates/sanctum-core`, `crates/sanctum-vdp`, `crates/sanctum-apu`, `crates/sanctum-scart`, `crates/sanctum-input`). Features embedded QuickJS-NG (ES2020+) executing cartridges sandboxed against `sanctum:engine`, a 3-plane WGPU VDP compositor, an 8-voice Lanthorn-PSG APU, and native OS windowing via `winit`.
+2. First-Class Supported Web Edition: Pure browser client (ES Modules, Web Audio, HTML5 Canvas) sharing identical simulation logic and assets without divergence.
+Virtual Memory & Hardware Quotas (SC-32):
+Fixed virtual machine specification: 32 MiB system RAM, 12 MiB VRAM (6 MiB Plane 1 indexed, 4 MiB Plane 2 stamps, 2 MiB Plane 3 HiRes overlays).
 Language & Code Sharing:
-JavaScript (ES Modules) across both Node.js server and browser client.
-Shared /shared/ modules (Constants.js, MathUtils.js, DungeonGen.js, CombatMath.js) guarantee identical physics, RNG, and damage math on both sides.
+Shared /shared/ modules (Constants.js, MathUtils.js, DungeonGen.js, CombatMath.js, StatEngine.js) guarantee identical physics, RNG, and damage math across server and clients.
 Modular Client & Server Systems:
 Server systems (/server/systems/): GameRoom, DataRegistry, LootGenerator, Database, AuthService, SaveManager, ModService, DemoSeeder.
-Client systems (/client/systems/): LightingSystem (merged-wall analytical shadowcasting + 9-band Bayer dither + additive 16-color lights + subpixel sprite/entity stamping), SpriteRegistry (/data/sprites.json hex-grid loader), AudioPSG (Lanthorn-PSG core + Visual SFX Painter engine), Renderer, Interpolator, HUDController, InputController, MenuController.
-Detailed documentation of implemented systems lives in SYSTEMS.md.
+Client systems (/client/systems/): LightingSystem (merged-wall analytical shadowcasting + 9-band Bayer dither + additive 16-color lights + subpixel sprite/entity stamping), SpriteRegistry (/data/sprites.json hex-grid loader), AudioPSG (Lanthorn-PSG core + Visual SFX Painter engine), MusicPlayer, Renderer, Interpolator, HUDController, InputController, MenuController, and canvas-native UI framework (`client/systems/ui/`).
+Detailed documentation of implemented systems lives in SYSTEMS.md and Plans/SC32_COMPLETE_SPECIFICATION.md.
 Server-Authoritative Simulation (15 Hz):
 Clients send lightweight input intents (MOVE, ATTACK, SKILL, POTION, PICKUP).
 Server owns monster AI, hit detection, loot rolls, and death verification, broadcasting compact snapshots at 15 ticks/second.
@@ -60,8 +70,9 @@ Homelab & Scaling Strategy:
 Designed to run as a tiny Dockerized Node.js service alongside existing homelab workloads (e.g., Jellyfin, RomM) using ~30–50 MB RAM.
 Supports Node.js Worker/Cluster multithreading to scale room instances across all 12c/24t Xeon Gold cores if player concurrency grows into the thousands.
 Distribution:
+Native Desktop: 64-bit Windows portable/installer, Linux AppImage/Steam Runtime binary, and macOS Universal Binary (`x86_64` + `arm64`) targeting Standalone DRM-free, Steam, and GOG.
 Web-First + PWA: Instant play from any browser, installable as a standalone desktop window with zero overhead.
-Optional Native Executables: Can be wrapped later with Tauri (< 8 MB binary) for standalone Linux/Windows distribution.
+Cartridge Packaging: Standalone single-file `.scart` v1.0 binary format containing manifest, scripts, and LZ4-compressed assets.
 
 5. Future Roadmap (Remaining Items Only — See SYSTEMS.md for Implemented Systems)
 
@@ -92,18 +103,32 @@ Phase 2C: Interconnected Cell/Chunk World, Constrained Biomes & Day/Night Cycle
  [ ] Overworld Day/Night cycle: time-of-day ambient light curve & palette shifting on outdoor cells (daylight visibility vs. nightfall torch-only visibility and tougher nocturnal spawns) contrasted with permanent darkness underground.
  [ ] Seamless cell transitions, Dungeon Entrances / Stairs (Up & Down), Town Portals (TILES.PORTAL_TOWN), and New Game+ (ngCycle) transitions.
 
-Phase 2D: UI Refactor, Custom Dark-Fantasy CSS & Paperdoll Overhaul
+Phase 2D: Canvas-Native ARPG UI Framework, Grimoires & Diablo III Tooltips
  [x] Zero-Dependency Custom Retro CSS Stylesheet (`client/style.css`):
      - Completely purged external Tailwind CDN runtime across `index.html`, `dev.html`, and `mod.html` in favor of a handcrafted, high-performance static stylesheet with zero network dependencies (< 20 KB uncompressed).
      - PICO-8 16-color CSS variable design tokens (`--p8-0` through `--p8-15`), subtle iron/stone bevels, custom scrollbars, and dark-fantasy parchment/iron aesthetics.
- [x] Inventory & Paperdoll Overhaul:
-     - Dedicated visual paperdoll layout with crisp equipment sockets (Helm, Amulet, Weapon, Armor, Off-hand/Shield, Gloves, Boots, Ring) styled with sunken stone sockets.
+ [x] Canvas-Native ARPG UI Framework (`client/systems/ui/`):
+     - Component hierarchy: `UITheme.js` (PICO-8 & SANCTUM-48 palette color tokens, font sizes, shadow styles), `UILayout.js` (screen anchor resolution, responsive scaling tiers, safe zone constraints), `UIPanel.js` (beveled 9-slice stone frames, gold studs, title bars, tab rails), `UIButton.js` (responsive button primitives with hover, active, pressed states), `UISlot.js` (inventory/paperdoll sockets, quality borders, rarity glowing backdrop, drag/drop hooks), `UIMeter.js` (resource and XP bars with animated text and fill indicators), `UIText.js` (shadowed pixel typography), and `UIManager.js` (event dispatching, unified pointer hit-testing, modal/z-index layering, frame composition).
+ [x] Dual-Grimoire Docking System (`UICharacter.js` & `UIInventory.js`):
+     - Pure canvas modal grimoire panels docked smoothly to screen edges (`TOP_LEFT` for Character Chronicle, `TOP_RIGHT` for Inventory & Paperdoll) with responsive multi-tier scaling, integer pixel snapping, and no DOM layout thrash.
+ [x] Inventory & Paperdoll Overhaul (`client/systems/ui/containers/UIInventory.js`):
+     - Dedicated visual paperdoll layout with crisp equipment sockets (Helm, Amulet, Weapon, Armor, Off-hand/Shield, Gloves, Boots, Ring 1, Ring 2) styled with sunken stone sockets.
      - Modern ARPG ergonomics: 1-click equip/swap, right-click to drop, and click-to-unequip back to bag via server-authoritative UNEQUIP_ITEM packet.
      - Dynamic Carry Weight meter with visual overburden thresholds and warning tooltips.
-     - Comparative hover tooltips: side-by-side inspection comparing hovered gear with currently equipped slot, displaying clean colored stat deltas (+4 Armor, -2 Focus).
- [ ] Character Sheet (`C`) Deepening:
-     - Revamped layout showing core attributes (Might, Focus, Agility, Vitality) with uncommitted +/- point allocation preview.
-     - Detailed derived combat stats panel: physical armor mitigation %, spell damage multiplier, critical strike chance & multiplier, effective movement speed, and health/mana regeneration rates.
+ [x] Tabbed Character Chronicle (`client/systems/ui/containers/UICharacter.js`):
+     - Tabbed architecture with dedicated sub-views: `STATS` (Might, Agility, Vitality, Focus with uncommitted [+] attribute point allocation), `OFFENSE` (realistic DPS calculation, attack speed in APS, critical strike chance & damage, spell power bonuses), and `DEFENSE` (Total Armor rating, physical damage mitigation %, Max HP/MP, health regeneration, movement velocity, and full 7-element resistance breakdown).
+ [x] Diablo III Comparative Tooltip Engine (`client/systems/ui/containers/UITooltip.js`):
+     - Side-by-side inspection cards: `[CURRENTLY EQUIPPED]` pinned to the left, `[INSPECTED ITEM]` on the right, dynamically clamping within safe-zone viewport bounds.
+     - Unified card height matching, rarity border headers, prominent damage/armor summary boxes, full stat affix listing with green/red/grey diff indicators, and intelligent dual-ring socket evaluations.
+ [x] Unified StatEngine Single Source of Truth (`shared/StatEngine.js`):
+     - Centralized engine calculating all derived player vitals, base stats, primary attributes, secondary bonuses (Might -> Damage/Health, Agility -> Crit/Armor/Dodge, Vitality -> Max HP/Armor/Regen, Focus -> Mana/Spell Power/Magic Res).
+     - Authoritative differential gear simulation (`simulateEquipDiff`, `simulateDualRingDiff`), extensible damage types (`PHYSICAL`, `FIRE`, `COLD`, `LIGHTNING`, `POISON`, `ARCANE`, `HOLY`, `SHADOW`), and non-linear diminishing return curves ($R = \frac{\text{Stat}}{\text{Stat} + 50}$) ensuring 100% mathematical parity between tooltip deltas and character sheet tabs.
+ [ ] In-Game Canvas Pause Menu (`UIPauseMenu.js`):
+     - Canvas-native esc/pause overlay replacing legacy DOM modal: Resume, Settings (SFX/Music sliders, fullscreen toggle, CRT shader toggle), Return to Camp, Disconnect/Quit.
+ [ ] Canvas Defeat / Death Modal (`UIDeathModal.js`):
+     - Canvas-native respawn/spectate dialog for Classic (XP penalty recap + respawn button) and Hardcore (Permadeath fallen epitaph, killer name, final floor reached).
+ [ ] Canvas Action Belt & Skill HUD Polish:
+     - Migrate remaining in-game HUD elements (Action Belt slots 1-4, potion counters, XP bar, skill hotkeys) from DOM into canvas-native components aligned with `UIOrbs.js`.
  [ ] Itemization Deepening (Consumables, Stacking & Socketing):
      - Consumable stack architecture: Health/Mana potions, Town Portal scrolls, and Antidotes supporting `{ stackable: true, count: 5, maxStack: 20 }` in player bags.
      - Socketable Gem/Rune System: Weapons and armor rolling 1–2 sockets accepting chipped gems (Ruby = flat HP, Sapphire = MP/Spell, Topaz = MF/Crit) for early crafting depth.
@@ -160,3 +185,25 @@ Phase 5: Narrative Pass, Combat Juice, Binary Asset Packing & PWA Polish
  [ ] Combat feel pass: hit-stop frames, directional screen shake, and enhanced crit/overkill typography on highResCanvas.
  [ ] Production Asset Packing: compile finalized sprite sheets & synthesized sound patch data from authoring JSON into compact binary packfiles (or SQLite asset DB) for minimal single-fetch loading, while retaining JSON mod overrides.
  [ ] PWA manifest.json, service worker caching, and offline solo-play fallback mode.
+
+Phase 6: SC-32 Virtual Computing System & Dual-Platform Migration (Rust Native + Web Parity)
+ [x] Phase 6.1 — Workspace & Platform Architecture Separation:
+     - Cargo workspace established (`crates/sanctum-core`, `crates/sanctum-vdp`, `crates/sanctum-apu`, `crates/sanctum-scart`, `crates/sanctum-input`).
+     - Master specification finalized (`Plans/SC32_COMPLETE_SPECIFICATION.md`, Revision 1.0 Frozen Platform Baseline).
+ [ ] Phase 6.2 — Native CORE & Embedded QuickJS-NG Runtime:
+     - Embedded QuickJS-NG (ES2020+) runtime in `crates/sanctum-core` with dual-rate scheduler (15 Hz fixed simulation tick / 60+ Hz presentation tick).
+     - Sandboxed `"sanctum:engine"` FFI bridge and shared memory zero-copy array buffers.
+ [ ] Phase 6.3 — Managed Server Supervisor:
+     - Native Node.js background process supervisor with stdio IPC handshake and loopback WebSocket transport for seamless single-player and co-op hosting.
+ [ ] Phase 6.4 — VDP 3-Plane Graphics Compositor & SANCTUM-48 Engine:
+     - 3-plane compositor in `crates/sanctum-vdp`: Plane 1 (240×144 indexed world), Plane 2 (24×24 entity stamps), Plane 3 (HiRes UI overlays).
+     - 7,776-entry LUT palette remapper, 4×4 Bayer dither, and hardware WGPU surface presentation.
+ [ ] Phase 6.5 — APU 8-Voice Lanthorn-PSG & Input:
+     - 8-voice Lanthorn-PSG native synthesizer in `crates/sanctum-apu` with dual oscillators, ADSR, pitch sweeps, and stereo buffer mixing.
+     - Input subsystem in `crates/sanctum-input`: `gilrs` gamepad abstraction, keyboard mapping, and dual-coordinate mouse hit-testing (Plane 1 tile coords vs. Plane 3 HiRes UI coords).
+ [ ] Phase 6.6 — `.scart` v1.0 Cartridge Packager:
+     - Standalone `scart-pack` CLI utility to compile scripts, sprites (`sprites.json`), sound patches (`sfx.json`), and music into single-file binary `.scart` cartridges with LZ4 compression.
+ [ ] Phase 6.7 — Native Desktop Packaging & Storefront Distribution:
+     - Multi-platform targets: Windows (`.exe` portable/installer), Linux (AppImage / Steam Runtime), macOS Universal Binary.
+     - Modular platform backend: `PlatformStandalone` (100% DRM-free offline), `PlatformSteam` (Steamworks overlay, cloud saves, achievements), and `PlatformGOG`.
+     - Continuous verification of first-class Web Edition parity.

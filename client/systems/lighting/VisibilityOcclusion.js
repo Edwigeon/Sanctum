@@ -190,3 +190,4 @@ export function computeVisibility(state, sx, sy, tx, ty, segs = state.wallSegmen
 
   return wallSurfaceFade * objVis;
 }
+
