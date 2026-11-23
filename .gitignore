@@ -10,3 +10,4 @@ backups/
 config/initial-moderator.json
 .env
 .env.*
+target/
